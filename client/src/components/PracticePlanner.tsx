@@ -1,4 +1,14 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+
+// Helper: safely parse focusAreas which may come from DB as JSON string or array
+function parseFocusAreas(val: unknown): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val as string[];
+  if (typeof val === "string") {
+    try { const p = JSON.parse(val); return Array.isArray(p) ? p : []; } catch { return []; }
+  }
+  return [];
+}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -284,7 +294,7 @@ function PlanCard({ plan, onView, onEdit, onStartSession, onDuplicate, onDelete,
   onToggleShare: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const focusAreas = (plan.focusAreas as string[] | null) || [];
+  const focusAreas = parseFocusAreas(plan.focusAreas);
   const statusColors: Record<string, string> = {
     draft: "bg-gray-500/20 text-gray-400 border-gray-500/30",
     scheduled: "bg-[#DC143C]/20 text-[#E8425A] border-[#DC143C]/30",
@@ -426,7 +436,7 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
     </div>
   );
 
-  const focusAreas = (plan.focusAreas as string[] | null) || [];
+  const focusAreas = parseFocusAreas(plan.focusAreas);
   const blocks = plan.blocks || [];
   let runningTime = 0;
 
@@ -979,7 +989,7 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
       setSelectedAthlete(existingPlan.athleteId ? String(existingPlan.athleteId) : "none");
       setSessionDate(existingPlan.sessionDate ? new Date(existingPlan.sessionDate).toISOString().slice(0, 16) : "");
       setStatus(existingPlan.status as any);
-      setFocusAreas((existingPlan.focusAreas as string[]) || []);
+      setFocusAreas(parseFocusAreas(existingPlan.focusAreas));
       setSessionNotes(existingPlan.sessionNotes || "");
       setBlocks(
         existingPlan.blocks.map((b: any) => ({
@@ -1567,7 +1577,7 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
           ) : (
             <div className="space-y-2">
               {selectedPlans.map((plan: any) => {
-                const focusAreas = (plan.focusAreas as string[] | null) || [];
+                const focusAreas = parseFocusAreas(plan.focusAreas);
                 return (
                   <div
                     key={plan.id}
