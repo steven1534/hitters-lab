@@ -20,7 +20,7 @@ const SiteContentContext = createContext<SiteContentContextValue>({
 
 export function SiteContentProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const canEdit = user?.role === "admin" || user?.role === "coach";
+  const canEdit = false; // Inline editing disabled
 
   // Local cache: key → overridden value
   const [overrides, setOverrides] = useState<Record<string, string>>({});
