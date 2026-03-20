@@ -87,6 +87,18 @@ export default function Home() {
     return map;
   }, [drillCustomizations]);
 
+  // Fetch all drill videos to use YouTube thumbnails on first load
+  const { data: allVideos = [] } = trpc.drillVideos.getAllVideos.useQuery();
+  const videosMap = useMemo(() => {
+    const map = new Map<string, string>();
+    allVideos.forEach((v: any) => {
+      // Extract YouTube video ID from embed URL and build thumbnail URL
+      const match = v.videoUrl?.match(/embed\/([a-zA-Z0-9_-]+)/);
+      if (match) map.set(v.drillId, `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`);
+    });
+    return map;
+  }, [allVideos]);
+
   // Set SEO-friendly document title (30-60 characters)
   useEffect(() => {
     document.title = "Baseball Training Drills | Coach Steve's Library";
@@ -411,7 +423,8 @@ export default function Home() {
               const imageSource = customization?.thumbnailUrl 
                 || (customization?.imageBase64 && customization?.imageMimeType
                   ? `data:${customization.imageMimeType};base64,${customization.imageBase64}`
-                  : null);
+                  : null)
+                || videosMap.get(drill.id)  // YouTube thumbnail from video data (loads instantly)
               const diffConfig = DIFFICULTY_CONFIG[displayDifficulty] || DIFFICULTY_CONFIG.Easy;
 
               // Build drill detail URL preserving current query params
@@ -447,18 +460,11 @@ export default function Home() {
                     <div className="glass-card rounded-xl overflow-hidden drill-card-hover cursor-pointer h-full flex flex-col">
                       {/* Card Image */}
                       <div className="relative h-44 bg-gradient-to-br from-card to-accent overflow-hidden">
-                        {imageSource ? (
+                        {imageSource && (
                           <img 
                             src={imageSource}
                             alt={drill.name}
                             className="w-full h-full object-cover opacity-90 group-hover:scale-108 transition-transform duration-700 ease-out"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                          />
-                        ) : (
-                          <img 
-                            src={`/images/drills/${drill.id.toLowerCase().replace(/[^a-z0-9]/g, '-')}.jpg`}
-                            alt={drill.name}
-                            className="w-full h-full object-cover opacity-75 group-hover:scale-108 transition-transform duration-700 ease-out"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
                         )}
