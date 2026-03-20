@@ -1,4 +1,4 @@
-import { eq, and, or, isNull, inArray, desc, lte, gte, sql } from "drizzle-orm";
+import { eq, and, or, ne, isNull, inArray, desc, lte, gte, sql } from "drizzle-orm";
 import { drillAssignments, assignmentProgress, InsertDrillAssignment, InsertAssignmentProgress, users, notifications, invites } from "../drizzle/schema";
 import { getDb } from "./db";
 import { sendDrillAssignmentEmail } from "./email";
@@ -202,11 +202,15 @@ export async function getAthleteAssignmentOverview() {
     throw new Error("Database not available");
   }
 
-  // Get all athletes (users with role 'athlete' or active clients)
+  // Get all athletes (users with role 'athlete' or active clients) — exclude parents and admins
   const allAthletes = await db.select().from(users).where(
-    or(
-      eq(users.role, 'athlete'),
-      eq(users.isActiveClient, 1)
+    and(
+      or(
+        eq(users.role, 'athlete'),
+        eq(users.isActiveClient, 1)
+      ),
+      ne(users.role, 'parent'),
+      ne(users.role, 'admin')
     )
   );
 
