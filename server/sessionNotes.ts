@@ -28,8 +28,8 @@ export async function createSessionNote(data: InsertSessionNote) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(sessionNotes).values(data);
-  const insertId = result[0].insertId;
+  const result = await db.insert(sessionNotes).values(data).returning({ id: sessionNotes.id });
+  const insertId = result[0].id;
   return getSessionNoteById(insertId);
 }
 
@@ -165,8 +165,8 @@ export async function createProgressReport(data: InsertProgressReport) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(progressReports).values(data);
-  const insertId = result[0].insertId;
+  const result = await db.insert(progressReports).values(data).returning({ id: progressReports.id });
+  const insertId = result[0].id;
   return getProgressReportById(insertId);
 }
 

@@ -528,8 +528,8 @@ export async function addCoachNote(data: {
     meetingDate: data.meetingDate,
   };
 
-  const result = await db.insert(coachNotes).values(noteData);
-  return { success: true, id: result[0].insertId };
+  const result = await db.insert(coachNotes).values(noteData).returning({ id: coachNotes.id });
+  return { success: true, id: result[0].id };
 }
 
 /**
@@ -609,8 +609,8 @@ export async function createWeeklyGoal(data: {
     notes: data.notes || null,
   };
 
-  const result = await db.insert(weeklyGoals).values(goalData);
-  return { success: true, id: result[0].insertId };
+  const result = await db.insert(weeklyGoals).values(goalData).returning({ id: weeklyGoals.id });
+  return { success: true, id: result[0].id };
 }
 
 /**
