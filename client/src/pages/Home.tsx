@@ -31,7 +31,7 @@ const DIFFICULTY_CONFIG: Record<string, { label: string; class: string; dotClass
 };
 
 // Category config with icons
-const CATEGORIES = ["All", "Hitting", "Bunting", "Pitching", "Infield", "Outfield", "Catching", "Base Running"];
+const CATEGORIES = ["All", "Hitting", "Bunting", "Pitching", "Infield", "Outfield"];
 
 /**
  * Save scroll position to sessionStorage keyed by the current query string.
