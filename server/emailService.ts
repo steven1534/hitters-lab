@@ -1,7 +1,8 @@
 import { Resend } from "resend";
 import { ENV } from "./_core/env";
 
-const resend = new Resend(ENV.resendApiKey);
+let _resendSvc: any = null;
+function getResend() { if (!_resendSvc) { _resendSvc = new Resend(ENV.resendApiKey || "placeholder_not_configured"); } return _resendSvc; }
 
 export async function sendStreakReminderEmail(
   athleteEmail: string,
@@ -9,7 +10,7 @@ export async function sendStreakReminderEmail(
   streakDays: number
 ): Promise<boolean> {
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: "USA Baseball Drills <noreply@manus.space>",
       to: athleteEmail,
       subject: `🔥 Keep your ${streakDays}-day streak alive!`,

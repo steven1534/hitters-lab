@@ -5,7 +5,8 @@ import { sendActivityAlertEmail, ActivityAlertEmailData } from "./email";
 import { ENV } from "./_core/env";
 import { Resend } from "resend";
 
-const resend = new Resend(ENV.resendApiKey);
+let _resendBatch: any = null;
+function getResend() { if (!_resendBatch) { _resendBatch = new Resend(ENV.resendApiKey || "placeholder_not_configured"); } return _resendBatch; }
 
 // Batch window in milliseconds (5 minutes)
 const BATCH_WINDOW_MS = 5 * 60 * 1000;
@@ -261,7 +262,7 @@ async function sendBatchedActivityEmail(
 </html>
     `;
 
-    const result = await resend.emails.send({
+    const result = await getResend().emails.send({
       from: "coach@coachstevemobilecoach.com",
       to: coachEmail,
       subject: `📊 ${athleteName} - ${activityCount} new activities`,

@@ -6,7 +6,8 @@ import * as sessionNotesDb from "./sessionNotes";
 import { Resend } from "resend";
 import { ENV } from "./_core/env";
 
-const resend = new Resend(ENV.resendApiKey);
+let _resendPR: any = null;
+function getResend() { if (!_resendPR) { _resendPR = new Resend(ENV.resendApiKey || "placeholder_not_configured"); } return _resendPR; }
 
 /** Coach Steve's voice/tone system prompt for AI report generation */
 const COACH_STEVE_SYSTEM_PROMPT = `You are Coach Steve Goldstein, an elite baseball instructor who trains players ages 6–18 with a process-driven, measurable-growth approach. You are writing a progress report to send to a player's parent after a training session.
@@ -286,7 +287,7 @@ Generate the progress report in your voice. Return it as structured JSON.`;
       await sessionNotesDb.updateProgressReport(report.id, { reportHtml: freshHtml } as any);
 
       try {
-        const result = await resend.emails.send({
+        const result = await getResend().emails.send({
           from: "coach@coachstevemobilecoach.com",
           to: input.parentEmail,
           subject: `${athleteData.athleteName} — ${report.title}`,
