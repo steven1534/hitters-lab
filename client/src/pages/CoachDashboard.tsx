@@ -49,7 +49,7 @@ export default function CoachDashboard() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [searchDrill, setSearchDrill] = useState("");
   const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "video-analysis" | "blast-metrics">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "blast-metrics">("overview");
   const [editingLayoutDrill, setEditingLayoutDrill] = useState<{ id: string; name: string } | null>(null);
   const [layoutSearchQuery, setLayoutSearchQuery] = useState("");
   const [isBulkGoalOpen, setIsBulkGoalOpen] = useState(false);
@@ -300,7 +300,6 @@ export default function CoachDashboard() {
                 { key: "athletes" as const, label: "Athletes Table", shortLabel: "Athletes", icon: Table2 },
                 { key: "planner" as const, label: "Practice Planner", shortLabel: "Planner", icon: Target },
                 { key: "session-notes" as const, label: "Session Notes", shortLabel: "Notes", icon: FileText },
-                { key: "video-analysis" as const, label: "Video Analysis", shortLabel: "AI Video", icon: Sparkles },
                 { key: "blast-metrics" as const, label: "Blast Metrics", shortLabel: "Blast", icon: Activity },
               ].map((tab) => (
                 <button
@@ -343,8 +342,6 @@ export default function CoachDashboard() {
           <PracticePlanner />
         ) : activeTab === "session-notes" ? (
           <SessionNotesTab />
-        ) : activeTab === "video-analysis" ? (
-          <VideoAnalysisTab />
         ) : activeTab === "blast-metrics" ? (
           <BlastMetricsTab />
         ) : activeTab === "page-layouts" ? (
