@@ -304,7 +304,7 @@ export function PlayerReportsTab() {
   const [view, setView] = useState<View>({ type: "select-athlete" });
   const [athleteSearch, setAthleteSearch] = useState("");
 
-  const { data: allUsers = [] } = trpc.getAllUsers.useQuery();
+  const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
   const athletes = (allUsers as any[]).filter((u: any) => u.role === "athlete");
   const utils = trpc.useUtils();
 
