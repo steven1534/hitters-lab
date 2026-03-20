@@ -23,6 +23,7 @@ import { progressReportsRouter } from "./routers-progress-reports";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
 import { videoAnalysisRouter } from "./routers-video-analysis";
 import { blastMetricsRouter } from "./routers-blast-metrics";
+import { playerReportsRouter } from "./routers-player-reports";
 import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
 import * as drillCustomizationsDb from "./drillCustomizations";
@@ -476,6 +477,7 @@ export const appRouter = router({
   // AI Video Analysis router
   videoAnalysis: videoAnalysisRouter,
   blastMetrics: blastMetricsRouter,
+  playerReports: playerReportsRouter,
 
   // Q&A router
   qa: qaRouter,

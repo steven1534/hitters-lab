@@ -22,6 +22,7 @@ import { DrillPageBuilderNotion } from "@/components/DrillPageBuilderNotion";
 import { AthleteTable } from "@/components/AthleteTable";
 import PracticePlanner from "@/components/PracticePlanner";
 import { SessionNotesTab } from "@/components/SessionNotesTab";
+import { PlayerReportsTab } from "@/components/PlayerReportsTab";
 import { VideoAnalysisTab } from "@/components/VideoAnalysisTab";
 import { BlastMetricsTab } from "@/components/BlastMetricsTab";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
@@ -49,7 +50,7 @@ export default function CoachDashboard() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [searchDrill, setSearchDrill] = useState("");
   const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "video-analysis" | "blast-metrics">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics">("overview");
   const [editingLayoutDrill, setEditingLayoutDrill] = useState<{ id: string; name: string } | null>(null);
   const [layoutSearchQuery, setLayoutSearchQuery] = useState("");
   const [isBulkGoalOpen, setIsBulkGoalOpen] = useState(false);
@@ -300,6 +301,7 @@ export default function CoachDashboard() {
                 { key: "athletes" as const, label: "Athletes Table", shortLabel: "Athletes", icon: Table2 },
                 { key: "planner" as const, label: "Practice Planner", shortLabel: "Planner", icon: Target },
                 { key: "session-notes" as const, label: "Session Notes", shortLabel: "Notes", icon: FileText },
+                { key: "player-reports" as const, label: "Player Reports", shortLabel: "Reports", icon: FileText },
                 { key: "video-analysis" as const, label: "Video Analysis", shortLabel: "AI Video", icon: Sparkles },
                 { key: "blast-metrics" as const, label: "Blast Metrics", shortLabel: "Blast", icon: Activity },
               ].map((tab) => (
@@ -343,6 +345,8 @@ export default function CoachDashboard() {
           <PracticePlanner />
         ) : activeTab === "session-notes" ? (
           <SessionNotesTab />
+        ) : activeTab === "player-reports" ? (
+          <PlayerReportsTab />
         ) : activeTab === "video-analysis" ? (
           <VideoAnalysisTab />
         ) : activeTab === "blast-metrics" ? (

@@ -698,3 +698,20 @@ export const drillStatCards = pgTable("drillStatCards", {
 
 export type DrillStatCard = typeof drillStatCards.$inferSelect;
 export type InsertDrillStatCard = typeof drillStatCards.$inferInsert;
+
+// ============================================================
+// Player Reports
+// ============================================================
+export const playerReports = pgTable("playerReports", {
+  id: serial("id").primaryKey(),
+  athleteId: integer("athleteId").notNull(),
+  title: varchar("title", { length: 500 }).notNull(),
+  content: text("content").notNull().default(""),
+  reportDate: timestamp("reportDate").notNull(),
+  createdBy: integer("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type PlayerReport = typeof playerReports.$inferSelect;
+export type InsertPlayerReport = typeof playerReports.$inferInsert;
