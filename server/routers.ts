@@ -659,10 +659,7 @@ export const appRouter = router({
         await db.saveOrUpdateDrillVideo(input.drillId, input.videoUrl, ctx.user.id);
         return { success: true };
       }),
-    getAllVideos: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== 'admin') {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-      }
+    getAllVideos: publicProcedure.query(async () => {
       return await db.getAllDrillVideos();
     }),
     deleteVideo: protectedProcedure
