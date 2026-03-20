@@ -1,0 +1,103 @@
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+
+interface SiteContentContextValue {
+  get: (key: string, defaultValue?: string) => string;
+  set: (key: string, value: string) => Promise<void>;
+  reset: (key: string) => Promise<void>;
+  hasOverride: (key: string) => boolean;
+  canEdit: boolean;
+}
+
+const SiteContentContext = createContext<SiteContentContextValue>({
+  get: (_key, defaultValue = "") => defaultValue,
+  set: async () => {},
+  reset: async () => {},
+  hasOverride: () => false,
+  canEdit: false,
+});
+
+export function SiteContentProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const canEdit = user?.role === "admin" || user?.role === "coach";
+
+  // Local cache: key → overridden value
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
+
+  // Load all site content on mount
+  const { data: siteContentList } = trpc.siteContent?.getAll
+    ? trpc.siteContent.getAll.useQuery(undefined, { staleTime: 60_000 })
+    : { data: undefined };
+
+  // Merge server data into overrides on load
+  React.useEffect(() => {
+    if (siteContentList && Array.isArray(siteContentList)) {
+      const map: Record<string, string> = {};
+      for (const item of siteContentList) {
+        if (item.contentKey && item.contentValue != null) {
+          map[item.contentKey] = item.contentValue;
+        }
+      }
+      setOverrides(map);
+    }
+  }, [siteContentList]);
+
+  const setSiteContentMutation = trpc.siteContent?.set
+    ? trpc.siteContent.set.useMutation()
+    : null;
+
+  const resetSiteContentMutation = trpc.siteContent?.reset
+    ? trpc.siteContent.reset.useMutation()
+    : null;
+
+  const get = useCallback(
+    (key: string, defaultValue = "") => {
+      return overrides[key] ?? defaultValue;
+    },
+    [overrides]
+  );
+
+  const set = useCallback(
+    async (key: string, value: string) => {
+      setOverrides((prev) => ({ ...prev, [key]: value }));
+      try {
+        await setSiteContentMutation?.mutateAsync({ key, value });
+      } catch (e) {
+        console.error("Failed to persist site content:", e);
+      }
+    },
+    [setSiteContentMutation]
+  );
+
+  const reset = useCallback(
+    async (key: string) => {
+      setOverrides((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+      try {
+        await resetSiteContentMutation?.mutateAsync({ key });
+      } catch (e) {
+        console.error("Failed to reset site content:", e);
+      }
+    },
+    [resetSiteContentMutation]
+  );
+
+  const hasOverride = useCallback(
+    (key: string) => key in overrides,
+    [overrides]
+  );
+
+  return (
+    <SiteContentContext.Provider value={{ get, set, reset, hasOverride, canEdit }}>
+      {children}
+    </SiteContentContext.Provider>
+  );
+}
+
+export function useSiteContent() {
+  return useContext(SiteContentContext);
+}
