@@ -240,6 +240,15 @@ export function AthleteTable() {
   }
 
   const sendReminderMutation = trpc.drillAssignments.sendFollowUpReminder.useMutation();
+  const utils = trpc.useUtils();
+  const impersonateMutation = trpc.auth.impersonate.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+      await utils.auth.isImpersonating.invalidate();
+      window.location.href = "/athlete-portal";
+    },
+    onError: (err) => alert("Could not switch view: " + err.message),
+  });
 
   return (
     <div className="space-y-4">
@@ -504,8 +513,24 @@ export function AthleteTable() {
                             </div>
                           </div>
                           {/* Action buttons */}
+                          <div className="mt-3 flex items-center gap-2 flex-wrap">
+                            {athlete.type === "user" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1.5 text-xs border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300"
+                                disabled={impersonateMutation.isPending}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  impersonateMutation.mutate({ userId: athlete.numericId });
+                                }}
+                              >
+                                👁️ {impersonateMutation.isPending ? "Switching..." : "View As This Athlete"}
+                              </Button>
+                            )}
+                          </div>
                           {athlete.type === "user" && athlete.totalDrills > athlete.completedDrills && (
-                            <div className="mt-3 flex items-center gap-2">
+                            <div className="mt-2 flex items-center gap-2">
                               <Button
                                 variant="outline"
                                 size="sm"

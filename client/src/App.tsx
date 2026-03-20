@@ -29,6 +29,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ToastContainer } from "./components/ToastContainer";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
+import { ImpersonationBanner } from "./components/ImpersonationBanner";
 import { useEffect } from "react";
 
 // Register service worker
@@ -176,6 +177,7 @@ function App() {
           // switchable
         >
           <TooltipProvider>
+            <ImpersonationBanner />
             <Toaster />
             <ToastContainer />
             <Router />
