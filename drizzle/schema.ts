@@ -3,7 +3,7 @@ import { boolean, integer, json, text, pgEnum, pgTable, varchar, timestamp, seri
 // ============================================================
 // Enums
 // ============================================================
-export const roleEnum = pgEnum("role", ["user", "admin", "athlete", "coach"]);
+export const roleEnum = pgEnum("role", ["user", "admin", "athlete", "coach", "parent"]);
 export const assignmentStatusEnum = pgEnum("assignment_status", ["assigned", "in-progress", "completed"]);
 export const inviteRoleEnum = pgEnum("invite_role", ["user", "admin", "athlete", "coach"]);
 export const inviteStatusEnum = pgEnum("invite_status", ["pending", "accepted", "expired"]);
