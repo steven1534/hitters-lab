@@ -1,0 +1,168 @@
+/* Mobile Optimizations for Drill Submission and Feedback */
+
+/* Ensure touch targets are at least 44x44px for mobile accessibility */
+@media (max-width: 768px) {
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Optimize form inputs for mobile */
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+    padding: 12px;
+  }
+
+  /* Optimize video player for mobile */
+  video {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+  }
+
+  /* Optimize cards for mobile */
+  .card {
+    margin-bottom: 12px;
+  }
+
+  /* Optimize spacing for mobile */
+  .space-y-4 > * + * {
+    margin-top: 12px;
+  }
+
+  /* Optimize grid layout for mobile */
+  .grid {
+    gap: 12px;
+  }
+
+  /* Optimize text for mobile readability */
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Optimize badges for mobile */
+  .badge {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  /* Optimize modals for mobile */
+  .modal,
+  [role="dialog"] {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* Optimize sticky elements for mobile */
+  .sticky {
+    position: relative;
+  }
+
+  /* Optimize file input for mobile */
+  input[type="file"] {
+    cursor: pointer;
+  }
+
+  label[for="video-input"] {
+    padding: 16px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Landscape orientation optimizations */
+@media (max-width: 1024px) and (orientation: landscape) {
+  video {
+    max-height: 400px;
+  }
+
+  .sticky {
+    position: relative;
+  }
+
+  .lg\:col-span-1 {
+    grid-column: auto;
+  }
+}
+
+/* Optimize for very small screens */
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+
+  .card {
+    border-radius: 12px;
+  }
+
+  .text-lg {
+    font-size: 16px;
+  }
+
+  .text-xl {
+    font-size: 18px;
+  }
+
+  /* Stack layout for small screens */
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lg\:col-span-2,
+  .lg\:col-span-1 {
+    grid-column: 1;
+  }
+}
+
+/* Optimize for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button:active,
+  [role="button"]:active {
+    background-color: var(--color-active);
+    transform: scale(0.98);
+  }
+
+  /* Remove hover states on touch devices */
+  button:hover,
+  [role="button"]:hover {
+    background-color: inherit;
+  }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  input,
+  textarea,
+  select {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    border-color: var(--color-border);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--color-primary);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

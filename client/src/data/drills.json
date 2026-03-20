@@ -1,0 +1,959 @@
+[
+  {
+    "id": "1-2-3-drill",
+    "name": "1-2-3 Drill",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills/3310/1-2-3-drill",
+    "is_direct_link": true
+  },
+  {
+    "id": "1-2-3-rhythm-tee",
+    "name": "1-2-3 Rhythm Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=1-2-3-rhythm-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "4-corners-bunting",
+    "name": "4 Corners Bunting",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "15m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=4-corners-bunting",
+    "is_direct_link": false
+  },
+  {
+    "id": "7-ball-front-toss",
+    "name": "7 Ball Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=7-ball-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "9045even-progression-tee",
+    "name": "90/45/Even Progression Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=90-45-even-progression-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "angle-flips",
+    "name": "Angle Flips",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills/3230/angle-flips",
+    "is_direct_link": true
+  },
+  {
+    "id": "angled-force-plate-tee-back-foot",
+    "name": "Angled Force Plate Tee - Back Foot",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=angled-force-plate-tee---back-foot",
+    "is_direct_link": false
+  },
+  {
+    "id": "back-foot-cone-tee",
+    "name": "Back Foot Cone Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=back-foot-cone-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "back-hip-load-tee",
+    "name": "Back Hip Load Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=back-hip-load-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "back-net-constraint-tee",
+    "name": "Back Net Constraint Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=back-net-constraint-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "backside-angle-toss",
+    "name": "Backside Angle Toss",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=backside-angle-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "balance-beam",
+    "name": "Balance Beam",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=balance-beam",
+    "is_direct_link": false
+  },
+  {
+    "id": "ball-down-front-toss",
+    "name": "Ball Down Front Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=ball-down-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "ball-hit-front-toss",
+    "name": "Ball-Hit Front Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=ball-hit-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "bat-behind-hips",
+    "name": "Bat Behind Hips",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=bat-behind-hips",
+    "is_direct_link": false
+  },
+  {
+    "id": "behind-the-hitter-toss-1-2-3",
+    "name": "Behind the Hitter Toss 1-2-3",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=behind-the-hitter-toss-1-2-3",
+    "is_direct_link": false
+  },
+  {
+    "id": "belly-button-tee",
+    "name": "Belly Button Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=belly-button-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "bottom-hand-tee",
+    "name": "Bottom Hand Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=bottom-hand-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "change-up-front-toss",
+    "name": "Change-Up Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills/3088/change-up-front-toss",
+    "is_direct_link": true
+  },
+  {
+    "id": "change-up-tee",
+    "name": "Change-Up Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=change-up-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "color-front-toss",
+    "name": "Color Front Toss",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills/3224/color-front-toss",
+    "is_direct_link": true
+  },
+  {
+    "id": "decline-swings",
+    "name": "Decline Swings",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=decline-swings",
+    "is_direct_link": false
+  },
+  {
+    "id": "defense-stance",
+    "name": "Defense Stance",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "1m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=defense-stance",
+    "is_direct_link": false
+  },
+  {
+    "id": "double-ball-toss",
+    "name": "Double Ball Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=double-ball-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "double-tee",
+    "name": "Double Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills/3305/double-tee",
+    "is_direct_link": true
+  },
+  {
+    "id": "double-tee-decision-making",
+    "name": "Double Tee Decision Making",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=double-tee-decision-making",
+    "is_direct_link": false
+  },
+  {
+    "id": "extended-tee",
+    "name": "Extended Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=extended-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "fastball-front-toss",
+    "name": "Fastball Front Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=fastball-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-casting-the-hands-outside-of-the-ball",
+    "name": "Flaw- Casting the Hands Outside of the Ball",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--casting-the-hands-outside-of-the-ball",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-chopping-at-the-ball",
+    "name": "Flaw- Chopping at the Ball",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--chopping-at-the-ball",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-collapsing-the-backside",
+    "name": "Flaw- Collapsing the Backside",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--collapsing-the-backside",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-contact-point-too-far-out-front",
+    "name": "Flaw- Contact Point too Far Out Front",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--contact-point-too-far-out-front",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-hands-dropping-too-low",
+    "name": "Flaw- Hands Dropping too Low",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--hands-dropping-too-low",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-improper-stance",
+    "name": "Flaw- Improper Stance",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--improper-stance",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-lack-of-separation",
+    "name": "Flaw- Lack of Separation",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--lack-of-separation",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-loop-in-the-barrel",
+    "name": "Flaw- Loop in the Barrel",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--loop-in-the-barrel",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-lunging-to-the-ball",
+    "name": "Flaw- Lunging to the Ball",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--lunging-to-the-ball",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-no-lower-half",
+    "name": "Flaw- No Lower Half",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--no-lower-half",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-soft-front-knee",
+    "name": "Flaw- Soft Front Knee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--soft-front-knee",
+    "is_direct_link": false
+  },
+  {
+    "id": "flaw-stepping-in-the-bucket",
+    "name": "Flaw- Stepping in the Bucket",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "Unknown",
+    "url": "https://usabdevelops.com/page/1363/drills?q=flaw--stepping-in-the-bucket",
+    "is_direct_link": false
+  },
+  {
+    "id": "follow-through-swing",
+    "name": "Follow Through Swing",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=follow-through-swing",
+    "is_direct_link": false
+  },
+  {
+    "id": "front-hip-toss",
+    "name": "Front Hip Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills/17078/front-hip-toss",
+    "is_direct_link": true
+  },
+  {
+    "id": "fungo-for-hitters",
+    "name": "Fungo For Hitters",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=fungo-for-hitters",
+    "is_direct_link": false
+  },
+  {
+    "id": "half-swing-drill",
+    "name": "Half Swing Drill",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=half-swing-drill",
+    "is_direct_link": false
+  },
+  {
+    "id": "high-tee",
+    "name": "High Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=high-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "hip-loading-balance-disc-tee",
+    "name": "Hip Loading Balance Disc Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=hip-loading-balance-disc-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "hit-and-run",
+    "name": "Hit and Run",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=hit-and-run",
+    "is_direct_link": false
+  },
+  {
+    "id": "insideoutside-tee",
+    "name": "Inside/Outside Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=inside-outside-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "knee-to-knee-tee",
+    "name": "Knee to Knee Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=knee-to-knee-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "knob-inside-the-ball-toss",
+    "name": "Knob Inside the Ball Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=knob-inside-the-ball-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "location-tee",
+    "name": "Location Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=location-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "long-tee",
+    "name": "Long Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=long-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "low-tee",
+    "name": "Low Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=low-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "low-tee-mini-bat",
+    "name": "Low Tee Mini Bat",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=low-tee-mini-bat",
+    "is_direct_link": false
+  },
+  {
+    "id": "no-stride-tee",
+    "name": "No Stride Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=no-stride-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "off-speed-front-toss",
+    "name": "Off-Speed Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=off-speed-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "one-handed-hitting",
+    "name": "One-Handed Hitting",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "15m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=one-handed-hitting",
+    "is_direct_link": false
+  },
+  {
+    "id": "outside-angle-toss",
+    "name": "Outside Angle Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=outside-angle-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "outside-tee",
+    "name": "Outside Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=outside-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "overload-bat-soft-toss",
+    "name": "Overload Bat Soft Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=overload-bat-soft-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "random-front-toss",
+    "name": "Random Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=random-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "rapid-fire-toss",
+    "name": "Rapid Fire Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=rapid-fire-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "reverse-stride",
+    "name": "Reverse Stride",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=reverse-stride",
+    "is_direct_link": false
+  },
+  {
+    "id": "rhythm-tee",
+    "name": "Rhythm Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=rhythm-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "scissor-tee-and-soft-toss",
+    "name": "Scissor Tee and Soft Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=scissor-tee-and-soft-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "separation-progression-tee",
+    "name": "Separation Progression Tee",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=separation-progression-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "short-bat-bottom-hand-front-toss",
+    "name": "Short Bat Bottom Hand Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=short-bat-bottom-hand-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "short-bat-bottom-hand-tee",
+    "name": "Short Bat Bottom Hand Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=short-bat-bottom-hand-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "short-bat-top-hand-front-toss",
+    "name": "Short Bat Top Hand Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=short-bat-top-hand-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "short-bat-top-hand-tee",
+    "name": "Short Bat Top Hand Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=short-bat-top-hand-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "side-toss",
+    "name": "Side Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=side-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "soft-toss",
+    "name": "Soft Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=soft-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "stance-distance-check",
+    "name": "Stance Distance Check",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "1m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=stance-distance-check",
+    "is_direct_link": false
+  },
+  {
+    "id": "target-tee",
+    "name": "Target Tee",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=target-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "tees-with-timing",
+    "name": "Tees with Timing",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=tees-with-timing",
+    "is_direct_link": false
+  },
+  {
+    "id": "three-plate-front-toss",
+    "name": "Three-Plate Front Toss",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=three-plate-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "throw-the-bat",
+    "name": "Throw the Bat",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=throw-the-bat",
+    "is_direct_link": false
+  },
+  {
+    "id": "tight-tee",
+    "name": "Tight Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=tight-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "top-drop-drill",
+    "name": "Top Drop Drill",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=top-drop-drill",
+    "is_direct_link": false
+  },
+  {
+    "id": "top-hand-tee",
+    "name": "Top Hand Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=top-hand-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "two-ball-front-toss",
+    "name": "Two-Ball Front Toss",
+    "difficulty": "Hard",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=two-ball-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "underload-bat-soft-toss",
+    "name": "Underload Bat Soft Toss",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=underload-bat-soft-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "volleyball-between-knees",
+    "name": "Volleyball Between Knees",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=volleyball-between-knees",
+    "is_direct_link": false
+  },
+  {
+    "id": "weighted-ball-front-toss",
+    "name": "Weighted Ball Front Toss",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=weighted-ball-front-toss",
+    "is_direct_link": false
+  },
+  {
+    "id": "wrist-strength-tee",
+    "name": "Wrist Strength Tee",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "5m",
+    "url": "https://usabdevelops.com/page/1363/drills?q=wrist-strength-tee",
+    "is_direct_link": false
+  },
+  {
+    "id": "3-plate-adjustment-drill",
+    "name": "3-Plate Adjustment Drill",
+    "difficulty": "Medium",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "15m",
+    "url": "https://youtu.be/LexqSfXL8cY?si=qNEgm2hAwKpggs3K",
+    "is_direct_link": true
+  },
+  {
+    "id": "stride-separation-drill",
+    "name": "Stride & Separation Drill",
+    "difficulty": "Easy",
+    "categories": [
+      "Hitting"
+    ],
+    "duration": "10m",
+    "url": "https://youtu.be/qaEQEpmxOwE?si=1yvPaVlhoIWpHZKY",
+    "is_direct_link": true
+  }
+]

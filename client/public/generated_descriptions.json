@@ -1,0 +1,517 @@
+[
+  {
+    "drillId": "1st-base-flip-to-pitcher",
+    "drillName": "1st Base Flip to Pitcher",
+    "description": "The first baseman fields a ground ball moving away from the base as the pitcher sprints over to cover. In one fluid motion, the first baseman underhands the ball softly to the pitcher's chest, leading them to the bag. This drill focuses on the timing, accuracy, and communication required to execute this common defensive play efficiently."
+  },
+  {
+    "drillId": "1st-base-inside-receiving",
+    "drillName": "1st Base Inside Receiving",
+    "description": "The first baseman sets up on the inside of first base, creating a direct throwing lane for the infielder. As the throw approaches, the player should step towards the ball with their glove-side foot, keeping their body open to the field while keeping their other foot on the bag. The main focus is on cleanly receiving the ball on the inside part of the base to secure the out while successfully avoiding the runner."
+  },
+  {
+    "drillId": "1st-base-off-bag",
+    "drillName": "1st Base Off Bag",
+    "description": "The first baseman begins in a ready stance, positioned several steps off the bag toward second base. On a ground ball hit by a coach, the player works on fielding the ball cleanly with proper technique, focusing on footwork and glove work. After securing the ball, the player simulates a throw to another base or returns to first base, reinforcing the transition from fielder to covering the bag."
+  },
+  {
+    "drillId": "1st-base-receiving",
+    "drillName": "1st Base Receiving",
+    "description": "Set up with your heels on the front of the bag, providing a large, clear target for the infielder. As the throw comes, step towards the ball with your glove-side foot, aiming to catch it out in front of your body. Emphasize quick, efficient footwork to adjust to off-target throws and secure the catch while maintaining contact with the base."
+  },
+  {
+    "drillId": "1st-base-receiving-short-hops",
+    "drillName": "1st Base Receiving Short Hops",
+    "description": "A coach or partner throws one-hop throws to the first baseman, who is positioned at the bag. The player should focus on getting their body in front of the ball and keeping their glove low to the ground. Emphasis is placed on reading the hop, using a soft glove to absorb the ball, and keeping the ball in front of them to make the out."
+  },
+  {
+    "drillId": "2nd-baseman-backhand-flip",
+    "drillName": "2nd Baseman Backhand Flip",
+    "description": "From the ready position, the second baseman moves to their glove side to field a ground ball on their backhand. Without taking the ball out of the glove, the player uses momentum and a soft wrist action to execute a gentle underhand flip to the player covering second base. The focus is on maintaining body control and delivering an accurate, easy-to-handle toss while moving towards the target."
+  },
+  {
+    "drillId": "2nd-baseman-drop-step-throw",
+    "drillName": "2nd Baseman Drop Step Throw",
+    "description": "From the second base position, the player fields a ground ball to their glove side, away from the bag. The player will then execute a drop step with their throwing-side foot, opening their hips to create alignment and momentum toward the target. After the transfer, the player makes a strong, accurate throw, focusing on a quick release and proper follow-through."
+  },
+  {
+    "drillId": "2nd-baseman-forehand-spin",
+    "drillName": "2nd Baseman Forehand Spin",
+    "description": "The drill begins with a coach rolling a ground ball to the 2nd baseman's forehand side, forcing them to move away from the base. Upon fielding the ball, the player executes a reverse spin, turning their body completely around while securing the grip. This movement allows them to quickly realign their shoulders and feet to make a strong and accurate throw to the target base."
+  },
+  {
+    "drillId": "2nd-baseman-underhand-flip",
+    "drillName": "2nd Baseman Underhand Flip",
+    "description": "From the second base position, field a ground ball and establish a firm grip. As you approach the bag, create momentum with your lower half by stepping toward your target. Use a firm wrist and a smooth, pendulum-like arm motion to deliver an accurate underhand flip to the chest area of the player covering the base."
+  },
+  {
+    "drillId": "30-second-backhand",
+    "drillName": "30 Second Backhand",
+    "description": "A coach or partner rolls a continuous stream of ground balls to the player's backhand side for 30 seconds. The player must maintain a low, athletic stance, moving their feet to create a good fielding angle for each ball. The emphasis is on watching the ball into the glove and using a clean, one-handed scoop."
+  },
+  {
+    "drillId": "30-second-backhand-cross",
+    "drillName": "30 Second Backhand Cross",
+    "description": "From an athletic fielding position, the player will react to a series of balls rolled or tossed to their backhand side for a continuous 30-second interval. The player must execute a quick crossover step, get their body in front of the ball, and cleanly field it with a backhand technique. After securing the ball, the player should simulate a strong and accurate throw to first base."
+  },
+  {
+    "drillId": "30-second-crow-hops",
+    "drillName": "30 Second Crow Hops",
+    "description": "From a ready athletic position, an infielder will receive a ground ball or a feed from a coach and immediately execute a crow hop to simulate a long throw across the diamond. The player should focus on gaining ground toward their target with a quick, explosive hop, ensuring their feet are aligned upon landing to facilitate a powerful and accurate throw. This drill emphasizes rapid footwork and maintaining momentum through the throwing motion in a continuous, timed sequence."
+  },
+  {
+    "drillId": "30-second-grounders",
+    "drillName": "30 Second Grounders",
+    "description": "A coach or partner hits a continuous series of ground balls to a fielder for 30 seconds without stopping. The fielder must maintain a low, athletic fielding posture, focusing on watching the ball into the glove and using quick feet to get in front of each grounder. After fielding, the player should practice a quick, clean exchange to the throwing hand before discarding the ball and preparing for the next repetition."
+  },
+  {
+    "drillId": "30-second-quick-toss",
+    "drillName": "30 Second Quick Toss",
+    "description": "Two players stand approximately 10-15 feet apart in an athletic stance. Using one ball, they engage in a rapid-fire game of catch for 30 seconds, focusing on a quick, clean exchange from glove to throwing hand. The goal is to make as many accurate throws as possible to the partner's chest within the time limit, maintaining proper footwork and a consistent release point."
+  },
+  {
+    "drillId": "30-second-short-hops",
+    "drillName": "30 Second Short Hops",
+    "description": "A coach or partner kneels 10-15 feet away and throws a continuous series of short hops to a player in a ready fielding position for 30 seconds. The player should focus on keeping their glove out front, reading the bounce quickly, and using soft hands to absorb the ball. This drill emphasizes quick reactions and proper fielding mechanics under pressure."
+  },
+  {
+    "drillId": "arm-path-drill",
+    "drillName": "Arm Path Drill",
+    "description": "Begin in a balanced pitching stance with the ball in your glove at your chest. Break your hands and simulate your throwing motion in slow motion, focusing on a consistent and efficient arm path. Concentrate on achieving a proper 'scap load' position before moving through a fluid, circular motion to a high release point, building muscle memory for a smooth delivery."
+  },
+  {
+    "drillId": "arm-speed",
+    "drillName": "Arm Speed",
+    "description": "From a standing or kneeling position, the pitcher performs rapid, controlled arm circles both forward and backward, focusing on a loose and fluid motion. The emphasis is on moving the arm as quickly as possible without tension, using a towel or a light training ball to ensure the focus remains on speed rather than force. This drill isolates the arm action to build neuromuscular speed and endurance."
+  },
+  {
+    "drillId": "backhand-cross-and-throw",
+    "drillName": "Backhand Cross and Throw",
+    "description": "An infielder starts in a ready position and moves to their backhand side to field a ground ball. After securing the ball, they use a quick crossover step with their throwing-side foot to open their hips and shoulders toward the target. The drill finishes with a strong, accurate throw to first base, emphasizing a fluid transition from fielding to throwing."
+  },
+  {
+    "drillId": "backhand-pick-stick-fungo",
+    "drillName": "Backhand Pick & Stick Fungo",
+    "description": "An infielder sets up in a ready position as a coach hits a medium-paced fungo ground ball to their backhand side. The player must move their feet to get into a proper fielding position, extend their glove across their body to receive the ball, and secure it cleanly. Upon receiving the ball, the player should 'stick' the position for a moment, demonstrating balance and control through the backhand fielding motion."
+  },
+  {
+    "drillId": "backhand-rake-fungo",
+    "drillName": "Backhand Rake Fungo",
+    "description": "An infielder begins in a ready stance and breaks to their backhand side to field a ground ball from a fungo bat. The player should focus on taking an aggressive angle to get around the ball, staying low while sweeping the glove across the ground in a \"raking\" motion to secure the ball. This drill emphasizes fluid footwork and maintaining momentum through the play to make a strong throw."
+  },
+  {
+    "drillId": "balance-drill",
+    "drillName": "Balance Drill",
+    "description": "From the stretch position, the pitcher will come set, lift their lead leg to a balanced position, and hold for a count of three to five seconds before returning to the set position. The focus is on maintaining a stable head and a controlled posture over the landing leg without wobbling. This drill should be repeated multiple times to build muscle memory and core stability."
+  },
+  {
+    "drillId": "balance-pause-drill",
+    "drillName": "Balance Pause Drill",
+    "description": "Start on the pitching rubber with a slight weight bias on your drive leg. Lift your lead leg to your balance point, pausing for a full three to five seconds to ensure your posture is stable and your head is centered over your back leg. If you lose balance, reset and repeat the hold, focusing on a strong core and a controlled, deliberate motion before proceeding with your throw."
+  },
+  {
+    "drillId": "balanced-stationary-drill",
+    "drillName": "Balanced Stationary Drill",
+    "description": "Begin in a balanced, athletic stance with your glove-side shoulder aimed at your target, mimicking your landing position. Your throwing-side foot is anchored behind you as if on the pitching rubber. Execute the throw by focusing on upper body mechanics, emphasizing core engagement and full extension through the release, all while keeping your back foot firmly planted to maintain balance."
+  },
+  {
+    "drillId": "balanced-stationary-drill-with-upper-body",
+    "drillName": "Balanced Stationary Drill with Upper Body",
+    "description": "Begin in a balanced, athletic stance with your feet shoulder-width apart, simulating the 'set' position. Without moving your lower body, isolate your upper half and execute your full pitching motion, focusing on arm path and shoulder rotation. Concentrate on maintaining a stable core and a consistent release point throughout the movement."
+  },
+  {
+    "drillId": "ball-in-hand",
+    "drillName": "Ball in Hand",
+    "description": "Begin in a standard infield athletic position with a baseball already secured in your glove. On a coach's signal, simulate the process of fielding a ground ball by transitioning the ball from your glove to your throwing hand as you shuffle your feet toward the target. This drill removes the variable of fielding a live ball, allowing the player to concentrate solely on a clean exchange and proper footwork alignment before the throw."
+  },
+  {
+    "drillId": "ball-in-the-sun",
+    "drillName": "Ball in the Sun",
+    "description": "The drill starts with an outfielder positioned in their ready stance as a coach throws a high fly ball directly into the sun's path. The player must track the ball while using their glove to shield their eyes from the glare, timing the catch perfectly without losing sight of the ball. This exercise simulates the challenge of making a play when the sun is a major visual obstruction, forcing the player to rely on technique and feel."
+  },
+  {
+    "drillId": "box-drill-2nd-baseman-double-play-feeds",
+    "drillName": "Box Drill- 2nd Baseman Double Play Feeds",
+    "description": "Set up four cones in a square to create a 'box' around the second base position. The player starts in the center of the box, and on a ground ball rolled from a coach, they will break to the ball, field it cleanly, and execute a quick, accurate feed to the shortstop covering the bag. This drill emphasizes efficient footwork and creating proper angles to the bag to ensure a smooth double play turn."
+  },
+  {
+    "drillId": "box-drill-shortstop-double-play-feeds",
+    "drillName": "Box Drill- Shortstop Double Play Feeds",
+    "description": "Set up a square box of cones around the shortstop position to create a confined space for movement. On a ground ball from a coach, the shortstop fields the ball and executes a fundamentally sound feed to a partner at second base, focusing on a quick transfer and proper footwork within the box. The drill should incorporate feeds from different angles, including underhand tosses and backhand flips, to simulate various game situations."
+  },
+  {
+    "drillId": "break-down-and-come-through",
+    "drillName": "Break Down and Come Through",
+    "description": "An outfielder approaches a ground ball, chopping their feet to get into a controlled 'break down' position with their glove-side foot forward. As they receive the ball, they 'come through' it, securing the catch out in front and transitioning their feet and body into a powerful and aligned throwing position. This drill emphasizes fielding the ball cleanly and preparing for a quick, accurate throw."
+  },
+  {
+    "drillId": "break-of-the-hands-drill",
+    "drillName": "Break of the Hands Drill",
+    "description": "Begin in a standard pitching stance, coming to a balanced position. As you initiate your motion, concentrate on a clean and efficient separation of your hands. The throwing hand should move down, back, and up in a fluid arc, while the glove hand provides balance and direction toward the target. This exercise isolates the critical 'hand break' to build muscle memory for a consistent arm action."
+  },
+  {
+    "drillId": "chair-drill",
+    "drillName": "Chair Drill",
+    "description": "Sit on the edge of a sturdy chair or stool with your feet in your pitching stance, simulating your position on the mound. Drive up from the chair as you begin your throwing motion, focusing on using your legs and glutes to generate power. Explode out of the seated position, ensuring your hips and shoulders rotate in sequence toward the target. This drill isolates the lower half, forcing the pitcher to engage their leg muscles for momentum rather than relying solely on their arm."
+  },
+  {
+    "drillId": "change-up-catch",
+    "drillName": "Change-Up Catch",
+    "description": "The catcher sets up in their standard receiving position while the pitcher throws exclusively change-ups. The catcher must focus on tracking the pitch out of the hand, recognizing the reduced velocity, and staying balanced to receive the ball cleanly in the pocket of the mitt. This drill emphasizes patience and a soft glove hand to avoid stabbing at the slower pitch."
+  },
+  {
+    "drillId": "change-up-grips",
+    "drillName": "Change-Up Grips",
+    "description": "This drill focuses on finding a comfortable and effective change-up grip. Experiment with various grips like the circle change, three-finger, or vulcan change, focusing on how each feels in your hand and upon release. The key is to maintain your natural arm speed and slot, allowing the grip itself to reduce the pitch's velocity and create deception."
+  },
+  {
+    "drillId": "crow-hops",
+    "drillName": "Crow Hops",
+    "description": "After fielding the ball, an outfielder takes a small, athletic hop forward, landing on their throwing-side foot while bringing their glove-side foot forward. This explosive step helps to align the body toward the target and generate momentum through the lower half. The player then transfers this energy into a powerful and accurate throw, ensuring the ball reaches its destination with velocity."
+  },
+  {
+    "drillId": "daily-band-work",
+    "drillName": "Daily Band Work",
+    "description": "Secure an exercise band to a stable object at hip height, then perform a series of internal and external rotations with your throwing arm to stretch and strengthen the shoulder. The routine includes a variety of movements at different heights to ensure a comprehensive warm-up. This drill is designed to prepare the arm for the demands of pitching through a dynamic warm-up."
+  },
+  {
+    "drillId": "daily-flat-ground-work",
+    "drillName": "Daily Flat Ground Work",
+    "description": "From a flat ground position, the pitcher will throw to a catcher at a reduced distance, focusing on clean and repeatable mechanics. The pitcher should concentrate on maintaining a stable head position, a smooth and controlled arm action, and a balanced follow-through. This drill emphasizes precision and consistency over velocity, allowing the pitcher to build a solid mechanical foundation without the strain of throwing from a mound."
+  },
+  {
+    "drillId": "daily-throwing-program",
+    "drillName": "Daily Throwing Program",
+    "description": "Begin close to your partner, focusing on a clean and efficient arm path with a full follow-through. Use a four-seam grip and concentrate on spinning the ball with backspin. As you feel loose, gradually increase the distance, ensuring your mechanics remain consistent and your lower half is engaged to support the throw."
+  },
+  {
+    "drillId": "defense-prep",
+    "drillName": "Defense Prep",
+    "description": "Begin in a low, athletic fielding stance with your glove presented out front. Have a coach or partner roll ground balls directly to you, concentrating on watching the ball into the glove and securing it with both hands. This drill emphasizes clean mechanics and prepares you for reacting to various types of ground balls."
+  },
+  {
+    "drillId": "double-play-footwork-2b-drop-step",
+    "drillName": "Double Play Footwork- 2B Drop Step",
+    "description": "From the second base position, receive a feed from the shortstop or a coach. As the ball travels, execute a drop step with your throwing-side foot, opening your hips toward the base to create a direct line for your throw. Secure the catch as you move through the bag, then make a strong, accurate throw to first base to complete the double play."
+  },
+  {
+    "drillId": "double-play-footwork-2b-rocker-step",
+    "drillName": "Double Play Footwork- 2B Rocker Step",
+    "description": "As the throw approaches, the second baseman should step on the corner of the base with their left foot while receiving the ball. Immediately after securing the catch, they rock back onto their right foot, creating a clear throwing lane and generating momentum. The final step is to stride with the left foot towards first base to execute a strong and accurate throw."
+  },
+  {
+    "drillId": "double-play-footwork-2b-step-across",
+    "drillName": "Double Play Footwork- 2B Step Across",
+    "description": "The second baseman starts by approaching the bag as the throw comes from the shortstop or third baseman. As the ball arrives, the player should plant their left foot on the base, then step across the bag with their right foot toward the direction of the throw to create momentum and a clear throwing lane to first base. This drill emphasizes receiving the ball in the center of the body and executing a quick, fluid transfer for a strong, accurate throw."
+  },
+  {
+    "drillId": "double-play-footwork-ss-back-cross",
+    "drillName": "Double Play Footwork- SS Back Cross",
+    "description": "The shortstop receives a feed at second base, and as they clear the bag to throw to first, their right foot crosses behind their left. This 'back cross' step helps to open the hips and align the body towards the target. The focus is on a quick, fluid transition from receiving the ball to generating powerful and accurate momentum on the throw."
+  },
+  {
+    "drillId": "double-play-footwork-ss-front-cross",
+    "drillName": "Double Play Footwork- SS Front Cross",
+    "description": "From the shortstop position, field a ground ball moving to your glove side. Instead of a traditional drop step, your throwing side foot will cross over in front of your glove side foot as you secure the ball. This 'front cross' creates a direct line and powerful momentum for a quick, accurate throw to the second base bag to initiate the double play."
+  },
+  {
+    "drillId": "double-play-footwork-ss-pop-feet",
+    "drillName": "Double Play Footwork- SS Pop Feet",
+    "description": "From the shortstop position, field a ground ball moving towards the second base bag. As you secure the ball, execute a quick 'pop' or hop with your feet, landing in a balanced position with your shoulders and hips aligned to your target. This explosive footwork allows for a rapid transfer and a powerful, accurate throw, minimizing the time it takes to turn the double play."
+  },
+  {
+    "drillId": "drag-bunt",
+    "drillName": "Drag Bunt",
+    "description": "As the pitcher starts their delivery, the batter takes a crossover step with their back foot, simultaneously opening their hips and shoulders toward the field. The bat is brought to a level position, with the top hand guiding the barrel to angle the ball down the desired baseline. The objective is to make contact with the ball out in front of the plate while already in motion, allowing the batter to get a quick start out of the box."
+  },
+  {
+    "drillId": "drop-step-cones",
+    "drillName": "Drop Step Cones",
+    "description": "Set up three cones in a triangle, with the player starting at the apex. On the coach's signal, the player executes a drop step, opening their hips and shoulders toward one of the back cones, then sprints to that cone. This drill emphasizes creating a direct line to the ball and gaining ground efficiently on balls hit over the outfielder's head."
+  },
+  {
+    "drillId": "drop-step-groundballs",
+    "drillName": "Drop Step Groundballs",
+    "description": "From an athletic fielding position, the player initiates the drill by taking a quick drop step with the foot corresponding to the direction of the groundball. This action involves opening the hips and stepping back to create a better angle to approach the ball. After the drop step, the player aggressively attacks the ball, fields it cleanly, and simulates a throw to the appropriate base."
+  },
+  {
+    "drillId": "flat-ground",
+    "drillName": "Flat Ground",
+    "description": "From a set position on a flat surface, the pitcher simulates a full throwing motion, focusing on a clean and repeatable arm action without the strain of a mound. The pitcher should concentrate on maintaining balance, achieving good extension toward the target, and finishing with a smooth, controlled follow-through. This drill emphasizes consistent mechanics over velocity, making it ideal for warm-ups and reinforcing proper form."
+  },
+  {
+    "drillId": "fly-balls",
+    "drillName": "Fly Balls",
+    "description": "From a ready athletic position, the outfielder reads the trajectory of a fly ball hit by a coach or partner. The player should take a direct route to the ball, getting their body in position to make the catch. Emphasis is placed on using proper footwork to get under the ball and securing it with two hands."
+  },
+  {
+    "drillId": "forehand-range",
+    "drillName": "Forehand Range",
+    "description": "From their ready position, the infielder reacts to a ground ball hit moderately to their forehand side, focusing on taking an efficient route to the ball. The player should work on fielding the ball outside of their body while keeping their feet moving toward the target to ensure a quick and powerful throw. This drill emphasizes creating proper angles to the ball and maintaining momentum through the play."
+  },
+  {
+    "drillId": "four-corners",
+    "drillName": "Four Corners",
+    "description": "Set up at the four corners of the infield, with players at first, second, third, and shortstop. Coaches hit a variety of hard ground balls to each player, who must field the ball cleanly and make a strong, accurate throw to the next base. The drill should include reps for routine plays, backhands, and forehands, keeping a quick pace to simulate game-like pressure."
+  },
+  {
+    "drillId": "free-play",
+    "drillName": "Free Play",
+    "description": "A coach hits or throws a variety of ground balls to infielders, who are free to move to any position. Players should focus on anticipating the ball's path, getting into a solid fielding stance, and securing the ball cleanly in their glove. After fielding, the player should make a crisp, accurate throw to a designated base, practicing fluid footwork and a quick release."
+  },
+  {
+    "drillId": "fungo-charge",
+    "drillName": "Fungo Charge",
+    "description": "From your ready position, aggressively charge the slow-rolling ground ball hit by the fungo bat. Focus on timing your approach to field the ball on a short hop or out in front of your body, often with your bare hand. Secure the grip quickly and make a strong, accurate throw to first base while still moving towards your target."
+  },
+  {
+    "drillId": "groundball-on-knees-progression",
+    "drillName": "Groundball on Knees Progression",
+    "description": "Players start on their knees, positioned 10 feet apart, or a coach can hit groundballs from 45 feet away. The focus is on keeping the glove out in front, watching the ball all the way in, and using soft hands to field the ball on a hop. This progression helps isolate the upper body and hands, forcing the player to work their glove underneath the ball."
+  },
+  {
+    "drillId": "grounders",
+    "drillName": "Grounders",
+    "description": "From a ready position, the outfielder charges a ground ball hit directly at them. The player should focus on approaching the ball under control, breaking down with their glove-side foot forward, and keeping their eyes on the ball as they field it out in front of their body. After securing the ball in their glove, they should cover it with their throwing hand to prepare for a quick transition."
+  },
+  {
+    "drillId": "hand-break-drill",
+    "drillName": "Hand Break Drill",
+    "description": "From the stretch position, the pitcher comes to a set position and then lifts their leg. As the lead leg begins its descent, the hands separate from the glove in a downward and outward motion, keeping the fingers on top of the ball. This drill emphasizes a smooth and properly timed hand break, ensuring the throwing arm is in the correct position as the body moves toward the plate."
+  },
+  {
+    "drillId": "heavy-front-side-drill",
+    "drillName": "Heavy Front Side Drill",
+    "description": "Begin in your pitching stance with a slightly heavier ball, such as a weighted baseball or softball, in your glove hand to create a 'heavy' front side sensation. As you move through your delivery, focus on keeping your front shoulder and glove arm directed towards the target for as long as possible before rotation. The added weight provides a physical cue to maintain a strong, stable front side, preventing your upper body from flying open too early."
+  },
+  {
+    "drillId": "high-choppers",
+    "drillName": "High Choppers",
+    "description": "From a ready position, the infielder charges a high-bouncing ground ball hit by a coach. The player must aggressively attack the ball, fielding it at the peak of its bounce before it starts to come down. After securing the ball, the player makes a strong and accurate throw to the target base."
+  },
+  {
+    "drillId": "high-choppers-fungo",
+    "drillName": "High Choppers Fungo",
+    "description": "A coach hits high-bouncing ground balls, or 'choppers,' with a fungo bat toward an infielder at their regular position. The fielder's task is to read the trajectory of the bounce, charge the ball with controlled aggression, and time their approach to field it at the highest point of the hop. After securing the ball, the player should focus on making a strong, accurate throw to the designated base."
+  },
+  {
+    "drillId": "hook-ems",
+    "drillName": "Hook 'Ems",
+    "description": "From the peak of your leg lift, focus on setting the angle of your hips by driving your back glute toward the target. This initial move should be the catalyst for your entire throwing motion, ensuring your lower half leads the way. By properly sequencing this movement, you will create a more powerful and efficient energy transfer from the ground up, leading to increased velocity and better command."
+  },
+  {
+    "drillId": "infield-hands-routine",
+    "drillName": "Infield Hands Routine",
+    "description": "In this drill, an infielder assumes their ready position without a glove while a partner tosses them ground balls from a short distance. The player focuses on receiving the ball with two hands out in front, absorbing the impact with soft hands, and quickly transitioning the ball to their throwing hand. This routine helps build muscle memory for the proper fielding sequence."
+  },
+  {
+    "drillId": "intentional-throwing",
+    "drillName": "Intentional Throwing",
+    "description": "This drill emphasizes deliberate practice over velocity. The pitcher focuses on a single mechanical point for each throw, such as hand position or follow-through, while throwing at a reduced intensity. Each repetition is a conscious effort to execute that specific movement perfectly, building a stronger mind-body connection."
+  },
+  {
+    "drillId": "interval-throwing",
+    "drillName": "Interval Throwing",
+    "description": "Begin by making 15-20 easy throws from a distance of 45-60 feet, focusing on a clean arm action and consistent release point. After a short rest, increase the distance by 15-20 feet and repeat the set, ensuring you maintain the same smooth mechanics without overthrowing. This progression helps pitchers build arm strength and endurance gradually while reinforcing proper throwing fundamentals."
+  },
+  {
+    "drillId": "knee-short-hops",
+    "drillName": "Knee Short Hops",
+    "description": "From a position on both knees, an infielder sets up with their glove out in front, ready to receive. A coach or partner will toss firm short hops, challenging the player to keep their eyes on the ball and hands soft through the catch. The focus is on clean fielding mechanics and a quick transfer from glove to throwing hand without standing up."
+  },
+  {
+    "drillId": "lincecum-drill",
+    "drillName": "Lincecum Drill",
+    "description": "From the windup, the pitcher should focus on creating a continuous and explosive motion toward the plate, avoiding any pauses. The drill emphasizes a strong drive from the back leg and leading the movement with the front hip to generate momentum. The throwing arm should remain relaxed and follow the lower body's rotation, ensuring it comes through late to create a powerful, whip-like action."
+  },
+  {
+    "drillId": "long-toss",
+    "drillName": "Long Toss",
+    "description": "Begin by playing catch at a comfortable distance, focusing on a loose and relaxed arm motion. Gradually extend the distance between you and your partner, throwing the ball with a high arc to ensure you are not throwing on a line. As you reach your maximum comfortable distance, work on maintaining a fluid, full range of motion on each throw before gradually decreasing the distance to cool down."
+  },
+  {
+    "drillId": "on-the-run",
+    "drillName": "On the Run",
+    "description": "This drill simulates fielding a slow roller or bunt that requires the infielder to charge the ball and make a throw without stopping. The player should focus on creating a direct line to the ball, fielding it out in front, and then seamlessly transitioning into a throwing motion while their feet are still moving. The key is to synchronize the footwork with the throw, using the momentum of the body to generate power and accuracy on the run."
+  },
+  {
+    "drillId": "on-the-run-fungo",
+    "drillName": "On the Run Fungo",
+    "description": "A coach or player tosses the ball to a batter who hits it on the run, creating a more game-like ground ball with topspin for the infielder. This drill forces the fielder to read the unpredictable hops and react quickly with their footwork, improving their defensive instincts. The difficulty can be increased by timing the play to simulate a runner heading to first base."
+  },
+  {
+    "drillId": "one-knee-drill",
+    "drillName": "One Knee Drill",
+    "description": "Begin in a balanced position with your throwing-side knee on the ground and your glove-side foot planted firmly in front. Without using your lower body, focus on a clean, fluid arm path, rotating your torso and shoulders to deliver the ball towards the target. This drill isolates the upper half, forcing you to concentrate on proper arm mechanics and a consistent release point out in front of your body."
+  },
+  {
+    "drillId": "outfield-groundballs",
+    "drillName": "Outfield Groundballs",
+    "description": "From a ready position, the outfielder charges a ground ball hit by a coach or partner, focusing on taking an aggressive but controlled angle. The player should break down with feet apart to get their body in front of the ball and field it cleanly out in front. After securing the ball, the player executes a proper crow-hop to simulate a strong and accurate throw back to the infield."
+  },
+  {
+    "drillId": "power-position",
+    "drillName": "Power Position",
+    "description": "From a balanced starting position, the pitcher lifts their lead leg and drives toward the plate, freezing at the moment their front foot lands. In this power position, the throwing arm should be up and back in a loaded 'L' shape, with hips open and eyes on the target. Hold this pose for a few seconds to build muscle memory before following through without a ball."
+  },
+  {
+    "drillId": "preset-backhand-pick-stick",
+    "drillName": "Preset Backhand Pick & Stick",
+    "description": "Begin in a preset backhand fielding position, with your glove low and open to the ground. As the ball is rolled in, receive it cleanly in the pocket of your glove and 'stick' the catch, freezing your position upon receiving the ball. This action emphasizes keeping the glove hand steady and absorbing the ball's force without stabbing at it, ensuring a secure catch."
+  },
+  {
+    "drillId": "preset-backhand-rake",
+    "drillName": "Preset Backhand Rake",
+    "description": "Start in a pre-set backhand fielding stance, with your glove already positioned open and low to the ground on your backhand side. As the ball is rolled, focus on attacking it with your glove, using a firm 'raking' motion from outside-in to secure the ball into the pocket. This drill isolates the final action of the backhand play, allowing for repetition and focus on proper glove mechanics without the need for complex footwork."
+  },
+  {
+    "drillId": "push-bunt",
+    "drillName": "Push Bunt",
+    "description": "From your batting stance, pivot to square your shoulders to the pitcher as the ball is delivered, bringing the bat out front. Instead of absorbing the pitch for a soft sacrifice, firmly guide the bat forward through the ball upon impact. The objective is to push the ball with pace past the pitcher and charging infielders, aiming for an open area on the infield for a base hit."
+  },
+  {
+    "drillId": "quarterback-adjustments",
+    "drillName": "Quarterback Adjustments",
+    "description": "The outfielder starts in a ready position while the coach stands in front of them with two balls. The coach throws one ball over the outfielder's left shoulder and the other over their right, forcing them to drop-step and adjust their route to catch the ball. This drill teaches outfielders to read the ball's trajectory and adjust their path accordingly, emphasizing efficient footwork and glove presentation."
+  },
+  {
+    "drillId": "quarterback-angle-throw",
+    "drillName": "Quarterback Angle Throw",
+    "description": "An outfielder starts by backpedaling away from the infield, then breaks at a 45-degree angle to simulate fielding a ball on the run. As they catch the ball, they will open their hips and make a strong, accurate throw to a designated base, mimicking the motion of a quarterback throwing on the move. This drill emphasizes a quick transition from fielding to throwing while maintaining momentum and accuracy."
+  },
+  {
+    "drillId": "quarterback-over-the-shoulder",
+    "drillName": "Quarterback Over the Shoulder",
+    "description": "The outfielder starts in a ready position while a coach or partner stands behind them, acting as the 'quarterback.' The quarterback throws a ball high and deep over the outfielder's head, forcing them to execute a drop step, turn their hips, and run to track the ball. The player must locate the ball in the air and make a clean over-the-shoulder catch, simulating a game situation where a fly ball is hit over their head."
+  },
+  {
+    "drillId": "quick-hands-fielding",
+    "drillName": "Quick Hands Fielding",
+    "description": "From a low, athletic fielding position, a player prepares to receive a series of rapid tosses from a coach or partner standing a few feet away. The player focuses on using quick, soft hands to catch each ball cleanly out in front of their body, funnelling it to their center. This drill emphasizes minimal body movement, forcing the player to rely on efficient hand-eye coordination and swift glove-to-hand transfer."
+  },
+  {
+    "drillId": "rainbow-route",
+    "drillName": "Rainbow Route",
+    "description": "An outfielder starts in a ready position as a coach throws a deep fly ball over their head, forcing them to retreat. The player will take a drop step with the foot on the side the ball is thrown and run a curved \"rainbow\" route to get behind the ball. The focus is on maintaining eye contact with the ball while running the arc, allowing the player to catch the ball while moving forward toward their target."
+  },
+  {
+    "drillId": "rapid-fire-fungo",
+    "drillName": "Rapid Fire Fungo",
+    "description": "A coach hits a rapid succession of ground balls to an infielder, who must field each one cleanly and make a quick throw to a designated base. The player should maintain a ready athletic stance, focusing on efficient footwork to move to each ball and a quick, clean exchange to get the ball out of the glove. This drill simulates the fast pace of a real game, forcing the infielder to react and reset quickly between plays."
+  },
+  {
+    "drillId": "read-and-react",
+    "drillName": "Read and React",
+    "description": "From a ready athletic position, the outfielder's focus is entirely on the coach or hitter. As the ball is hit or thrown, the player reads the angle and speed off the bat to take a quick, explosive first step in the correct direction—forward, back, left, or right. The drill is completed after the initial movement, emphasizing the 'read and react' phase over catching the ball."
+  },
+  {
+    "drillId": "right-left-shuffle",
+    "drillName": "Right Left Shuffle",
+    "description": "An infielder starts in a ready position. A coach rolls a ground ball to their right, forcing them to move laterally. The player shuffles to the ball by stepping with their right foot, then their left, keeping their shoulders square to the ball. After fielding the ball, they continue the right-left shuffle to create momentum towards their target before making a throw."
+  },
+  {
+    "drillId": "right-left-shuffle-fungo",
+    "drillName": "Right Left Shuffle Fungo",
+    "description": "An infielder begins in a ready stance. A coach hits a medium-paced groundball to either side of the player, forcing them to move laterally. The player executes a quick 'right-left' shuffle with their feet to get their body centered and in front of the ball before fielding it cleanly out in front. After securing the ball, the player should practice a smooth transition into a throwing position."
+  },
+  {
+    "drillId": "running-short-hops",
+    "drillName": "Running Short Hops",
+    "description": "An outfielder charges forward on a ball thrown or hit on a short hop just in front of them. The player must maintain momentum and body control, getting their glove down at the last second to secure the ball on the run. This drill forces the player to read the bounce quickly and field the ball cleanly in stride, simulating a do-or-die play on a sinking liner."
+  },
+  {
+    "drillId": "sacrifice-bunt",
+    "drillName": "Sacrifice Bunt",
+    "description": "Begin by squaring your shoulders to the pitcher as they deliver the ball, presenting the bat early to provide a clear target. Angle the bat to direct the ball towards the desired side of the infield, either first or third base. The objective is to absorb the pitch's energy by 'catching' the ball with the bat, causing it to be deadened upon impact and roll a short distance away from the fielders."
+  },
+  {
+    "drillId": "safety-squeeze-bunt",
+    "drillName": "Safety Squeeze Bunt",
+    "description": "With a runner on third base, the batter sets the angle of the bat early, keeping it at the top of the strike zone to bunt the top of the baseball. The focus is on bunting the ball to a specific location, forcing the defense to make a play and allowing the runner from third to score. This drill emphasizes precision and execution over power or surprise."
+  },
+  {
+    "drillId": "short-base-team-bunt-drill",
+    "drillName": "Short Base Team Bunt Drill",
+    "description": "Set up with runners on first and second base to simulate a live game situation where advancing the runners is critical. As the pitch is delivered, the batter must execute a firm, well-placed bunt down either the first or third baseline, focusing on creating a difficult play for the charging infielders. This drill emphasizes precise bat control and the ability to read the defense while executing under pressure."
+  },
+  {
+    "drillId": "short-fungo-circle-drill",
+    "drillName": "Short Fungo Circle Drill",
+    "description": "A coach with a fungo bat stands a short distance in front of a semi-circle of infielders in their ready positions. The coach hits hard, rapid-fire ground balls and short hops to each player in succession, challenging their reaction time and forcing them to move their feet to get in front of the ball. This drill emphasizes fielding the ball cleanly out in front of the body and executing a quick, efficient transfer from glove to throwing hand."
+  },
+  {
+    "drillId": "short-hops",
+    "drillName": "Short Hops",
+    "description": "An outfielder charges a ground ball thrown by a coach or partner, focusing on an aggressive approach to field the ball on a short hop. The player should concentrate on keeping their eyes on the ball, maintaining a low body position, and using soft hands to receive the ball cleanly just after the bounce."
+  },
+  {
+    "drillId": "shortstop-backhand-spin",
+    "drillName": "Shortstop Backhand Spin",
+    "description": "The shortstop fields a ground ball on their backhand side, planting their glove-side foot and spinning their body toward the target. As they spin, they bring the ball to their throwing hand and make a strong, accurate throw to first base. This drill emphasizes a quick, fluid transition from fielding to throwing on a challenging play."
+  },
+  {
+    "drillId": "shortstop-drop-step-throw",
+    "drillName": "Shortstop Drop Step Throw",
+    "description": "From the shortstop position, field a ground ball hit to your glove side. Execute a 'drop step' by planting your glove-side foot and dropping your throwing-side foot back and behind to open up your hips towards the target. This creates momentum and alignment, allowing you to make a strong and accurate throw to the base without shuffling your feet."
+  },
+  {
+    "drillId": "shortstop-flips-to-second",
+    "drillName": "Shortstop Flips to Second",
+    "description": "The shortstop fields a ground ball moving towards the second base bag, maintaining momentum through the play. They execute a firm underhand flip from the glove to the chest of the second baseman covering the bag. This drill emphasizes a quick, clean exchange and a precise toss that leads the receiver into the base for a force out or to initiate a double play."
+  },
+  {
+    "drillId": "shortstop-forehand-flip",
+    "drillName": "Shortstop Forehand Flip",
+    "description": "From the shortstop position, attack a ground ball rolled to your forehand side, fielding it with two hands out in front. As you approach the ball, focus on creating momentum towards second base. Without standing up, execute a quick and controlled underhand flip from your glove, aiming for the second baseman's chest to facilitate a smooth turn for a double play."
+  },
+  {
+    "drillId": "show-knuckles-drill",
+    "drillName": "Show Knuckles Drill",
+    "description": "From a balanced throwing stance, the pitcher extends their arm toward the target, positioning the hand so the knuckles face upward and are visible to the catcher. While maintaining this hand position, the pitcher executes their arm circle, focusing on keeping the hand on top of the baseball through the entire motion. This drill simplifies the throwing action to emphasize proper wrist and hand alignment, ensuring the pitcher stays behind the ball to generate clean backspin upon release."
+  },
+  {
+    "drillId": "shuffle-gather-throw-fungo",
+    "drillName": "Shuffle Gather Throw Fungo",
+    "description": "An infielder starts in a ready position as a coach hits a ground ball with a fungo bat just to their side. The player shuffles laterally to get their body in front of the ball, gathers it cleanly into their glove, and then makes a strong, accurate throw to a designated base. This drill emphasizes proper footwork and the smooth transition from fielding to throwing."
+  },
+  {
+    "drillId": "slow-rollers",
+    "drillName": "Slow Rollers",
+    "description": "From their ready position, the infielder charges a slowly rolled ball from a coach or partner. The player should focus on timing their approach to field the ball on a good hop, keeping their feet moving through the play. After securing the ball, they continue their momentum towards first base to make a strong, accurate throw."
+  },
+  {
+    "drillId": "slow-rollers-fungo",
+    "drillName": "Slow Rollers Fungo",
+    "description": "A coach hits slow rolling ground balls with a fungo bat to infielders at their respective positions. The fielder must aggressively charge the ball, field it out in front of their body, and make a strong, accurate throw to first base. This drill emphasizes using proper footwork to create momentum towards the target and ensures a quick, clean transfer from the glove to the throwing hand."
+  },
+  {
+    "drillId": "speed-square",
+    "drillName": "Speed Square",
+    "description": "Set up four cones in a ten-by-ten yard square and start in the center. On the coach's signal, sprint to touch a designated cone, then immediately return to the center before sprinting to the next cone in the sequence. This drill emphasizes explosive first steps and maintaining body control while changing direction at high speed."
+  },
+  {
+    "drillId": "squared-throwing",
+    "drillName": "Squared Throwing",
+    "description": "Begin by standing with your feet shoulder-width apart, directly facing your target with your body completely squared up. Without any stride or lower body rotation, isolate your arm and execute a clean, fluid throw, focusing on the path of the ball and your follow-through. This exercise strips down the pitching motion to its essential upper-body mechanics, forcing a focus on a consistent release point and arm slot."
+  },
+  {
+    "drillId": "stride-to-spot",
+    "drillName": "Stride to Spot",
+    "description": "From the stretch position, the pitcher lifts their lead leg and strides forward, focusing on landing their foot on a specific, marked spot on the ground. The emphasis is on maintaining balance and direction toward the target throughout the movement, without actually throwing a ball. This allows the pitcher to isolate and repeat the stride portion of their delivery, building muscle memory for a consistent landing point."
+  },
+  {
+    "drillId": "tandem",
+    "drillName": "Tandem",
+    "description": "Two outfielders line up in a tandem position, one directly behind the other, spaced about 15-20 feet apart. On a ball hit into the gap, the lead outfielder pursues and fields the ball while the trailing outfielder moves into a direct line between the lead outfielder and the intended base. The lead outfielder makes a strong, accurate throw to the trailing outfielder who then acts as a relay to make the final throw to the base."
+  },
+  {
+    "drillId": "upper-body-throwing",
+    "drillName": "Upper Body Throwing",
+    "description": "From a kneeling or seated position to eliminate lower-body involvement, the player focuses solely on the upper body throwing motion. Emphasis should be placed on a smooth, powerful arm action, complete shoulder rotation, and a full follow-through after releasing the ball. This drill isolates the upper half to build pure arm strength and reinforce correct pitching mechanics."
+  },
+  {
+    "drillId": "working-in-set-position",
+    "drillName": "Working in Set Position",
+    "description": "Begin in the set position with your glove-side foot on the rubber and hands together at the belt. Come to a complete, balanced stop for a full second before separating your hands and delivering a pitch to the plate. Focus on maintaining a consistent rhythm and a quick, compact motion to minimize the runner's lead and prevent stolen bases."
+  }
+]

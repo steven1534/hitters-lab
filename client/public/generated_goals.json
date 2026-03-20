@@ -1,0 +1,517 @@
+[
+  {
+    "drillId": "1st-base-flip-to-pitcher",
+    "drillName": "1st Base Flip to Pitcher",
+    "goal": "To coordinate the timing and develop a soft, accurate flip from the first baseman to the pitcher covering first base."
+  },
+  {
+    "drillId": "1st-base-inside-receiving",
+    "drillName": "1st Base Inside Receiving",
+    "goal": "To train the first baseman to confidently handle inside throws, use proper footwork around the bag, and secure the catch without interfering with the advancing runner."
+  },
+  {
+    "drillId": "1st-base-off-bag",
+    "drillName": "1st Base Off Bag",
+    "goal": "To improve a first baseman's range in fielding ground balls and to develop the footwork required to transition from a fielding position back to covering the bag."
+  },
+  {
+    "drillId": "1st-base-receiving",
+    "drillName": "1st Base Receiving",
+    "goal": "To develop proper footwork, glove presentation, and receiving technique for first basemen to secure outs on throws from the infield."
+  },
+  {
+    "drillId": "1st-base-receiving-short-hops",
+    "drillName": "1st Base Receiving Short Hops",
+    "goal": "To develop a first baseman's skill and confidence in cleanly fielding short hops and handling difficult throws."
+  },
+  {
+    "drillId": "2nd-baseman-backhand-flip",
+    "drillName": "2nd Baseman Backhand Flip",
+    "goal": "To improve a second baseman's body control and soft hands when fielding a backhand ground ball and making a quick flip to start a double play."
+  },
+  {
+    "drillId": "2nd-baseman-drop-step-throw",
+    "drillName": "2nd Baseman Drop Step Throw",
+    "goal": "To train the second baseman to create space and proper throwing mechanics on balls hit to their glove-side."
+  },
+  {
+    "drillId": "2nd-baseman-forehand-spin",
+    "drillName": "2nd Baseman Forehand Spin",
+    "goal": "To develop advanced body control and footwork, enabling the infielder to make a difficult play and throw accurately after a full rotation."
+  },
+  {
+    "drillId": "2nd-baseman-underhand-flip",
+    "drillName": "2nd Baseman Underhand Flip",
+    "goal": "To develop a quick, efficient, and accurate underhand flip technique for close-range feeds, particularly during double plays."
+  },
+  {
+    "drillId": "30-second-backhand",
+    "drillName": "30 Second Backhand",
+    "goal": "To build a player's confidence and consistency in making the routine backhand play."
+  },
+  {
+    "drillId": "30-second-backhand-cross",
+    "drillName": "30 Second Backhand Cross",
+    "goal": "To enhance a player's lateral agility, improve their backhand fielding mechanics, and develop muscle memory for quick, efficient transfers on difficult plays."
+  },
+  {
+    "drillId": "30-second-crow-hops",
+    "drillName": "30 Second Crow Hops",
+    "goal": "To develop proper footwork and momentum for long throws, reinforcing the mechanics of a quick and efficient crow hop."
+  },
+  {
+    "drillId": "30-second-grounders",
+    "drillName": "30 Second Grounders",
+    "goal": "To develop the fielder's endurance, focus, and ability to maintain proper defensive mechanics while handling a high volume of repetitions in a short period."
+  },
+  {
+    "drillId": "30-second-quick-toss",
+    "drillName": "30 Second Quick Toss",
+    "goal": "To develop rapid glove-to-hand transfers, improve throwing accuracy under pressure, and enhance overall hand speed."
+  },
+  {
+    "drillId": "30-second-short-hops",
+    "drillName": "30 Second Short Hops",
+    "goal": "To improve an infielder's ability to handle difficult short hops by developing quick, soft hands and confidence."
+  },
+  {
+    "drillId": "arm-path-drill",
+    "drillName": "Arm Path Drill",
+    "goal": "To develop a consistent and efficient arm action that promotes throwing accuracy and reduces the risk of injury."
+  },
+  {
+    "drillId": "arm-speed",
+    "drillName": "Arm Speed",
+    "goal": "To enhance the pitcher's natural arm speed and develop a more efficient, quick arm path to the release point."
+  },
+  {
+    "drillId": "backhand-cross-and-throw",
+    "drillName": "Backhand Cross and Throw",
+    "goal": "To develop an infielder's ability to cleanly field a backhand ground ball and execute a quick, powerful throw across the diamond."
+  },
+  {
+    "drillId": "backhand-pick-stick-fungo",
+    "drillName": "Backhand Pick & Stick Fungo",
+    "goal": "To develop proper footwork, glove action, and body control while executing a clean backhand play on a ground ball."
+  },
+  {
+    "drillId": "backhand-rake-fungo",
+    "drillName": "Backhand Rake Fungo",
+    "goal": "To develop an infielder's ability to attack backhand ground balls with proper footwork and a clean, continuous glove action."
+  },
+  {
+    "drillId": "balance-drill",
+    "drillName": "Balance Drill",
+    "goal": "To develop a stable and repeatable balance point, which is crucial for consistent mechanics and command."
+  },
+  {
+    "drillId": "balance-pause-drill",
+    "drillName": "Balance Pause Drill",
+    "goal": "To develop body control and a consistent, powerful posture at the top of the pitching delivery."
+  },
+  {
+    "drillId": "balanced-stationary-drill",
+    "drillName": "Balanced Stationary Drill",
+    "goal": "To isolate the upper body, developing proper core engagement and extension in the pitching motion without lower body involvement."
+  },
+  {
+    "drillId": "balanced-stationary-drill-with-upper-body",
+    "drillName": "Balanced Stationary Drill with Upper Body",
+    "goal": "To refine upper body mechanics and improve balance by isolating the throwing motion from the lower half."
+  },
+  {
+    "drillId": "ball-in-hand",
+    "drillName": "Ball in Hand",
+    "goal": "To develop a quick, clean exchange and reinforce the proper footwork needed to make an accurate throw."
+  },
+  {
+    "drillId": "ball-in-the-sun",
+    "drillName": "Ball in the Sun",
+    "goal": "To train outfielders to confidently track and catch fly balls while effectively shielding their eyes from direct sunlight."
+  },
+  {
+    "drillId": "box-drill-2nd-baseman-double-play-feeds",
+    "drillName": "Box Drill- 2nd Baseman Double Play Feeds",
+    "goal": "To develop the footwork, rhythm, and quickness required for a second baseman to efficiently field a ground ball and make an accurate feed to turn a double play."
+  },
+  {
+    "drillId": "box-drill-shortstop-double-play-feeds",
+    "drillName": "Box Drill- Shortstop Double Play Feeds",
+    "goal": "To improve a shortstop's ability to make quick, accurate, and efficient feeds to second base while maintaining proper body control in the turn of a double play."
+  },
+  {
+    "drillId": "break-down-and-come-through",
+    "drillName": "Break Down and Come Through",
+    "goal": "To develop the fundamental footwork and body control required for an outfielder to properly field a ground ball and transition into a throw."
+  },
+  {
+    "drillId": "break-of-the-hands-drill",
+    "drillName": "Break of the Hands Drill",
+    "goal": "To develop a smooth and repeatable hand break, ensuring a consistent arm path and proper timing in the pitching delivery."
+  },
+  {
+    "drillId": "chair-drill",
+    "drillName": "Chair Drill",
+    "goal": "To develop lower-body strength and explosive power from the ground up, improving drive and balance in the pitching delivery."
+  },
+  {
+    "drillId": "change-up-catch",
+    "drillName": "Change-Up Catch",
+    "goal": "To help the catcher identify the change-up early, stay balanced, and develop the soft hands required to receive off-speed pitches effectively."
+  },
+  {
+    "drillId": "change-up-grips",
+    "drillName": "Change-Up Grips",
+    "goal": "To develop a repeatable change-up grip that maximizes deception and control."
+  },
+  {
+    "drillId": "crow-hops",
+    "drillName": "Crow Hops",
+    "goal": "To maximize throwing velocity and accuracy from the outfield by creating linear momentum toward the target."
+  },
+  {
+    "drillId": "daily-band-work",
+    "drillName": "Daily Band Work",
+    "goal": "To prepare the arm for pitching by doing a band workout to stretch and strengthen."
+  },
+  {
+    "drillId": "daily-flat-ground-work",
+    "drillName": "Daily Flat Ground Work",
+    "goal": "To develop and reinforce proper pitching mechanics, arm care, and consistency in a low-stress environment."
+  },
+  {
+    "drillId": "daily-throwing-program",
+    "drillName": "Daily Throwing Program",
+    "goal": "To build a consistent, repeatable throwing motion and establish a solid mechanical foundation before progressing to more intensive pitching work."
+  },
+  {
+    "drillId": "defense-prep",
+    "drillName": "Defense Prep",
+    "goal": "To activate the player's defensive mindset and reinforce the fundamental mechanics of fielding ground balls."
+  },
+  {
+    "drillId": "double-play-footwork-2b-drop-step",
+    "drillName": "Double Play Footwork- 2B Drop Step",
+    "goal": "To create an efficient path to the bag and develop a quick, powerful throwing motion when turning a double play."
+  },
+  {
+    "drillId": "double-play-footwork-2b-rocker-step",
+    "drillName": "Double Play Footwork- 2B Rocker Step",
+    "goal": "To develop a quick and efficient method for turning a double play at second base, ensuring a rapid transfer and powerful throw to first."
+  },
+  {
+    "drillId": "double-play-footwork-2b-step-across",
+    "drillName": "Double Play Footwork- 2B Step Across",
+    "goal": "To develop efficient footwork and a quick, powerful throw for turning double plays at second base."
+  },
+  {
+    "drillId": "double-play-footwork-ss-back-cross",
+    "drillName": "Double Play Footwork- SS Back Cross",
+    "goal": "To train a shortstop's footwork for efficiently redirecting momentum towards first base, ensuring a strong and accurate throw to complete the double play."
+  },
+  {
+    "drillId": "double-play-footwork-ss-front-cross",
+    "drillName": "Double Play Footwork- SS Front Cross",
+    "goal": "To develop a shortstop's ability to execute a quick and efficient turn on a double play, particularly on balls hit to their glove-hand side."
+  },
+  {
+    "drillId": "double-play-footwork-ss-pop-feet",
+    "drillName": "Double Play Footwork- SS Pop Feet",
+    "goal": "To train shortstops to quickly and explosively align their feet and body to make a strong, accurate throw to second base."
+  },
+  {
+    "drillId": "drag-bunt",
+    "drillName": "Drag Bunt",
+    "goal": "To disguise the bunt until the last moment and beat out the throw by placing the ball in a difficult spot for the defense to field."
+  },
+  {
+    "drillId": "drop-step-cones",
+    "drillName": "Drop Step Cones",
+    "goal": "To develop a quick and efficient first step, enabling the outfielder to react and get in position to catch deep fly balls."
+  },
+  {
+    "drillId": "drop-step-groundballs",
+    "drillName": "Drop Step Groundballs",
+    "goal": "To develop an infielder's ability to create space and efficient angles to the ball on groundballs hit directly at them or to their immediate left or right."
+  },
+  {
+    "drillId": "flat-ground",
+    "drillName": "Flat Ground",
+    "goal": "To refine pitching mechanics, improve command, and build a consistent throwing motion without the stress of a sloped mound."
+  },
+  {
+    "drillId": "fly-balls",
+    "drillName": "Fly Balls",
+    "goal": "To develop the fundamental skills of tracking, judging, and catching fly balls in the outfield."
+  },
+  {
+    "drillId": "forehand-range",
+    "drillName": "Forehand Range",
+    "goal": "To increase an infielder's lateral range and ability to make a strong throw after fielding a ball on the move."
+  },
+  {
+    "drillId": "four-corners",
+    "drillName": "Four Corners",
+    "goal": "To develop advanced fielding skills, including quick footwork, soft hands, and the ability to make accurate throws under pressure from all infield positions."
+  },
+  {
+    "drillId": "free-play",
+    "drillName": "Free Play",
+    "goal": "To develop a player's natural defensive instincts, reaction time, and fundamental fielding and throwing mechanics in a game-like environment."
+  },
+  {
+    "drillId": "fungo-charge",
+    "drillName": "Fungo Charge",
+    "goal": "To develop the technique and confidence needed to attack slowly hit balls, make plays on the run, and execute a quick transfer for a successful putout."
+  },
+  {
+    "drillId": "groundball-on-knees-progression",
+    "drillName": "Groundball on Knees Progression",
+    "goal": "To develop soft hands, proper glove position, and the skill of fielding the ball on the hop by isolating the upper body."
+  },
+  {
+    "drillId": "grounders",
+    "drillName": "Grounders",
+    "goal": "To develop a fundamentally sound and aggressive approach to fielding ground balls in the outfield."
+  },
+  {
+    "drillId": "hand-break-drill",
+    "drillName": "Hand Break Drill",
+    "goal": "To develop a consistent and efficient hand separation, synchronizing the arm action with the lower body's movement to improve pitching mechanics and velocity."
+  },
+  {
+    "drillId": "heavy-front-side-drill",
+    "drillName": "Heavy Front Side Drill",
+    "goal": "To improve front-side stability and direction, helping the pitcher stay closed longer for increased rotational power and better command."
+  },
+  {
+    "drillId": "high-choppers",
+    "drillName": "High Choppers",
+    "goal": "To develop the skill of charging and fielding high-bouncing ground balls, improving the player's timing, footwork, and ability to make a quick transition from fielding to throwing."
+  },
+  {
+    "drillId": "high-choppers-fungo",
+    "drillName": "High Choppers Fungo",
+    "goal": "To develop an infielder's ability to aggressively charge and properly time the fielding of high-bouncing ground balls."
+  },
+  {
+    "drillId": "hook-ems",
+    "drillName": "Hook 'Ems",
+    "goal": "To develop proper hip sequencing and direction into foot-strike, promoting a powerful and efficient throwing motion."
+  },
+  {
+    "drillId": "infield-hands-routine",
+    "drillName": "Infield Hands Routine",
+    "goal": "To develop an infielder's hand-eye coordination, quick transfers, and soft hands when fielding ground balls."
+  },
+  {
+    "drillId": "intentional-throwing",
+    "drillName": "Intentional Throwing",
+    "goal": "To enhance a pitcher's body awareness and ability to make targeted mechanical adjustments."
+  },
+  {
+    "drillId": "interval-throwing",
+    "drillName": "Interval Throwing",
+    "goal": "To safely build arm strength, improve endurance, and reinforce sound throwing mechanics through a structured progression."
+  },
+  {
+    "drillId": "knee-short-hops",
+    "drillName": "Knee Short Hops",
+    "goal": "To refine an infielder's glove skills and hand-eye coordination for balls that take difficult or unexpected hops."
+  },
+  {
+    "drillId": "lincecum-drill",
+    "drillName": "Lincecum Drill",
+    "goal": "To develop a dynamic, full-body pitching delivery that improves momentum and maximizes arm speed through proper kinetic sequencing."
+  },
+  {
+    "drillId": "long-toss",
+    "drillName": "Long Toss",
+    "goal": "To build foundational arm strength, improve throwing mechanics, and promote a loose, fluid arm action over extended distances."
+  },
+  {
+    "drillId": "on-the-run",
+    "drillName": "On the Run",
+    "goal": "To train infielders to make strong, accurate throws on plays where they do not have time to set their feet."
+  },
+  {
+    "drillId": "on-the-run-fungo",
+    "drillName": "On the Run Fungo",
+    "goal": "To develop an infielder's ability to read and react to difficult, game-like ground balls with topspin."
+  },
+  {
+    "drillId": "one-knee-drill",
+    "drillName": "One Knee Drill",
+    "goal": "To develop a consistent arm action, proper upper-body rotation, and a repeatable release point without interference from the lower half."
+  },
+  {
+    "drillId": "outfield-groundballs",
+    "drillName": "Outfield Groundballs",
+    "goal": "To develop the fundamental techniques for aggressively charging, properly fielding, and quickly transitioning into a throw for ground balls hit to the outfield."
+  },
+  {
+    "drillId": "power-position",
+    "drillName": "Power Position",
+    "goal": "To develop a strong and repeatable body position that maximizes leverage and explosive force in the pitching delivery."
+  },
+  {
+    "drillId": "preset-backhand-pick-stick",
+    "drillName": "Preset Backhand Pick & Stick",
+    "goal": "To develop soft hands and a stable base by teaching the infielder to 'stick' the backhand catch without stabbing at the ball."
+  },
+  {
+    "drillId": "preset-backhand-rake",
+    "drillName": "Preset Backhand Rake",
+    "goal": "To develop clean glove action and muscle memory for securing ground balls on the backhand side."
+  },
+  {
+    "drillId": "push-bunt",
+    "drillName": "Push Bunt",
+    "goal": "To develop the skill of bunting for a base hit by using a firm, controlled push to place the ball offensively."
+  },
+  {
+    "drillId": "quarterback-adjustments",
+    "drillName": "Quarterback Adjustments",
+    "goal": "To improve an outfielder's ability to read, react, and adjust to fly balls hit in multiple directions."
+  },
+  {
+    "drillId": "quarterback-angle-throw",
+    "drillName": "Quarterback Angle Throw",
+    "goal": "To train outfielders to make powerful and precise throws from various angles while on the run."
+  },
+  {
+    "drillId": "quarterback-over-the-shoulder",
+    "drillName": "Quarterback Over the Shoulder",
+    "goal": "To develop an outfielder's ability to properly execute a drop step, efficiently track a deep fly ball, and make a difficult over-the-shoulder catch."
+  },
+  {
+    "drillId": "quick-hands-fielding",
+    "drillName": "Quick Hands Fielding",
+    "goal": "To improve an infielder's hand speed, reaction time, and ability to receive the ball with soft, absorbent hands."
+  },
+  {
+    "drillId": "rainbow-route",
+    "drillName": "Rainbow Route",
+    "goal": "To teach outfielders the proper footwork and running path for efficiently tracking and catching deep fly balls hit over their head."
+  },
+  {
+    "drillId": "rapid-fire-fungo",
+    "drillName": "Rapid Fire Fungo",
+    "goal": "To improve an infielder's reaction time, footwork, and ability to handle multiple plays in quick succession under pressure."
+  },
+  {
+    "drillId": "read-and-react",
+    "drillName": "Read and React",
+    "goal": "To develop an outfielder's ability to get a quick and accurate jump on the ball by improving their reaction time and first-step efficiency."
+  },
+  {
+    "drillId": "right-left-shuffle",
+    "drillName": "Right Left Shuffle",
+    "goal": "To develop proper footwork for fielding ground balls and to create momentum and direction towards the target."
+  },
+  {
+    "drillId": "right-left-shuffle-fungo",
+    "drillName": "Right Left Shuffle Fungo",
+    "goal": "To develop proper footwork and body control for moving laterally to get into an optimal fielding position for ground balls."
+  },
+  {
+    "drillId": "running-short-hops",
+    "drillName": "Running Short Hops",
+    "goal": "To develop an outfielder's ability to aggressively attack and field a short hop while on the move, turning a difficult play into a routine out."
+  },
+  {
+    "drillId": "sacrifice-bunt",
+    "drillName": "Sacrifice Bunt",
+    "goal": "To master the technique of advancing a baserunner by strategically placing a bunt in fair territory, sacrificing the batter for the benefit of the team."
+  },
+  {
+    "drillId": "safety-squeeze-bunt",
+    "drillName": "Safety Squeeze Bunt",
+    "goal": "To teach the batter how to execute a successful bunt that puts pressure on the defense and allows a runner to score from third base."
+  },
+  {
+    "drillId": "short-base-team-bunt-drill",
+    "drillName": "Short Base Team Bunt Drill",
+    "goal": "To develop a hitter's ability to execute a successful sacrifice bunt in a high-pressure, game-like scenario."
+  },
+  {
+    "drillId": "short-fungo-circle-drill",
+    "drillName": "Short Fungo Circle Drill",
+    "goal": "To develop an infielder's quick-twitch reactions, footwork, and glove skills when fielding hard-hit balls at close range."
+  },
+  {
+    "drillId": "short-hops",
+    "drillName": "Short Hops",
+    "goal": "To develop the confidence and technique required to aggressively charge and securely field short-hopped ground balls in the outfield."
+  },
+  {
+    "drillId": "shortstop-backhand-spin",
+    "drillName": "Shortstop Backhand Spin",
+    "goal": "To develop the ability to make a strong and accurate throw after fielding a backhanded ground ball, requiring a quick spin and body control."
+  },
+  {
+    "drillId": "shortstop-drop-step-throw",
+    "drillName": "Shortstop Drop Step Throw",
+    "goal": "To improve a shortstop's ability to create a direct throwing lane and make powerful throws on balls hit to their glove side."
+  },
+  {
+    "drillId": "shortstop-flips-to-second",
+    "drillName": "Shortstop Flips to Second",
+    "goal": "To develop quick, efficient transfers and accurate underhand feeds for middle infielders on plays around the second base bag."
+  },
+  {
+    "drillId": "shortstop-forehand-flip",
+    "drillName": "Shortstop Forehand Flip",
+    "goal": "To develop the footwork, body control, and quick hands necessary to make an accurate flip to second base for a potential double play."
+  },
+  {
+    "drillId": "show-knuckles-drill",
+    "drillName": "Show Knuckles Drill",
+    "goal": "To develop a consistent hand position that promotes true four-seam backspin and a downward plane on the fastball."
+  },
+  {
+    "drillId": "shuffle-gather-throw-fungo",
+    "drillName": "Shuffle Gather Throw Fungo",
+    "goal": "To develop an infielder's ability to move laterally, field a ground ball cleanly, and execute a quick, accurate throw."
+  },
+  {
+    "drillId": "slow-rollers",
+    "drillName": "Slow Rollers",
+    "goal": "To develop the proper footwork and aggressive mentality needed to attack slowly hit ground balls."
+  },
+  {
+    "drillId": "slow-rollers-fungo",
+    "drillName": "Slow Rollers Fungo",
+    "goal": "To develop the technique and confidence needed to properly approach and field slowly hit ground balls."
+  },
+  {
+    "drillId": "speed-square",
+    "drillName": "Speed Square",
+    "goal": "To enhance an outfielder's agility, acceleration, and ability to take efficient routes to the ball in all directions."
+  },
+  {
+    "drillId": "squared-throwing",
+    "drillName": "Squared Throwing",
+    "goal": "To improve throwing accuracy and develop a repeatable, efficient arm action by removing lower body variables."
+  },
+  {
+    "drillId": "stride-to-spot",
+    "drillName": "Stride to Spot",
+    "goal": "To develop a consistent and balanced stride, ensuring proper body alignment and direction towards home plate."
+  },
+  {
+    "drillId": "tandem",
+    "drillName": "Tandem",
+    "goal": "To develop teamwork, communication, and efficiency between outfielders on long throws from the gaps, ensuring the ball gets to the infield quickly and accurately."
+  },
+  {
+    "drillId": "upper-body-throwing",
+    "drillName": "Upper Body Throwing",
+    "goal": "To develop upper body strength, proper arm mechanics, and throwing accuracy for pitchers."
+  },
+  {
+    "drillId": "working-in-set-position",
+    "drillName": "Working in Set Position",
+    "goal": "To help pitchers develop a quicker, more efficient delivery from the stretch while maintaining control and composure."
+  }
+]

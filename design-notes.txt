@@ -1,0 +1,36 @@
+Reference Site Design Notes - Drills Page
+
+HEADER:
+- "Training Library" title in italic/script font
+- Subtitle: "Browse our curated collection of professional drills designed to elevate every aspect of your game."
+
+SEARCH BAR:
+- Full width search input
+- Placeholder: "Search for drills..."
+- Search icon on left
+
+DIFFICULTY FILTER:
+- Label: "Difficulty"
+- Pill buttons in a row: All, Beginner, Intermediate, Advanced
+- "All" is selected by default (highlighted)
+
+CATEGORY FILTER:
+- Label: "Category"
+- Pill buttons: All Categories (cyan highlighted), Mechanics, Hand-Eye Coordination, Game Situations, Bunting, Power, Pitch Recognition
+
+RESULTS COUNT:
+- "Found 24 drills" text
+
+DRILL CARDS:
+- 3 column grid
+- Featured image at top (full width of card)
+- Difficulty badge in top-right corner of image (Beginner=green, Intermediate=yellow, Advanced=red)
+- Category tag below image (cyan dot + uppercase text like "MECHANICS", "TEE WORK")
+- Drill title in bold white
+- Brief description in gray text
+- "View Details" link at bottom
+
+CARD STYLING:
+- Dark background
+- Rounded corners
+- Hover effects
