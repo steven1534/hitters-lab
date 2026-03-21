@@ -29,6 +29,7 @@ import { BlastMetricsTab } from "@/components/BlastMetricsTab";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { InlineEdit } from "@/components/InlineEdit";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
+import { AddNewDrill } from "@/components/AddNewDrill";
 
 interface Drill {
   id: string;
@@ -473,13 +474,14 @@ export default function CoachDashboard() {
                 {/* Left: Assign */}
                 <div className="lg:col-span-1 space-y-4">
                   <div className="glass-card rounded-xl overflow-hidden">
-                    <div className="p-4 md:p-5 border-b border-white/[0.06]">
+                    <div className="p-4 md:p-5 border-b border-white/[0.06] flex items-center justify-between gap-3">
                       <h3 className="font-heading font-bold text-lg flex items-center gap-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#DC143C]/20 to-[#DC143C]/20 flex items-center justify-center">
                           <Plus className="h-4 w-4 text-[#DC143C]" />
                         </div>
                         Assign Drill
                       </h3>
+                      <AddNewDrill />
                     </div>
                     <div className="p-4 md:p-5 space-y-4">
                       <div>
