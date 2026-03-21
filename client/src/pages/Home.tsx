@@ -301,10 +301,10 @@ export default function Home() {
             <div className="animate-fade-in-up stagger-2">
               <h1 className="font-heading font-black tracking-tight leading-none">
                 <span className="block text-foreground text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
-                  UNLEASH YOUR
+                  COACH STEVE'S
                 </span>
                 <span className="block text-6xl sm:text-7xl md:text-8xl lg:text-9xl mt-1 text-gradient">
-                  POTENTIAL
+                  HITTERS LAB
                 </span>
               </h1>
             </div>
