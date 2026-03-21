@@ -84,6 +84,18 @@ export const playerReportsRouter = router({
       return { success: true };
     }),
 
+  /** Get all reports for the currently logged-in athlete (athlete self-view) */
+  getMyReports: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      return db
+        .select()
+        .from(playerReports)
+        .where(eq(playerReports.athleteId, ctx.user.id))
+        .orderBy(desc(playerReports.reportDate));
+    }),
+
   /** Delete a report */
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
