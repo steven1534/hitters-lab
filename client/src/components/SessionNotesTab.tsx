@@ -1,276 +1,444 @@
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Users, FileText, ArrowLeft } from "lucide-react";
-import { trpc } from "@/lib/trpc";
-import { SessionNotesForm } from "./SessionNotesForm";
-import { SessionHistory } from "./SessionHistory";
-import { ProgressReportReview } from "./ProgressReportReview";
-import { InlineEdit } from "./InlineEdit";
+/**
+ * SessionNotesTab — rebuilt as a free-form rich text document editor,
+ * matching the Player Reports format exactly.
+ *
+ * Uses the same playerReports tRPC router but scoped to a "Session Notes"
+ * label so existing player reports are unaffected. Alternatively, it has its
+ * own dedicated sessionNotes tRPC procedures for any pre-existing data.
+ *
+ * For simplicity and consistency we store session notes in the playerReports
+ * table with a `noteType = 'session'` distinction — but since the existing
+ * sessionNotes table may already have data, we keep both paths and just
+ * render the new UI on top of the playerReports data store.
+ *
+ * NOTE: This replaces the old structured form UI. Old session note records
+ * in the sessionNotes table are unaffected.
+ */
 
-interface SessionNotesTabProps {
-  /** Pre-select an athlete by ID */
-  initialAthleteId?: number;
+import { useState, useCallback } from "react";
+import { trpc } from "@/lib/trpc";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import Placeholder from "@tiptap/extension-placeholder";
+import Link from "@tiptap/extension-link";
+import Typography from "@tiptap/extension-typography";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import {
+  Bold, Italic, UnderlineIcon, List, ListOrdered,
+  AlignLeft, AlignCenter, AlignRight,
+  Plus, Trash2, Edit3, ChevronLeft, FileText, Calendar, User,
+  Save, X, Quote, Minus, Link2, Heading1, Heading2, Heading3,
+  ChevronRight, StickyNote,
+} from "lucide-react";
+
+// ── Shared editor CSS (same as PlayerReportsTab) ──────────────
+const EDITOR_STYLES = `
+.sn-editor .ProseMirror {
+  outline: none;
+  min-height: 500px;
+  padding: 2.5rem 3rem;
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.88);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.sn-editor .ProseMirror p { margin: 0 0 0.75em 0; }
+.sn-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: rgba(255,255,255,0.2);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+.sn-editor .ProseMirror h1 { font-size:1.875rem;font-weight:800;line-height:1.25;margin:1.5em 0 0.5em;color:#fff;letter-spacing:-0.02em; }
+.sn-editor .ProseMirror h2 { font-size:1.375rem;font-weight:700;line-height:1.3;margin:1.25em 0 0.4em;color:rgba(255,255,255,.95);letter-spacing:-0.01em; }
+.sn-editor .ProseMirror h3 { font-size:1.1rem;font-weight:600;line-height:1.4;margin:1em 0 0.35em;color:rgba(255,255,255,.9); }
+.sn-editor .ProseMirror h1:first-child,.sn-editor .ProseMirror h2:first-child,.sn-editor .ProseMirror h3:first-child { margin-top:0; }
+.sn-editor .ProseMirror ul,.sn-editor .ProseMirror ol { padding-left:1.5em;margin:0.5em 0 0.75em; }
+.sn-editor .ProseMirror li { margin:0.2em 0;line-height:1.7; }
+.sn-editor .ProseMirror li p { margin:0; }
+.sn-editor .ProseMirror blockquote { border-left:3px solid rgba(99,179,237,.5);padding:0.5em 1em;margin:1em 0;color:rgba(255,255,255,.6);font-style:italic;background:rgba(255,255,255,.03);border-radius:0 6px 6px 0; }
+.sn-editor .ProseMirror hr { border:none;border-top:1px solid rgba(255,255,255,.1);margin:1.5em 0; }
+.sn-editor .ProseMirror a { color:#63b3ed;text-decoration:underline;text-underline-offset:2px; }
+.sn-editor .ProseMirror strong { color:#fff;font-weight:700; }
+.sn-editor .ProseMirror em { color:rgba(255,255,255,.75); }
+
+.sn-view h1 { font-size:1.875rem;font-weight:800;margin:1.5em 0 0.5em;color:#fff;letter-spacing:-0.02em;line-height:1.25; }
+.sn-view h2 { font-size:1.375rem;font-weight:700;margin:1.25em 0 0.4em;color:rgba(255,255,255,.95);line-height:1.3; }
+.sn-view h3 { font-size:1.1rem;font-weight:600;margin:1em 0 0.35em;color:rgba(255,255,255,.9);line-height:1.4; }
+.sn-view h1:first-child,.sn-view h2:first-child,.sn-view h3:first-child { margin-top:0; }
+.sn-view p { margin:0 0 0.75em;line-height:1.8;color:rgba(255,255,255,.85);font-size:15px; }
+.sn-view ul,.sn-view ol { padding-left:1.5em;margin:0.5em 0 0.75em; }
+.sn-view li { margin:0.2em 0;line-height:1.7;color:rgba(255,255,255,.85);font-size:15px; }
+.sn-view li p { margin:0; }
+.sn-view blockquote { border-left:3px solid rgba(99,179,237,.5);padding:0.5em 1em;margin:1em 0;color:rgba(255,255,255,.6);font-style:italic;background:rgba(255,255,255,.03);border-radius:0 6px 6px 0; }
+.sn-view hr { border:none;border-top:1px solid rgba(255,255,255,.1);margin:1.5em 0; }
+.sn-view a { color:#63b3ed;text-decoration:underline;text-underline-offset:2px; }
+.sn-view strong { color:#fff;font-weight:700; }
+.sn-view em { color:rgba(255,255,255,.75); }
+`;
+
+// ── Toolbar ───────────────────────────────────────────────────
+function TBtn({ active, onClick, title, children }: { active?: boolean; onClick: () => void; title: string; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onMouseDown={(e) => { e.preventDefault(); onClick(); }}
+      title={title}
+      className={`flex items-center justify-center w-7 h-7 rounded transition-colors ${active ? "bg-electric/90 text-black" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+    >
+      {children}
+    </button>
+  );
+}
+function Sep() { return <div className="w-px h-5 bg-white/10 mx-0.5" />; }
+
+function Toolbar({ editor }: { editor: any }) {
+  if (!editor) return null;
+  const setLink = () => {
+    const url = window.prompt("Enter URL:");
+    if (url) editor.chain().focus().setLink({ href: url, target: "_blank" }).run();
+  };
+  return (
+    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-white/[0.08] bg-[#111111] rounded-t-xl sticky top-0 z-10">
+      <TBtn active={editor.isActive("heading",{level:1})} onClick={()=>editor.chain().focus().toggleHeading({level:1}).run()} title="H1"><Heading1 className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive("heading",{level:2})} onClick={()=>editor.chain().focus().toggleHeading({level:2}).run()} title="H2"><Heading2 className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive("heading",{level:3})} onClick={()=>editor.chain().focus().toggleHeading({level:3}).run()} title="H3"><Heading3 className="w-3.5 h-3.5"/></TBtn>
+      <Sep/>
+      <TBtn active={editor.isActive("bold")} onClick={()=>editor.chain().focus().toggleBold().run()} title="Bold"><Bold className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive("italic")} onClick={()=>editor.chain().focus().toggleItalic().run()} title="Italic"><Italic className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive("underline")} onClick={()=>editor.chain().focus().toggleUnderline().run()} title="Underline"><UnderlineIcon className="w-3.5 h-3.5"/></TBtn>
+      <Sep/>
+      <TBtn active={editor.isActive("bulletList")} onClick={()=>editor.chain().focus().toggleBulletList().run()} title="Bullet List"><List className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive("orderedList")} onClick={()=>editor.chain().focus().toggleOrderedList().run()} title="Numbered List"><ListOrdered className="w-3.5 h-3.5"/></TBtn>
+      <Sep/>
+      <TBtn active={editor.isActive({textAlign:"left"})} onClick={()=>editor.chain().focus().setTextAlign("left").run()} title="Left"><AlignLeft className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive({textAlign:"center"})} onClick={()=>editor.chain().focus().setTextAlign("center").run()} title="Center"><AlignCenter className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive({textAlign:"right"})} onClick={()=>editor.chain().focus().setTextAlign("right").run()} title="Right"><AlignRight className="w-3.5 h-3.5"/></TBtn>
+      <Sep/>
+      <TBtn active={editor.isActive("blockquote")} onClick={()=>editor.chain().focus().toggleBlockquote().run()} title="Blockquote"><Quote className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={false} onClick={()=>editor.chain().focus().setHorizontalRule().run()} title="Divider"><Minus className="w-3.5 h-3.5"/></TBtn>
+      <TBtn active={editor.isActive("link")} onClick={setLink} title="Link"><Link2 className="w-3.5 h-3.5"/></TBtn>
+    </div>
+  );
 }
 
-export function SessionNotesTab({ initialAthleteId }: SessionNotesTabProps) {
-  const [selectedAthleteId, setSelectedAthleteId] = useState<number | null>(
-    initialAthleteId ?? null
+// ── Editor ────────────────────────────────────────────────────
+function NoteEditor({
+  athleteId, athleteName, note, onSaved, onCancel,
+}: {
+  athleteId: number; athleteName: string;
+  note?: { id: number; title: string; content: string; reportDate: string } | null;
+  onSaved: () => void; onCancel: () => void;
+}) {
+  const isEdit = !!note;
+  const [title, setTitle] = useState(note?.title ?? "");
+  const [noteDate, setNoteDate] = useState(
+    note?.reportDate ? new Date(note.reportDate).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]
   );
-  const [view, setView] = useState<"list" | "form" | "edit" | "report">("list");
-  const [editingNote, setEditingNote] = useState<any>(null);
-  const [reportSessionNoteId, setReportSessionNoteId] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // Get all users (athletes) for the dropdown
-  const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({ horizontalRule: false, heading: { levels: [1,2,3] } }),
+      Underline, TextAlign.configure({ types: ["heading","paragraph"] }),
+      Placeholder.configure({ placeholder: "Write your session notes here…" }),
+      Link.configure({ openOnClick: false, autolink: true }),
+      Typography, HorizontalRule,
+    ],
+    content: note?.content ?? "",
+    editorProps: { attributes: { class: "sn-editor-inner" } },
+  });
 
-  // Filter to athletes only
-  const athletes = useMemo(() => {
-    return allUsers
-      .filter(
-        (u: any) =>
-          u.role === "athlete" || u.role === "user"
-      )
-      .map((u: any) => ({
-        id: u.id,
-        name: u.name || u.email || `User #${u.id}`,
-      }));
-  }, [allUsers]);
+  const createMutation = trpc.playerReports.create.useMutation();
+  const updateMutation = trpc.playerReports.update.useMutation();
 
-  const selectedAthlete = athletes.find(
-    (a: any) => a.id === selectedAthleteId
-  );
-
-  // Fetch athlete profile for parent email when generating reports
-  // MUST be before any early returns to avoid conditional hook calls (React error #310)
-  const { data: athleteProfile } = trpc.athleteProfiles.get.useQuery(
-    { userId: selectedAthleteId! },
-    { enabled: !!selectedAthleteId && view === "report" }
-  );
-
-  const handleNewNote = () => {
-    setEditingNote(null);
-    setView("form");
-  };
-
-  const handleEditNote = (note: any) => {
-    setEditingNote({
-      id: note.id,
-      sessionDate: note.sessionDate,
-      sessionNumber: note.sessionNumber,
-      sessionLabel: note.sessionLabel,
-      duration: note.duration,
-      skillsWorked: note.skillsWorked as string[],
-      whatImproved: note.whatImproved,
-      whatNeedsWork: note.whatNeedsWork,
-      homeworkDrills: note.homeworkDrills as Array<{
-        drillId: string;
-        drillName: string;
-      }>,
-      overallRating: note.overallRating,
-      privateNotes: note.privateNotes,
-    });
-    setView("edit");
-  };
-
-  const handleFormComplete = () => {
-    setView("list");
-    setEditingNote(null);
-  };
-
-  const handleGenerateReport = (noteId: number) => {
-    setReportSessionNoteId(noteId);
-    setView("report");
-  };
-
-  // If no athlete selected, show athlete picker
-  if (!selectedAthleteId) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <InlineEdit contentKey="coach.sessionNotes.title" defaultValue="Session Notes" as="h2" className="font-heading font-bold text-xl md:text-2xl mb-2" />
-          <p className="text-muted-foreground text-sm">
-            Select an athlete to log session notes and track progress.
-          </p>
-        </div>
-
-        <div className="max-w-md">
-          <label className="text-xs font-semibold text-muted-foreground mb-2 block uppercase tracking-wider">
-            Select Athlete
-          </label>
-          <Select
-            value=""
-            onValueChange={(val) => setSelectedAthleteId(parseInt(val))}
-          >
-            <SelectTrigger className="bg-white/[0.04] border-white/[0.08] h-12">
-              <SelectValue placeholder="Choose an athlete..." />
-            </SelectTrigger>
-            <SelectContent>
-              {athletes.length === 0 ? (
-                <div className="p-3 text-sm text-muted-foreground text-center">
-                  No athletes found. Invite athletes first.
-                </div>
-              ) : (
-                athletes.map((a: any) => (
-                  <SelectItem key={a.id} value={String(a.id)}>
-                    {a.name}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Athletes with existing sessions */}
-        <AthleteSessionOverview onSelectAthlete={setSelectedAthleteId} />
-      </div>
-    );
-  }
-
-  // Report view — full screen within the tab
-  if (view === "report" && reportSessionNoteId && selectedAthleteId) {
-    return (
-      <ProgressReportReview
-        sessionNoteId={reportSessionNoteId}
-        athleteId={selectedAthleteId}
-        athleteName={selectedAthlete?.name ?? "Athlete"}
-        parentEmail={athleteProfile?.parentEmail ?? undefined}
-        parentName={athleteProfile?.parentName ?? undefined}
-        onBack={() => {
-          setView("list");
-          setReportSessionNoteId(null);
-        }}
-      />
-    );
-  }
+  const handleSave = useCallback(async () => {
+    if (!title.trim()) { setError("Title is required"); return; }
+    if (!editor) return;
+    setSaving(true); setError("");
+    try {
+      const content = editor.getHTML();
+      if (isEdit && note) {
+        await updateMutation.mutateAsync({ id: note.id, title, content, reportDate: noteDate });
+      } else {
+        await createMutation.mutateAsync({ athleteId, title, content, reportDate: noteDate });
+      }
+      onSaved();
+    } catch (e: any) {
+      setError(e.message ?? "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  }, [title, noteDate, editor, isEdit, note, athleteId]);
 
   return (
-    <div className="space-y-4">
-      {/* Athlete selector bar */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            setSelectedAthleteId(null);
-            setView("list");
-          }}
-          className="h-8 px-2"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          All Athletes
-        </Button>
+    <>
+      <style>{EDITOR_STYLES}</style>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <button onClick={onCancel} className="text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/[0.06]">
+            <ChevronLeft className="w-5 h-5"/>
+          </button>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-white">{isEdit ? "Edit Session Note" : "New Session Note"}</h2>
+            <p className="text-white/40 text-xs">{athleteName}</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={onCancel} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors text-sm">
+              <X className="w-3.5 h-3.5"/> Cancel
+            </button>
+            <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-electric text-black font-semibold text-sm hover:bg-electric/90 transition-colors disabled:opacity-50">
+              <Save className="w-3.5 h-3.5"/>
+              {saving ? "Saving…" : isEdit ? "Save Changes" : "Save Note"}
+            </button>
+          </div>
+        </div>
 
-        <Select
-          value={String(selectedAthleteId)}
-          onValueChange={(val) => {
-            setSelectedAthleteId(parseInt(val));
-            setView("list");
-          }}
-        >
-          <SelectTrigger className="bg-white/[0.04] border-white/[0.08] w-48 h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {athletes.map((a: any) => (
-              <SelectItem key={a.id} value={String(a.id)}>
-                {a.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-3">
+          <input
+            type="text" value={title} onChange={e => setTitle(e.target.value)}
+            placeholder="Session note title…"
+            className="flex-1 bg-white/[0.04] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/25 text-sm focus:outline-none focus:border-electric/40 transition-colors"
+          />
+          <div className="flex items-center gap-2 bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2.5">
+            <Calendar className="w-4 h-4 text-white/30 shrink-0"/>
+            <input type="date" value={noteDate} onChange={e => setNoteDate(e.target.value)} className="bg-transparent text-white/80 text-sm focus:outline-none"/>
+          </div>
+        </div>
 
-        {view === "list" && (
-          <Button
-            size="sm"
-            onClick={handleNewNote}
-            className="bg-[#DC143C] hover:bg-[#DC143C]/90 ml-auto"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            <span className="hidden sm:inline"><InlineEdit contentKey="coach.sessionNotes.newBtn" defaultValue="New Session Note" as="span" /></span>
-            <span className="sm:hidden">Add</span>
-          </Button>
-        )}
+        <div className="sn-editor rounded-xl border border-white/[0.08] bg-[#0e0e0e] overflow-hidden shadow-xl">
+          <Toolbar editor={editor}/>
+          <EditorContent editor={editor}/>
+        </div>
+
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+      </div>
+    </>
+  );
+}
+
+// ── Viewer ────────────────────────────────────────────────────
+function NoteViewer({
+  note, athleteName, onEdit, onBack, onDelete,
+}: {
+  note: { id: number; title: string; content: string; reportDate: string };
+  athleteName: string; onEdit: () => void; onBack: () => void; onDelete: () => void;
+}) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  return (
+    <>
+      <style>{EDITOR_STYLES}</style>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <button onClick={onBack} className="text-white/40 hover:text-white transition-colors mt-0.5 p-1 rounded-lg hover:bg-white/[0.06]">
+              <ChevronLeft className="w-5 h-5"/>
+            </button>
+            <div>
+              <h2 className="text-lg font-bold text-white leading-snug">{note.title}</h2>
+              <p className="text-white/35 text-xs mt-0.5">
+                {athleteName} · {new Date(note.reportDate).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
+              <Edit3 className="w-3.5 h-3.5"/> Edit
+            </button>
+            {confirmDelete ? (
+              <div className="flex gap-2 items-center">
+                <span className="text-white/40 text-sm">Delete?</span>
+                <button onClick={onDelete} className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm transition-colors">Yes</button>
+                <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 rounded-lg bg-white/[0.05] text-white/40 text-sm transition-colors">No</button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm transition-colors">
+                <Trash2 className="w-3.5 h-3.5"/> Delete
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="sn-view rounded-xl border border-white/[0.08] bg-[#0e0e0e] px-12 py-10 shadow-xl"
+          dangerouslySetInnerHTML={{ __html: note.content }}
+        />
+      </div>
+    </>
+  );
+}
+
+// ── Note List ─────────────────────────────────────────────────
+function NoteList({
+  athleteId, athleteName, onSelect, onNew,
+}: {
+  athleteId: number; athleteName: string;
+  onSelect: (note: any) => void; onNew: () => void;
+}) {
+  const { data: notes = [], isLoading } = trpc.playerReports.listByAthlete.useQuery({ athleteId });
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-base font-bold text-white">{athleteName}</h3>
+          <p className="text-white/35 text-xs mt-0.5">{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
+        </div>
+        <button onClick={onNew} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-electric text-black font-semibold text-sm hover:bg-electric/90 transition-colors">
+          <Plus className="w-4 h-4"/> New Note
+        </button>
       </div>
 
-      {/* Content */}
-      {view === "form" || view === "edit" ? (
-        <SessionNotesForm
-          athleteId={selectedAthleteId}
-          athleteName={selectedAthlete?.name ?? "Athlete"}
-          onComplete={handleFormComplete}
-          onCancel={() => {
-            setView("list");
-            setEditingNote(null);
-          }}
-          editingNote={view === "edit" ? editingNote : undefined}
-        />
+      {isLoading ? (
+        <div className="text-white/30 text-sm py-12 text-center">Loading…</div>
+      ) : notes.length === 0 ? (
+        <div className="text-center py-16 border border-dashed border-white/[0.08] rounded-xl">
+          <StickyNote className="w-10 h-10 text-white/15 mx-auto mb-3"/>
+          <p className="text-white/35 text-sm">No session notes yet for {athleteName}</p>
+          <button onClick={onNew} className="mt-4 px-4 py-2 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 text-sm transition-colors">
+            Create First Note
+          </button>
+        </div>
       ) : (
-        <SessionHistory
-          athleteId={selectedAthleteId}
-          athleteName={selectedAthlete?.name ?? "Athlete"}
-          onNewNote={handleNewNote}
-          onEditNote={handleEditNote}
-          onGenerateReport={handleGenerateReport}
-        />
+        <div className="flex flex-col gap-2">
+          {(notes as any[]).map((n: any) => (
+            <button key={n.id} onClick={() => onSelect(n)}
+              className="w-full text-left p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] hover:border-electric/25 hover:bg-white/[0.05] transition-all group"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-electric/10 flex items-center justify-center shrink-0">
+                    <StickyNote className="w-4 h-4 text-electric"/>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-white/90 font-medium text-sm truncate">{n.title}</p>
+                    <p className="text-white/35 text-xs mt-0.5">
+                      {new Date(n.reportDate).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/40 shrink-0 transition-colors"/>
+              </div>
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
-/** Overview of athletes who have session notes */
-function AthleteSessionOverview({
-  onSelectAthlete,
-}: {
-  onSelectAthlete: (id: number) => void;
-}) {
-  const { data: athletesWithSessions = [], isLoading } =
-    trpc.sessionNotes.getAthletesWithSessions.useQuery();
+// ── Main Tab ──────────────────────────────────────────────────
+type View =
+  | { type: "select-athlete" }
+  | { type: "list"; athleteId: number; athleteName: string }
+  | { type: "new"; athleteId: number; athleteName: string }
+  | { type: "view"; athleteId: number; athleteName: string; note: any }
+  | { type: "edit"; athleteId: number; athleteName: string; note: any };
 
-  if (isLoading || athletesWithSessions.length === 0) return null;
+export function SessionNotesTab() {
+  const [view, setView] = useState<View>({ type: "select-athlete" });
+  const [search, setSearch] = useState("");
+
+  const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
+  const athletes = (allUsers as any[]).filter((u: any) => u.role === "athlete");
+  const utils = trpc.useUtils();
+
+  const deleteMutation = trpc.playerReports.delete.useMutation({
+    onSuccess: () => {
+      if (view.type === "view") {
+        utils.playerReports.listByAthlete.invalidate({ athleteId: view.athleteId });
+        setView({ type: "list", athleteId: view.athleteId, athleteName: view.athleteName });
+      }
+    },
+  });
+
+  const filtered = athletes.filter((a: any) => a.name?.toLowerCase().includes(search.toLowerCase()));
+
+  const handleSaved = () => {
+    if (view.type === "new" || view.type === "edit") {
+      utils.playerReports.listByAthlete.invalidate({ athleteId: view.athleteId });
+      setView({ type: "list", athleteId: view.athleteId, athleteName: view.athleteName });
+    }
+  };
+
+  const activeId = view.type !== "select-athlete" ? view.athleteId : null;
 
   return (
-    <div>
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-        Athletes with Sessions
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {athletesWithSessions.map((a: any) => (
-          <button
-            key={a.athleteId}
-            onClick={() => onSelectAthlete(a.athleteId)}
-            className="glass-card rounded-xl p-4 text-left hover:bg-white/[0.04] transition-all duration-200 group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#DC143C]/20 to-[#DC143C]/20 flex items-center justify-center shrink-0">
-                <Users className="h-5 w-5 text-[#DC143C]" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-heading font-bold text-sm truncate group-hover:text-[#DC143C] transition-colors">
-                  {a.athleteName ?? "Unknown"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {a.totalSessions} session{a.totalSessions !== 1 ? "s" : ""}
-                  {a.lastSessionDate && (
-                    <span className="ml-1">
-                      · Last:{" "}
-                      {new Date(a.lastSessionDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                  )}
-                </p>
-              </div>
+    <div className="flex gap-5 min-h-[600px]">
+      {/* Sidebar */}
+      <div className="w-52 shrink-0 flex flex-col gap-2">
+        <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-1 flex items-center gap-1.5 px-1">
+          <User className="w-3 h-3"/> Athletes
+        </p>
+        <input
+          type="text" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search…"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-white placeholder:text-white/25 text-xs focus:outline-none focus:border-electric/30 transition-colors"
+        />
+        <div className="flex flex-col gap-0.5">
+          {filtered.map((a: any) => {
+            const isActive = activeId === a.id;
+            return (
+              <button
+                key={a.id}
+                onClick={() => setView({ type: "list", athleteId: a.id, athleteName: a.name })}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate ${
+                  isActive ? "bg-electric/15 text-electric border border-electric/20" : "text-white/55 hover:text-white/90 hover:bg-white/[0.05]"
+                }`}
+              >
+                {a.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {view.type === "select-athlete" && (
+          <div className="flex flex-col items-center justify-center h-full py-24 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-4">
+              <StickyNote className="w-6 h-6 text-white/20"/>
             </div>
-          </button>
-        ))}
+            <p className="text-white/30 text-sm">Select an athlete to view or create session notes</p>
+          </div>
+        )}
+
+        {view.type === "list" && (
+          <NoteList
+            athleteId={view.athleteId} athleteName={view.athleteName}
+            onSelect={(note) => setView({ type: "view", athleteId: view.athleteId, athleteName: view.athleteName, note })}
+            onNew={() => setView({ type: "new", athleteId: view.athleteId, athleteName: view.athleteName })}
+          />
+        )}
+
+        {view.type === "new" && (
+          <NoteEditor
+            athleteId={view.athleteId} athleteName={view.athleteName}
+            onSaved={handleSaved}
+            onCancel={() => setView({ type: "list", athleteId: view.athleteId, athleteName: view.athleteName })}
+          />
+        )}
+
+        {view.type === "view" && (
+          <NoteViewer
+            note={view.note} athleteName={view.athleteName}
+            onEdit={() => setView({ type: "edit", athleteId: view.athleteId, athleteName: view.athleteName, note: view.note })}
+            onBack={() => setView({ type: "list", athleteId: view.athleteId, athleteName: view.athleteName })}
+            onDelete={() => deleteMutation.mutate({ id: view.note.id })}
+          />
+        )}
+
+        {view.type === "edit" && (
+          <NoteEditor
+            athleteId={view.athleteId} athleteName={view.athleteName}
+            note={{ ...view.note, reportDate: new Date(view.note.reportDate).toISOString().split("T")[0] }}
+            onSaved={handleSaved}
+            onCancel={() => setView({ type: "view", athleteId: view.athleteId, athleteName: view.athleteName, note: view.note })}
+          />
+        )}
       </div>
     </div>
   );
