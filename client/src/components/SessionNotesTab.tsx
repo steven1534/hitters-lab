@@ -30,7 +30,7 @@ import {
   AlignLeft, AlignCenter, AlignRight,
   Plus, Trash2, Edit3, ChevronLeft, FileText, Calendar, User,
   Save, X, Quote, Minus, Link2, Heading1, Heading2, Heading3,
-  ChevronRight, StickyNote, Download,
+  ChevronRight, StickyNote, Download, Check,
 } from "lucide-react";
 import { exportHtmlToPdf } from "@/lib/exportPdf";
 
@@ -224,13 +224,36 @@ function NoteEditor({
 
 // ── Viewer ────────────────────────────────────────────────────
 function NoteViewer({
-  note, athleteName, onEdit, onBack, onDelete,
+  note, athleteName, onEdit, onBack, onDelete, onDateChange,
 }: {
   note: { id: number; title: string; content: string; reportDate: string };
   athleteName: string; onEdit: () => void; onBack: () => void; onDelete: () => void;
+  onDateChange: (newDate: string) => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [editingDate, setEditingDate] = useState(false);
+  const [dateValue, setDateValue] = useState(
+    new Date(note.reportDate).toISOString().split("T")[0]
+  );
+  const [savingDate, setSavingDate] = useState(false);
+
+  const updateMutation = trpc.playerReports.update.useMutation();
+
+  const handleSaveDate = async (val: string) => {
+    if (!val || val === new Date(note.reportDate).toISOString().split("T")[0]) {
+      setEditingDate(false);
+      return;
+    }
+    setSavingDate(true);
+    try {
+      await updateMutation.mutateAsync({ id: note.id, reportDate: val });
+      onDateChange(val);
+    } finally {
+      setSavingDate(false);
+      setEditingDate(false);
+    }
+  };
 
   const handleExport = async () => {
     setExporting(true);
@@ -258,9 +281,40 @@ function NoteViewer({
             </button>
             <div>
               <h2 className="text-lg font-bold text-white leading-snug">{note.title}</h2>
-              <p className="text-white/35 text-xs mt-0.5">
-                {athleteName} · {new Date(note.reportDate).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
-              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-white/35 text-xs">{athleteName} ·</span>
+                {editingDate ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="date"
+                      value={dateValue}
+                      onChange={e => setDateValue(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") handleSaveDate(dateValue); if (e.key === "Escape") setEditingDate(false); }}
+                      autoFocus
+                      className="bg-white/[0.08] border border-electric/40 rounded px-2 py-0.5 text-white text-xs focus:outline-none focus:border-electric"
+                    />
+                    <button
+                      onClick={() => handleSaveDate(dateValue)}
+                      disabled={savingDate}
+                      className="p-1 rounded text-electric hover:bg-electric/10 disabled:opacity-50"
+                    >
+                      <Check className="w-3 h-3" />
+                    </button>
+                    <button onClick={() => setEditingDate(false)} className="p-1 rounded text-white/30 hover:text-white/60">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setEditingDate(true)}
+                    className="flex items-center gap-1 text-white/35 text-xs hover:text-white/70 hover:bg-white/[0.05] px-1.5 py-0.5 rounded transition-colors group"
+                    title="Click to edit date"
+                  >
+                    <Calendar className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {new Date(note.reportDate).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
@@ -449,6 +503,10 @@ export function SessionNotesTab() {
             onEdit={() => setView({ type: "edit", athleteId: view.athleteId, athleteName: view.athleteName, note: view.note })}
             onBack={() => setView({ type: "list", athleteId: view.athleteId, athleteName: view.athleteName })}
             onDelete={() => deleteMutation.mutate({ id: view.note.id })}
+            onDateChange={(newDate) => {
+              utils.playerReports.listByAthlete.invalidate({ athleteId: view.athleteId });
+              setView({ type: "view", athleteId: view.athleteId, athleteName: view.athleteName, note: { ...view.note, reportDate: newDate } });
+            }}
           />
         )}
 
