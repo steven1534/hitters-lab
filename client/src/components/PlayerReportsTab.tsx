@@ -13,8 +13,9 @@ import {
   AlignLeft, AlignCenter, AlignRight,
   Plus, Trash2, Edit3, ChevronLeft, FileText, Calendar, User,
   Save, X, Quote, Minus, Link2, Heading1, Heading2, Heading3,
-  ChevronRight,
+  ChevronRight, Download,
 } from "lucide-react";
+import { exportHtmlToPdf } from "@/lib/exportPdf";
 
 // ── Toolbar Button ────────────────────────────────────────────
 function TBtn({
@@ -360,6 +361,22 @@ function ReportViewer({
   onDelete: () => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportHtmlToPdf({
+        title: report.title,
+        athleteName,
+        date: new Date(report.reportDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+        html: report.content,
+        filename: `${athleteName.replace(/\s+/g, "-")}_Report_${new Date(report.reportDate).toISOString().split("T")[0]}`,
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <>
@@ -379,6 +396,9 @@ function ReportViewer({
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
+            <button onClick={handleExport} disabled={exporting} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors disabled:opacity-50">
+              <Download className="w-3.5 h-3.5" /> {exporting ? "Exporting…" : "Export PDF"}
+            </button>
             <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
               <Edit3 className="w-3.5 h-3.5" /> Edit
             </button>

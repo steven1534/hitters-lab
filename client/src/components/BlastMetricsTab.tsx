@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft, Users, TrendingUp, Zap, Target,
-  ChevronRight, BarChart3, Gauge, Crosshair, Plus, UserPlus, Trash2, Link2, FileText, Pencil, FileSpreadsheet
+  ChevronRight, BarChart3, Gauge, Crosshair, Plus, UserPlus, Trash2, Link2, FileText, Pencil, FileSpreadsheet, Download
 } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -20,6 +20,7 @@ import { EditBlastSession, type SessionData } from "./EditBlastSession";
 import { ImportBlastCSV } from "./ImportBlastCSV";
 import { RetroactiveBlastNotes } from "./RetroactiveBlastNotes";
 import { InlineEdit } from "./InlineEdit";
+import { exportHtmlToPdf } from "@/lib/exportPdf";
 
 // Metric display config
 const METRIC_CONFIGS = {
@@ -75,6 +76,7 @@ export function BlastMetricsTab() {
   const [editSession, setEditSession] = useState<SessionData | null>(null);
   const [importCSVOpen, setImportCSVOpen] = useState(false);
   const [retroNotesOpen, setRetroNotesOpen] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const { data: players = [], isLoading: playersLoading } = trpc.blastMetrics.listPlayers.useQuery();
 
@@ -102,6 +104,95 @@ export function BlastMetricsTab() {
     { playerId: selectedPlayerId! },
     { enabled: !!selectedPlayerId }
   );
+
+  // Export blast metrics to PDF
+  async function exportBlastPdf() {
+    if (!player || !sessions.length) return;
+    setIsExportingPdf(true);
+    try {
+      const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+      const sessionsRows = sessions.map((s: any) => `
+        <tr>
+          <td>${formatDate(s.sessionDate)}</td>
+          <td>${s.sessionType || "—"}</td>
+          <td>${s.batSpeedMph ? parseFloat(s.batSpeedMph).toFixed(1) + " mph" : "—"}</td>
+          <td>${s.onPlaneEfficiencyPercent ? parseFloat(s.onPlaneEfficiencyPercent).toFixed(1) + "%" : "—"}</td>
+          <td>${s.attackAngleDeg ? parseFloat(s.attackAngleDeg).toFixed(1) + "°" : "—"}</td>
+          <td>${s.exitVelocityMph ? parseFloat(s.exitVelocityMph).toFixed(1) + " mph" : "—"}</td>
+        </tr>
+      `).join("");
+
+      const averagesRows = averages.map((avg: any) => `
+        <tr class="avg-row">
+          <td>${avg.sessionType}</td>
+          <td>${avg.sessionCount}</td>
+          <td>${avg.avgBatSpeed} mph</td>
+          <td>${avg.avgOnPlaneEfficiency}%</td>
+          <td>${avg.avgAttackAngle}°</td>
+          <td>${avg.avgExitVelocity} mph</td>
+        </tr>
+      `).join("");
+
+      const html = `
+        <style>
+          .blast-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; font-size: 13px; }
+          .blast-table th { background: #f4f4f4; font-weight: 700; text-align: left; padding: 8px 10px;
+            border-bottom: 2px solid #ddd; color: #333; }
+          .blast-table td { padding: 7px 10px; border-bottom: 1px solid #eee; color: #444; }
+          .blast-table tr:last-child td { border-bottom: none; }
+          .blast-table tr:hover td { background: #fafafa; }
+          .avg-row td { font-weight: 600; color: #111; background: #f9f9f9; }
+          .section-title { font-size: 15px; font-weight: 700; color: #111; margin: 24px 0 10px;
+            padding-bottom: 6px; border-bottom: 2px solid #DC143C; }
+        </style>
+
+        <div class="section-title">Session History (${sessions.length} sessions)</div>
+        <table class="blast-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Bat Speed</th>
+              <th>On-Plane Eff.</th>
+              <th>Attack Angle</th>
+              <th>Exit Velo</th>
+            </tr>
+          </thead>
+          <tbody>${sessionsRows}</tbody>
+        </table>
+
+        ${averages.length > 0 ? `
+          <div class="section-title">Averages by Session Type</div>
+          <table class="blast-table">
+            <thead>
+              <tr>
+                <th>Session Type</th>
+                <th>Sessions</th>
+                <th>Bat Speed</th>
+                <th>On-Plane Eff.</th>
+                <th>Attack Angle</th>
+                <th>Exit Velo</th>
+              </tr>
+            </thead>
+            <tbody>${averagesRows}</tbody>
+          </table>
+        ` : ""}
+      `;
+
+      const safeName = player.fullName.replace(/\s+/g, "-");
+      const dateStr = new Date().toISOString().slice(0, 10);
+      await exportHtmlToPdf({
+        title: "Blast Motion Metrics Report",
+        athleteName: player.fullName,
+        date: today,
+        html,
+        filename: `${safeName}_BlastMetrics_${dateStr}`,
+      });
+    } finally {
+      setIsExportingPdf(false);
+    }
+  }
 
   // Prepare chart data
   const chartData = useMemo(() => {
@@ -296,6 +387,16 @@ export function BlastMetricsTab() {
           >
             <FileSpreadsheet className="h-3.5 w-3.5 mr-1" />
             Import CSV
+          </Button>
+          <Button
+            onClick={exportBlastPdf}
+            disabled={isExportingPdf || !sessions.length}
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs text-sky-400 border-sky-500/30 hover:bg-sky-500/10 disabled:opacity-40"
+          >
+            <Download className="h-3.5 w-3.5 mr-1" />
+            {isExportingPdf ? "Exporting..." : "Export PDF"}
           </Button>
           <Button
             onClick={() => setAddSessionOpen(true)}
