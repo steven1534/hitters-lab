@@ -118,22 +118,8 @@ export default function DrillsDirectory() {
     tagFilter !== "all-tags",
   ].filter(Boolean).length;
 
-  if (!loading && !isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <h1 className="text-4xl font-bold mb-4">Access Restricted</h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            This content is exclusive to invited athletes. Please log in to access the drill library.
-          </p>
-          <Button onClick={() => window.location.href = getLoginUrl()} size="lg">
-            <LogIn className="h-5 w-5 mr-2" />
-            Log In
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // Anonymous visitors can browse the directory — they get locked out after 1 free drill view.
+
 
   if (!loading && isAuthenticated && user?.role === 'athlete' && !user?.isActiveClient) {
     return (

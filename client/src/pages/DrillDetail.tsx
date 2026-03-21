@@ -1164,7 +1164,7 @@ export default function DrillDetail() {
   const id = params?.id;
 
   // Free preview tracking for unauthenticated visitors
-  const { viewedSlugs, remaining, isLimitReached, recordView, hasViewed } = usePreviewLimit();
+  const { viewCount, isLimitReached, recordView } = usePreviewLimit();
 
   // Preserve query params for back navigation to drill list
   // wouter's useSearch() strips the '?' prefix, returning e.g. 'page=2&category=Hitting'
@@ -1327,22 +1327,22 @@ export default function DrillDetail() {
   // Check if user has access (or if preview mode is enabled)
   const hasAccess = PREVIEW_MODE || (user && (user.role === 'admin' || user.isActiveClient === 1));
 
-  // Free preview logic: unauthenticated visitors get 2 free drill views
-  // If they're logged in (any role), bypass the preview limit entirely
   const isAnonymous = !user && !loading;
-  const currentSlugAlreadyViewed = id ? hasViewed(id) : false;
-  const showPreviewWall = isAnonymous && isLimitReached && !currentSlugAlreadyViewed;
 
-  // Record this drill view for anonymous users (only if they haven't hit the wall)
+  // Each drill page load by an anonymous visitor counts as one view.
+  // After the first free view, any subsequent visit (same or different drill)
+  // sends them straight to login.
   useEffect(() => {
-    if (isAnonymous && id && drill && !isLimitReached) {
-      recordView(id);
+    if (isAnonymous && id && drill) {
+      if (isLimitReached) {
+        // Already used their free view — redirect to login immediately
+        window.location.href = "/login";
+      } else {
+        // This is their first (free) view — record it
+        recordView();
+      }
     }
-    // Also allow viewing if they already viewed this slug before hitting limit
-    if (isAnonymous && id && drill && currentSlugAlreadyViewed) {
-      // No-op: they can revisit drills they already saw
-    }
-  }, [isAnonymous, id, drill?.name, isLimitReached, currentSlugAlreadyViewed]);
+  }, [isAnonymous, id, drill?.name]);
 
   if (loading) {
     return (
@@ -1375,16 +1375,10 @@ export default function DrillDetail() {
     );
   }
 
-  // Show the preview wall for anonymous users who have hit their free limit
-  if (showPreviewWall) {
-    return (
-      <DrillPreviewWall
-        drillName={drill.name}
-        viewedCount={viewedSlugs.length}
-        maxPreviews={MAX_FREE_PREVIEWS}
-        backHref={backHref}
-      />
-    );
+  // If anonymous and already at the limit, the useEffect above will redirect;
+  // render nothing while that navigation happens.
+  if (isAnonymous && isLimitReached) {
+    return null;
   }
 
   return (
