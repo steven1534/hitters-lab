@@ -378,6 +378,7 @@ export default function CoachDashboard() {
               <h1 className="text-xl font-bold text-white">{TAB_LABELS[activeTab]}</h1>
               <p className="text-white/35 text-xs mt-0.5">Coach Steve Baseball · {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
             </div>
+            <AddNewDrill />
           </div>
 
           {/* Tab content */}
