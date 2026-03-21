@@ -15,7 +15,7 @@
  * in the sessionNotes table are unaffected.
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -231,43 +231,47 @@ function NoteViewer({
   onDateChange: (newDate: string) => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [exporting, setExporting] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
   const [dateValue, setDateValue] = useState(
-    new Date(note.reportDate).toISOString().split("T")[0]
+    note.reportDate.includes("T") ? note.reportDate.split("T")[0] : note.reportDate
   );
   const [savingDate, setSavingDate] = useState(false);
 
   const updateMutation = trpc.playerReports.update.useMutation();
 
+  // Sync dateValue when parent updates reportDate after save
+  useEffect(() => {
+    const iso = note.reportDate.includes("T")
+      ? note.reportDate.split("T")[0]
+      : note.reportDate;
+    setDateValue(iso);
+  }, [note.reportDate]);
+
   const handleSaveDate = async (val: string) => {
-    if (!val || val === new Date(note.reportDate).toISOString().split("T")[0]) {
-      setEditingDate(false);
-      return;
-    }
+    if (!val) { setEditingDate(false); return; }
     setSavingDate(true);
     try {
       await updateMutation.mutateAsync({ id: note.id, reportDate: val });
       onDateChange(val);
+    } catch (e) {
+      console.error("Failed to update date", e);
     } finally {
       setSavingDate(false);
       setEditingDate(false);
     }
   };
 
-  const handleExport = async () => {
-    setExporting(true);
-    try {
-      await exportHtmlToPdf({
-        title: note.title,
-        athleteName,
-        date: new Date(note.reportDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-        html: note.content,
-        filename: `${athleteName.replace(/\s+/g, "-")}_SessionNote_${new Date(note.reportDate).toISOString().split("T")[0]}`,
-      });
-    } finally {
-      setExporting(false);
-    }
+  const handleExport = () => {
+    const dateStr = note.reportDate.includes("T")
+      ? note.reportDate.split("T")[0]
+      : note.reportDate;
+    exportHtmlToPdf({
+      title: note.title,
+      athleteName,
+      date: new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+      html: note.content,
+      filename: `${athleteName.replace(/\s+/g, "-")}_SessionNote_${dateStr}`,
+    });
   };
 
   return (
@@ -311,15 +315,15 @@ function NoteViewer({
                     title="Click to edit date"
                   >
                     <Calendar className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {new Date(note.reportDate).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
+                    {new Date((note.reportDate.includes("T") ? note.reportDate.split("T")[0] : note.reportDate) + "T12:00:00").toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
                   </button>
                 )}
               </div>
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
-            <button onClick={handleExport} disabled={exporting} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors disabled:opacity-50">
-              <Download className="w-3.5 h-3.5"/> {exporting ? "Exporting…" : "Export PDF"}
+            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
+              <Download className="w-3.5 h-3.5"/> Export PDF
             </button>
             <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
               <Edit3 className="w-3.5 h-3.5"/> Edit
