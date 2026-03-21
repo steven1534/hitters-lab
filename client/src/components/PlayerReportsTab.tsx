@@ -17,6 +17,16 @@ import {
 } from "lucide-react";
 import { exportHtmlToPdf } from "@/lib/exportPdf";
 
+// ── Safe date helper (reportDate can be Date object or string) ──
+function toIsoDate(d: Date | string): string {
+  if (d instanceof Date) return d.toISOString().split("T")[0];
+  if (typeof d === "string") return d.includes("T") ? d.split("T")[0] : d;
+  return String(d);
+}
+function formatReportDate(d: Date | string): string {
+  return new Date(toIsoDate(d) + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
 // ── Toolbar Button ────────────────────────────────────────────
 function TBtn({
   active, onClick, title, children,
@@ -364,19 +374,14 @@ function ReportViewer({
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
-  const [dateValue, setDateValue] = useState(
-    report.reportDate.includes("T") ? report.reportDate.split("T")[0] : report.reportDate
-  );
+  const [dateValue, setDateValue] = useState(toIsoDate(report.reportDate));
   const [savingDate, setSavingDate] = useState(false);
 
   const updateMutation = trpc.playerReports.update.useMutation();
 
   // Sync dateValue when parent updates reportDate after save
   useEffect(() => {
-    const iso = report.reportDate.includes("T")
-      ? report.reportDate.split("T")[0]
-      : report.reportDate;
-    setDateValue(iso);
+    setDateValue(toIsoDate(report.reportDate));
   }, [report.reportDate]);
 
   const handleSaveDate = async (val: string) => {
@@ -394,13 +399,11 @@ function ReportViewer({
   };
 
   const handleExport = () => {
-    const dateStr = report.reportDate.includes("T")
-      ? report.reportDate.split("T")[0]
-      : report.reportDate;
+    const dateStr = toIsoDate(report.reportDate);
     exportHtmlToPdf({
       title: report.title,
       athleteName,
-      date: new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+      date: formatReportDate(report.reportDate),
       html: report.content,
       filename: `${athleteName.replace(/\s+/g, "-")}_Report_${dateStr}`,
     });
@@ -448,7 +451,7 @@ function ReportViewer({
                     title="Click to edit date"
                   >
                     <Calendar className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {new Date((report.reportDate.includes("T") ? report.reportDate.split("T")[0] : report.reportDate) + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                    {formatReportDate(report.reportDate)}
                   </button>
                 )}
               </div>

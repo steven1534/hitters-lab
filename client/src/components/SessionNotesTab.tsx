@@ -262,13 +262,11 @@ function NoteViewer({
   };
 
   const handleExport = () => {
-    const dateStr = note.reportDate.includes("T")
-      ? note.reportDate.split("T")[0]
-      : note.reportDate;
+    const dateStr = toIsoDate(note.reportDate);
     exportHtmlToPdf({
       title: note.title,
       athleteName,
-      date: new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+      date: formatNoteDate(note.reportDate),
       html: note.content,
       filename: `${athleteName.replace(/\s+/g, "-")}_SessionNote_${dateStr}`,
     });
@@ -315,7 +313,7 @@ function NoteViewer({
                     title="Click to edit date"
                   >
                     <Calendar className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {new Date((note.reportDate.includes("T") ? note.reportDate.split("T")[0] : note.reportDate) + "T12:00:00").toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
+                    {formatNoteDate(note.reportDate)}
                   </button>
                 )}
               </div>
