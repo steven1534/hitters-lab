@@ -568,6 +568,22 @@ export const appRouter = router({
       .query(async () => {
         return await db.getCustomDrills();
       }),
+    bulkImportCustomDrills: protectedProcedure
+      .input(z.object({
+        drills: z.array(z.object({
+          drillId: z.string(),
+          name: z.string(),
+          difficulty: z.string(),
+          category: z.string(),
+          duration: z.string(),
+        }))
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        return await db.bulkImportCustomDrills(input.drills, ctx.user.id);
+      }),
     // Drill page layout procedures
     savePageLayout: protectedProcedure
       .input(z.object({

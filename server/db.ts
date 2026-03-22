@@ -565,3 +565,42 @@ export async function getCustomDrills() {
     return [];
   }
 }
+
+export async function bulkImportCustomDrills(
+  drills: { drillId: string; name: string; difficulty: string; category: string; duration: string }[],
+  createdBy: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  let imported = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+
+  for (const drill of drills) {
+    try {
+      await db.insert(customDrills).values({
+        drillId: drill.drillId,
+        name: drill.name,
+        difficulty: drill.difficulty,
+        category: drill.category,
+        duration: drill.duration,
+        createdBy,
+      }).onConflictDoUpdate({
+        target: customDrills.drillId,
+        set: {
+          name: drill.name,
+          difficulty: drill.difficulty,
+          category: drill.category,
+          duration: drill.duration,
+        }
+      });
+      imported++;
+    } catch (e: any) {
+      skipped++;
+      errors.push(`${drill.name}: ${e.message}`);
+    }
+  }
+
+  return { imported, skipped, errors };
+}

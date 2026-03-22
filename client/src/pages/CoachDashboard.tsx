@@ -19,6 +19,7 @@ import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAllDrills } from "@/hooks/useAllDrills";
 import { BulkInstructionImport } from "@/components/BulkInstructionImport";
+import { BulkImportCustomDrills } from "@/components/BulkImportCustomDrills";
 import { BulkGoalUpload } from "@/components/BulkGoalUpload";
 import { AthleteProgressReport } from "@/components/AthleteProgressReport";
 import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOverview";
@@ -576,7 +577,8 @@ export default function CoachDashboard() {
             )}
 
             {activeTab === "bulk-import" && (
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <BulkImportCustomDrills />
                 <BulkInstructionImport />
               </div>
             )}
