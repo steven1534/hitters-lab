@@ -95,24 +95,37 @@ const TAB_LABELS: Record<ActiveTab, string> = {
 function InviteUserButton() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
+  const [inviteLink, setInviteLink] = useState("");
+  const [copied, setCopied] = useState(false);
   const utils = trpc.useUtils();
 
   const inviteMutation = trpc.invites.createInvite.useMutation({
-    onSuccess: () => {
-      toast.success(`Invite sent to ${email}`);
-      setEmail("");
-      setName("");
-      setOpen(false);
+    onSuccess: (data: any) => {
       utils.invites.getAllInvites.invalidate();
+      const link = data?.inviteUrl || `https://app.coachstevebaseball.com/accept-invite/${data?.inviteToken}`;
+      setInviteLink(link);
     },
     onError: (err: any) => {
-      toast.error(err.message || "Failed to send invite");
+      toast.error(err.message || "Failed to create invite");
     },
   });
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    toast.success("Link copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEmail("");
+    setInviteLink("");
+    setCopied(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <UserPlus className="h-4 w-4" />
@@ -126,41 +139,58 @@ function InviteUserButton() {
             Invite New User
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <Label htmlFor="invite-name">Name (optional)</Label>
-            <Input
-              id="invite-name"
-              placeholder="e.g. Jake Smith"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="invite-email">Email address *</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder="athlete@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-9"
-                onKeyDown={(e) => { if (e.key === "Enter" && email) inviteMutation.mutate({ email }); }}
-              />
+
+        {!inviteLink ? (
+          <>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="invite-email">Athlete email address *</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    placeholder="athlete@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-9"
+                    onKeyDown={(e) => { if (e.key === "Enter" && email) inviteMutation.mutate({ email }); }}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={handleClose}>Cancel</Button>
+              <Button
+                onClick={() => inviteMutation.mutate({ email })}
+                disabled={!email || inviteMutation.isPending}
+              >
+                {inviteMutation.isPending ? "Creating..." : "Generate Invite Link"}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="space-y-4 py-2">
+            <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-center">
+              <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+              <p className="font-semibold text-green-800">Invite created for</p>
+              <p className="text-green-700 text-sm">{email}</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Share this link with the athlete</Label>
+              <div className="flex gap-2">
+                <Input value={inviteLink} readOnly className="text-xs" />
+                <Button size="sm" onClick={handleCopy} className="shrink-0">
+                  {copied ? <CheckCircle className="h-4 w-4" /> : "Copy"}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Send this link via text or email. It expires in 7 days.</p>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleClose}>Done</Button>
             </div>
           </div>
-        </div>
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button
-            onClick={() => inviteMutation.mutate({ email })}
-            disabled={!email || inviteMutation.isPending}
-          >
-            {inviteMutation.isPending ? "Sending..." : "Send Invite"}
-          </Button>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
