@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { 
   ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, Search, 
   Sparkles, Video, Upload, MessageSquare, BarChart3, Activity, Users, 
   LayoutTemplate, Edit3, ArrowLeftRight, FileText, ChevronRight,
   Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
-  BookOpen, StickyNote, Menu, X as XIcon,
+  BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useMemo } from "react";
@@ -87,6 +89,81 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "video-analysis": "Video Analysis",
   "blast-metrics": "Blast Metrics",
 };
+
+// ── Invite User Dialog ────────────────────────────────────────
+function InviteUserButton() {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const utils = trpc.useUtils();
+
+  const inviteMutation = trpc.invites.createInvite.useMutation({
+    onSuccess: () => {
+      import("sonner").then(({ toast }) => toast.success(`Invite sent to ${email}`));
+      setEmail("");
+      setName("");
+      setOpen(false);
+      utils.invites.getAllInvites.invalidate();
+    },
+    onError: (err: any) => {
+      import("sonner").then(({ toast }) => toast.error(err.message || "Failed to send invite"));
+    },
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <UserPlus className="h-4 w-4" />
+          Invite User
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
+            Invite New User
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label htmlFor="invite-name">Name (optional)</Label>
+            <Input
+              id="invite-name"
+              placeholder="e.g. Jake Smith"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="invite-email">Email address *</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="invite-email"
+                type="email"
+                placeholder="athlete@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-9"
+                onKeyDown={(e) => { if (e.key === "Enter" && email) inviteMutation.mutate({ email }); }}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => inviteMutation.mutate({ email })}
+            disabled={!email || inviteMutation.isPending}
+          >
+            {inviteMutation.isPending ? "Sending..." : "Send Invite"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function CoachDashboard() {
   useScrollRestoration();
@@ -378,7 +455,10 @@ export default function CoachDashboard() {
               <h1 className="text-xl font-bold text-white">{TAB_LABELS[activeTab]}</h1>
               <p className="text-white/35 text-xs mt-0.5">Coach Steve Baseball · {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
             </div>
-            <AddNewDrill />
+            <div className="flex items-center gap-2">
+              <InviteUserButton />
+              <AddNewDrill />
+            </div>
           </div>
 
           {/* Tab content */}
