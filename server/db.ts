@@ -7,7 +7,7 @@ import postgres from "postgres";
 import {
   InsertUser, users, notifications, notificationPreferences,
   InsertNotificationPreference, invites, drillVideos, drillDetails,
-  drillSubmissions, coachFeedback,
+  drillSubmissions, coachFeedback, customDrills,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc } from "drizzle-orm";
@@ -512,5 +512,56 @@ export async function upsertNotificationPreferences(userId: number, prefs: Parti
     return true;
   } catch (error) {
     return false;
+  }
+}
+
+export async function createNewDrill(
+  input: { name: string; difficulty: string; category: string; duration: string; goal?: string; instructions?: string; videoUrl?: string },
+  createdBy: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Generate a URL-safe drill ID from the name
+  const drillId = input.name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .substring(0, 80)
+    + "-" + Date.now();
+
+  // Insert into customDrills
+  const [created] = await db.insert(customDrills).values({
+    drillId,
+    name: input.name,
+    difficulty: input.difficulty,
+    category: input.category,
+    duration: input.duration,
+    createdBy,
+  }).returning();
+
+  // If a video URL was provided, save it to drillVideos
+  if (input.videoUrl) {
+    await db.insert(drillVideos).values({
+      drillId,
+      videoUrl: input.videoUrl,
+      uploadedBy: createdBy,
+    }).onConflictDoUpdate({
+      target: drillVideos.drillId,
+      set: { videoUrl: input.videoUrl },
+    });
+  }
+
+  return created;
+}
+
+export async function getCustomDrills() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(customDrills).orderBy(customDrills.name);
+  } catch {
+    return [];
   }
 }
