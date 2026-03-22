@@ -11,6 +11,7 @@ interface DrillRow {
   difficulty: string;
   category: string;
   duration: string;
+  videoUrl: string;
   _error?: string;
 }
 
@@ -48,25 +49,25 @@ function parseCSV(text: string): DrillRow[] {
     }
     cols.push(current.trim());
 
-    const [drillId = "", name = "", difficulty = "Medium", category = "Hitting", duration = "10m"] = cols;
-    const row: DrillRow = { drillId: drillId.trim(), name: name.trim(), difficulty: difficulty.trim(), category: category.trim(), duration: duration.trim() };
+    const [drillId = "", name = "", difficulty = "Medium", category = "Hitting", duration = "10m", videoUrl = ""] = cols;
+    const row: DrillRow = { drillId: drillId.trim(), name: name.trim(), difficulty: difficulty.trim(), category: category.trim(), duration: duration.trim(), videoUrl: videoUrl.trim() };
     const err = validateRow(row);
     if (err) row._error = err;
     return row;
   }).filter(r => r.drillId || r.name); // skip fully blank lines
 }
 
-const TEMPLATE_CSV = `drillId,name,difficulty,category,duration
-slow---controlled---explode-drill,Slow - Controlled - Explode Drill,Medium,Hitting,5m
-one-handed-drills,One Handed Drills,Medium,Hitting,10m
-crossover-drill,Crossover Drill,Medium,Hitting,10m`;
+const TEMPLATE_CSV = `drillId,name,difficulty,category,duration,videoUrl
+slow---controlled---explode-drill,Slow - Controlled - Explode Drill,Medium,Hitting,5m,https://youtube.com/watch?v=example
+one-handed-drills,One Handed Drills,Medium,Hitting,10m,
+crossover-drill,Crossover Drill,Medium,Hitting,10m,`;
 
-const SAMPLE_DATA = `drillId,name,difficulty,category,duration
-slow---controlled---explode-drill,Slow - Controlled - Explode Drill,Medium,Hitting,5m
-one-handed-drills,One Handed Drills,Medium,Hitting,10m
-crossover-drill,Crossover Drill,Medium,Hitting,10m
-elevated-front-toss-drill,Elevated Front Toss Drill,Hard,Hitting,10m
-step-back-drill,Step-back Drill,Medium,Hitting,10m`;
+const SAMPLE_DATA = `drillId,name,difficulty,category,duration,videoUrl
+slow---controlled---explode-drill,Slow - Controlled - Explode Drill,Medium,Hitting,5m,
+one-handed-drills,One Handed Drills,Medium,Hitting,10m,
+crossover-drill,Crossover Drill,Medium,Hitting,10m,
+elevated-front-toss-drill,Elevated Front Toss Drill,Hard,Hitting,10m,
+step-back-drill,Step-back Drill,Medium,Hitting,10m,`;
 
 export function BulkImportCustomDrills() {
   const [rows, setRows] = useState<DrillRow[]>([]);
@@ -118,7 +119,7 @@ export function BulkImportCustomDrills() {
     if (!validRows.length) return;
     setImporting(true);
     try {
-      await bulkMutation.mutateAsync({ drills: validRows });
+      await bulkMutation.mutateAsync({ drills: validRows.map(r => ({ ...r, videoUrl: r.videoUrl || undefined })) });
     } finally {
       setImporting(false);
     }
@@ -139,7 +140,7 @@ export function BulkImportCustomDrills() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-heading font-bold text-white">Bulk Import Drills</h2>
-          <p className="text-white/40 text-sm mt-1">Import custom drills via CSV. All 5 fields are required per row.</p>
+          <p className="text-white/40 text-sm mt-1">Import custom drills via CSV. First 5 fields required; videoUrl is optional.</p>
         </div>
         <Button variant="outline" size="sm" onClick={downloadTemplate} className="gap-2">
           <Download className="h-4 w-4" /> Download Template
@@ -151,13 +152,14 @@ export function BulkImportCustomDrills() {
         <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
           <FileText className="h-4 w-4 text-[#DC143C]" /> Required CSV Columns (in order)
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
           {[
             { col: "drillId", desc: "URL-safe ID", example: "step-back-drill", note: "Unique, lowercase, hyphens only" },
             { col: "name", desc: "Display name", example: "Step-back Drill", note: "Human-readable title" },
             { col: "difficulty", desc: "Level", example: "Medium", note: "Easy · Medium · Hard" },
             { col: "category", desc: "Skill set", example: "Hitting", note: "Hitting · Pitching · Infield · Outfield · Bunting" },
             { col: "duration", desc: "Time", example: "10m", note: "5m · 10m · 15m · 20m · 30m" },
+            { col: "videoUrl", desc: "Video (optional)", example: "https://youtube.com/...", note: "YouTube or any video URL" },
           ].map(f => (
             <div key={f.col} className="bg-white/[0.04] rounded-lg p-3 border border-white/[0.06]">
               <div className="font-mono text-[#DC143C] text-xs font-bold mb-1">{f.col}</div>
@@ -177,7 +179,7 @@ export function BulkImportCustomDrills() {
             <h3 className="text-sm font-semibold text-white">Paste CSV</h3>
             <textarea
               className="w-full h-48 bg-black/30 border border-white/[0.08] rounded-lg p-3 text-white/70 text-xs font-mono resize-none focus:outline-none focus:border-[#DC143C]/40"
-              placeholder={`drillId,name,difficulty,category,duration\nstep-back-drill,Step-back Drill,Medium,Hitting,10m\nbounce-drill,Bounce Drill,Medium,Hitting,10m`}
+              placeholder={`drillId,name,difficulty,category,duration,videoUrl\nstep-back-drill,Step-back Drill,Medium,Hitting,10m,https://youtube.com/watch?v=abc\nbounce-drill,Bounce Drill,Medium,Hitting,10m,`}
               onPaste={handlePaste}
               onChange={handleTextarea}
             />
@@ -224,7 +226,7 @@ export function BulkImportCustomDrills() {
             <table className="w-full text-xs">
               <thead className="bg-white/[0.04] sticky top-0">
                 <tr>
-                  {["drillId", "name", "difficulty", "category", "duration", "status", ""].map(h => (
+                  {["drillId", "name", "difficulty", "category", "duration", "videoUrl", "status", ""].map(h => (
                     <th key={h} className="text-left text-white/40 font-semibold uppercase tracking-wider px-4 py-2.5">{h}</th>
                   ))}
                 </tr>
@@ -243,6 +245,12 @@ export function BulkImportCustomDrills() {
                     </td>
                     <td className="px-4 py-2.5 text-white/60">{row.category}</td>
                     <td className="px-4 py-2.5 text-white/60">{row.duration}</td>
+                    <td className="px-4 py-2.5 max-w-[160px] truncate">
+                      {row.videoUrl
+                        ? <a href={row.videoUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline text-[10px] truncate block">{row.videoUrl}</a>
+                        : <span className="text-white/20">—</span>
+                      }
+                    </td>
                     <td className="px-4 py-2.5">
                       {row._error
                         ? <span className="text-red-400 flex items-center gap-1"><AlertCircle className="h-3 w-3" />{row._error}</span>

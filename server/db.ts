@@ -567,7 +567,7 @@ export async function getCustomDrills() {
 }
 
 export async function bulkImportCustomDrills(
-  drills: { drillId: string; name: string; difficulty: string; category: string; duration: string }[],
+  drills: { drillId: string; name: string; difficulty: string; category: string; duration: string; videoUrl?: string }[],
   createdBy: number
 ) {
   const db = await getDb();
@@ -595,6 +595,12 @@ export async function bulkImportCustomDrills(
           duration: drill.duration,
         }
       });
+
+      // Save video URL if provided
+      if (drill.videoUrl?.trim()) {
+        await saveOrUpdateDrillVideo(drill.drillId, drill.videoUrl.trim(), createdBy);
+      }
+
       imported++;
     } catch (e: any) {
       skipped++;

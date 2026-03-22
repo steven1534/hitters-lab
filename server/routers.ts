@@ -576,6 +576,7 @@ export const appRouter = router({
           difficulty: z.string(),
           category: z.string(),
           duration: z.string(),
+          videoUrl: z.string().optional(),
         }))
       }))
       .mutation(async ({ ctx, input }) => {
