@@ -429,7 +429,7 @@ export default function CoachDashboard() {
           <Upload className="w-4 h-4 shrink-0" />
           <span>Bulk Import</span>
         </button>
-        <Link href="/">
+        <Link href="/drills">
           <div className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-all cursor-pointer">
             <ArrowLeft className="w-4 h-4 shrink-0" />
             <span>Drill Directory</span>

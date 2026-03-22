@@ -32,6 +32,7 @@ export function AddNewDrill() {
   const [instructions, setInstructions] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
 
+  const utils = trpc.useUtils();
   const createDrillMutation = trpc.drillDetails.createNewDrill.useMutation();
 
   const handleSave = () => {
@@ -55,8 +56,7 @@ export function AddNewDrill() {
           toast.success(`Drill "${drillName}" created successfully!`);
           handleReset();
           setDialogOpen(false);
-          // Reload the page to show the new drill
-          window.location.reload();
+          utils.drillDetails.getCustomDrills.invalidate();
         },
         onError: (error: any) => {
           toast.error(error.message || "Failed to create drill");
