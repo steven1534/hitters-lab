@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { 
   ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, Search, 
   Sparkles, Video, Upload, MessageSquare, BarChart3, Activity, Users, 
@@ -99,14 +100,14 @@ function InviteUserButton() {
 
   const inviteMutation = trpc.invites.createInvite.useMutation({
     onSuccess: () => {
-      import("sonner").then(({ toast }) => toast.success(`Invite sent to ${email}`));
+      toast.success(`Invite sent to ${email}`);
       setEmail("");
       setName("");
       setOpen(false);
       utils.invites.getAllInvites.invalidate();
     },
     onError: (err: any) => {
-      import("sonner").then(({ toast }) => toast.error(err.message || "Failed to send invite"));
+      toast.error(err.message || "Failed to send invite");
     },
   });
 
