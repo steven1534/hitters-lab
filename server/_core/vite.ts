@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
+import { ogMetaMiddleware } from "./ogMeta";
 
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
@@ -64,6 +65,9 @@ export function serveStatic(app: Express) {
   }
 
   app.use(express.static(distPath));
+
+  // Inject drill-specific OG meta tags for link preview (iMessage, Twitter, Slack, etc.)
+  app.use(ogMetaMiddleware(distPath));
 
   // fall through to index.html if the file doesn't exist (but not for API routes)
   app.use("*", (_req, res) => {
