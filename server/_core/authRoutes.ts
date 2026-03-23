@@ -13,10 +13,13 @@ import {
 } from "./auth";
 
 function getCookieOptions(req: Request) {
+  // SameSite=None + Secure is required for cookies to work inside cross-site iframes
+  // (e.g. when the app is embedded on another domain). Lax blocks third-party cookies.
+  const isSecure = ENV.isProduction || req.secure || req.headers["x-forwarded-proto"] === "https";
   return {
     httpOnly: true,
-    secure: ENV.isProduction,
-    sameSite: "lax" as const,
+    secure: isSecure,
+    sameSite: isSecure ? ("none" as const) : ("lax" as const),
     path: "/",
     maxAge: ONE_YEAR_MS,
   };
