@@ -35,6 +35,13 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // Allow the site to be embedded in iframes on any domain
+  app.use((_req, res, next) => {
+    res.removeHeader("X-Frame-Options");
+    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    next();
+  });
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
