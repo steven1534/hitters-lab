@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 
 const STORAGE_KEY = "drill_preview_count";
-export const MAX_FREE_PREVIEWS = 1; // user gets 1 free view; 2nd view triggers lockout
+export const MAX_FREE_PREVIEWS = 2; // user gets 2 free views; 3rd view triggers login prompt
 
 function getStoredCount(): number {
   try {

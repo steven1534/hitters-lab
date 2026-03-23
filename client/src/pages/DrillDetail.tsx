@@ -1324,23 +1324,15 @@ export default function DrillDetail() {
     setEditGoalText('');
   };
 
-  // Check if user has access (or if preview mode is enabled)
-  const hasAccess = PREVIEW_MODE || (user && (user.role === 'admin' || user.isActiveClient === 1));
+  // All logged-in users have full access — no isActiveClient gate
+  const hasAccess = !!user;
 
   const isAnonymous = !user && !loading;
 
-  // Each drill page load by an anonymous visitor counts as one view.
-  // After the first free view, any subsequent visit (same or different drill)
-  // sends them straight to login.
+  // Track anonymous views. After MAX_FREE_PREVIEWS, show login prompt (not redirect).
   useEffect(() => {
-    if (isAnonymous && id && drill) {
-      if (isLimitReached) {
-        // Already used their free view — redirect to login immediately
-        window.location.href = "/login";
-      } else {
-        // This is their first (free) view — record it
-        recordView();
-      }
+    if (isAnonymous && id && drill && !isLimitReached) {
+      recordView();
     }
   }, [isAnonymous, id, drill?.name]);
 
@@ -1375,52 +1367,40 @@ export default function DrillDetail() {
     );
   }
 
-  // If anonymous and already at the limit, the useEffect above will redirect;
-  // render nothing while that navigation happens.
-  if (isAnonymous && isLimitReached) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-background pb-8 md:pb-12">
-      {/* Access Control Check - for logged-in users without active client status */}
-      {!hasAccess && !isAnonymous && (
-        <div className="container py-12">
-          <Card className="max-w-2xl mx-auto border-2">
-            <CardHeader className="text-center">
-              <div className="mx-auto bg-muted h-16 w-16 rounded-full flex items-center justify-center mb-4">
-                <Lock className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <CardTitle className="text-2xl">Client Access Required</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <p className="text-muted-foreground">
-                This drill content is only available to active clients. Please log in with an authorized account to view the full drill details.
+
+      {/* Login prompt overlay — shown after 2 free views for anonymous users */}
+      {isAnonymous && isLimitReached && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="bg-[#0f0f13] border border-white/[0.12] rounded-2xl p-8 max-w-md w-full text-center shadow-2xl space-y-5">
+            <div className="h-16 w-16 rounded-full bg-[#DC143C]/10 border border-[#DC143C]/20 flex items-center justify-center mx-auto">
+              <Lock className="h-8 w-8 text-[#DC143C]" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-heading font-bold text-white mb-2">Free Preview Limit Reached</h2>
+              <p className="text-white/50 text-sm leading-relaxed">
+                You've viewed your 2 free drills. Log in to access all 200+ professional training drills.
               </p>
-              {!user ? (
-                <a href={getLoginUrl()}>
-                  <Button size="lg" className="gap-2">
-                    <LogIn className="h-5 w-5" />
-                    Login to Access
-                  </Button>
-                </a>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Your account does not have active client access. Please contact the administrator.
-                  </p>
-                  <Link href={backHref}>
-                    <Button variant="outline">Return to Directory</Button>
-                  </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+            <div className="flex flex-col gap-3">
+              <a href={getLoginUrl()} className="w-full">
+                <Button size="lg" className="w-full bg-[#DC143C] hover:bg-[#DC143C]/90 text-white font-semibold gap-2">
+                  <LogIn className="h-5 w-5" />
+                  Log In
+                </Button>
+              </a>
+              <Link href={backHref}>
+                <Button variant="ghost" className="w-full text-white/40 hover:text-white/70">
+                  Back to Directory
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Header */}
-      {(hasAccess || isAnonymous) && (
+      {/* Header — always rendered (blurred behind modal when limit reached) */}
       <>
       <header className="relative overflow-hidden mb-6 md:mb-8">
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.18_0.01_25)] via-[oklch(0.15_0.005_0)] to-[oklch(0.12_0.01_20)]" />
@@ -1801,8 +1781,7 @@ export default function DrillDetail() {
 
       </div>
       </>
-      )}
-      
+
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

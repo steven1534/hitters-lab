@@ -118,25 +118,8 @@ export default function DrillsDirectory() {
     tagFilter !== "all-tags",
   ].filter(Boolean).length;
 
-  // Anonymous visitors can browse the directory — they get locked out after 1 free drill view.
-
-
-  if (!loading && isAuthenticated && user?.role === 'athlete' && !user?.isActiveClient) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <h1 className="text-4xl font-bold mb-4">Account Inactive</h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            Your account has been deactivated. Please contact your coach for more information.
-          </p>
-          <Button onClick={() => logout()} variant="outline" size="lg">
-            <LogOut className="h-5 w-5 mr-2" />
-            Log Out
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // All logged-in users (regardless of isActiveClient) can browse the directory.
+  // Anonymous visitors can browse freely but get a login prompt after 2 drill views.
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
