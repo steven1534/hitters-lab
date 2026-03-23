@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { isValidVideoUrl, toEmbedUrl } from "@/lib/youtubeUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,10 +64,9 @@ export function SingleVideoUpload() {
       return;
     }
 
-    // Validate YouTube URL
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
-    if (!youtubeRegex.test(videoUrl)) {
-      toast.error("Please enter a valid YouTube URL");
+    // Validate YouTube/Vimeo URL
+    if (!isValidVideoUrl(videoUrl)) {
+      toast.error("Please enter a valid YouTube or Vimeo URL");
       return;
     }
 

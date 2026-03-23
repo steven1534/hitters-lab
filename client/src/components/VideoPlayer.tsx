@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Play } from 'lucide-react';
+import { toEmbedUrl } from '@/lib/youtubeUtils';
 
 interface VideoPlayerProps {
   videoUrl?: string;
@@ -13,42 +14,7 @@ export function VideoPlayer({ videoUrl, title = 'Drill Video' }: VideoPlayerProp
     return null;
   }
 
-  // Extract video ID from various URL formats
-  const getEmbedUrl = (url: string): string | null => {
-    try {
-      // YouTube formats - support multiple URL patterns:
-      // - youtube.com/watch?v=VIDEO_ID (standard)
-      // - youtube.com/watch?v=VIDEO_ID&si=... (with tracking params)
-      // - youtube.com/watch/VIDEO_ID (non-standard but sometimes used)
-      // - youtu.be/VIDEO_ID (short URL)
-      // - youtu.be/VIDEO_ID?si=... (short URL with tracking)
-      // - youtube.com/embed/VIDEO_ID (embed URL)
-      // - m.youtube.com/watch?v=VIDEO_ID (mobile)
-      const youtubeRegex = /(?:(?:www\.|m\.)?youtube\.com\/watch\?v=|(?:www\.|m\.)?youtube\.com\/watch\/|youtu\.be\/|(?:www\.|m\.)?youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})(?:[&?]|$)/;
-      const youtubeMatch = url.match(youtubeRegex);
-      if (youtubeMatch) {
-        return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-      }
-
-      // Vimeo formats
-      const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
-      const vimeoMatch = url.match(vimeoRegex);
-      if (vimeoMatch) {
-        return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-      }
-
-      // If it's already an embed URL, use it directly
-      if (url.includes('youtube.com/embed') || url.includes('player.vimeo.com')) {
-        return url;
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
-  };
-
-  const embedUrl = getEmbedUrl(videoUrl);
+  const embedUrl = toEmbedUrl(videoUrl);
 
   if (!embedUrl) {
     return (

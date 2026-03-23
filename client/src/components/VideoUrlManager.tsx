@@ -20,11 +20,7 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
 
   const validateVideoUrl = (url: string): boolean => {
     if (!url) return true; // Empty is valid
-    
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube|youtu\.be|youtube\.com)\/.+/i;
-    const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\/.+/;
-    
-    return youtubeRegex.test(url) || vimeoRegex.test(url);
+    return isValidVideoUrl(url);
   };
 
   const handleSave = () => {

@@ -12,6 +12,27 @@ import {
 import { ENV } from "./_core/env";
 import { eq, and, desc } from "drizzle-orm";
 
+// ── YouTube URL normalizer (server-side) ──────────────────────────────────────
+const YT_ID_RE = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/|e\/|watch\/|attribution_link\?(?:.*&)?u=(?:.*%3Fv%3D|.*\/watch%3Fv%3D)))([a-zA-Z0-9_-]{11})/i;
+function normalizeVideoUrl(url: string): string {
+  if (!url?.trim()) return url;
+  // Already proper embed URL — return as-is
+  if (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/video/')) {
+    return url.split('?')[0];
+  }
+  // Decode percent-encoded attribution_link URLs
+  let decoded = url;
+  try { decoded = decodeURIComponent(url); } catch { /* keep original */ }
+  // YouTube
+  const ytMatch = decoded.match(YT_ID_RE);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  // Vimeo
+  const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/i);
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  // Unknown — store as-is
+  return url;
+}
+
 let _db: ReturnType<typeof drizzle> | null = null;
 
 export async function getDb() {
@@ -176,11 +197,12 @@ export async function saveOrUpdateDrillVideo(drillId: string, videoUrl: string, 
   const db = await getDb();
   if (!db) return false;
   try {
+    const normalizedUrl = normalizeVideoUrl(videoUrl);
     const existing = await db.select().from(drillVideos).where(eq(drillVideos.drillId, drillId)).limit(1);
     if (existing.length > 0) {
-      await db.update(drillVideos).set({ videoUrl, updatedAt: new Date() }).where(eq(drillVideos.drillId, drillId));
+      await db.update(drillVideos).set({ videoUrl: normalizedUrl, updatedAt: new Date() }).where(eq(drillVideos.drillId, drillId));
     } else {
-      await db.insert(drillVideos).values({ drillId, videoUrl, uploadedBy: userId });
+      await db.insert(drillVideos).values({ drillId, videoUrl: normalizedUrl, uploadedBy: userId });
     }
     return true;
   } catch (error) {

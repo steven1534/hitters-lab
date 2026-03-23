@@ -11,6 +11,7 @@ import { useAllDrills } from "@/hooks/useAllDrills";
 import { DrillEditModal } from "@/components/DrillEditModal";
 import { Pencil } from "lucide-react";
 import { useDrillListParams } from "@/hooks/useDrillListParams";
+import { getYouTubeThumbnail } from "@/lib/youtubeUtils";
 
 interface Drill {
   id: string;
@@ -92,9 +93,9 @@ export default function Home() {
   const videosMap = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v: any) => {
-      // Extract YouTube video ID from embed URL and build thumbnail URL
-      const match = v.videoUrl?.match(/embed\/([a-zA-Z0-9_-]+)/);
-      if (match) map.set(v.drillId, `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`);
+      // Extract YouTube thumbnail from any URL format
+      const thumb = v.videoUrl ? getYouTubeThumbnail(v.videoUrl) : null;
+      if (thumb) map.set(v.drillId, thumb);
     });
     return map;
   }, [allVideos]);
