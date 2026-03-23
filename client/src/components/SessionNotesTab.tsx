@@ -15,6 +15,17 @@
  * in the sessionNotes table are unaffected.
  */
 
+// ── Safe date helpers (reportDate can be Date object OR string from Drizzle) ──
+function toIsoDate(d: Date | string | null | undefined): string {
+  if (!d) return new Date().toISOString().split("T")[0];
+  if (d instanceof Date) return d.toISOString().split("T")[0];
+  if (typeof d === "string") return d.includes("T") ? d.split("T")[0] : d;
+  return String(d).split("T")[0];
+}
+function formatNoteDate(d: Date | string | null | undefined): string {
+  return new Date(toIsoDate(d) + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
 import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -232,19 +243,14 @@ function NoteViewer({
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
-  const [dateValue, setDateValue] = useState(
-    note.reportDate.includes("T") ? note.reportDate.split("T")[0] : note.reportDate
-  );
+  const [dateValue, setDateValue] = useState(toIsoDate(note.reportDate));
   const [savingDate, setSavingDate] = useState(false);
 
   const updateMutation = trpc.playerReports.update.useMutation();
 
   // Sync dateValue when parent updates reportDate after save
   useEffect(() => {
-    const iso = note.reportDate.includes("T")
-      ? note.reportDate.split("T")[0]
-      : note.reportDate;
-    setDateValue(iso);
+    setDateValue(toIsoDate(note.reportDate));
   }, [note.reportDate]);
 
   const handleSaveDate = async (val: string) => {
