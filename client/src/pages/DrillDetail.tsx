@@ -1470,8 +1470,8 @@ export default function DrillDetail() {
                 </Button>
               )}
               
-              {/* Fallback to external link */}
-              {!details && (
+              {/* Fallback to external link — only for static drills, not custom drills */}
+              {!details && !customDrill && (
                 <a href={drill.url} target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-none">
                   <Button variant="outline" className="w-full bg-white/[0.06] hover:bg-white/[0.12] text-white/80 border-white/[0.12] gap-2">
                     <span className="hidden sm:inline">View on USA Baseball</span>
@@ -1691,15 +1691,29 @@ export default function DrillDetail() {
           </div>
         ) : (
           <div className="text-center py-12 bg-muted/30 rounded-xl border border-dashed">
-            <h3 className="text-xl font-bold mb-2">Content Not Available</h3>
-            <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              We haven't extracted the detailed content for this drill yet. You can view it on the official website.
-            </p>
-            <a href={drill.url} target="_blank" rel="noopener noreferrer">
-              <Button>
-                View on USA Baseball <ExternalLink className="ml-2 h-4 w-4" />
-              </Button>
-            </a>
+            {customDrill ? (
+              <>
+                <h3 className="text-xl font-bold mb-2">{customDrill.name}</h3>
+                <p className="text-muted-foreground max-w-md mx-auto mb-2">
+                  {customDrill.category} · {customDrill.difficulty} · {customDrill.duration}
+                </p>
+                <p className="text-muted-foreground/60 text-sm max-w-md mx-auto">
+                  Add a goal and instructions by clicking the edit button above.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-bold mb-2">Content Not Available</h3>
+                <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                  We haven't extracted the detailed content for this drill yet. You can view it on the official website.
+                </p>
+                <a href={drill.url} target="_blank" rel="noopener noreferrer">
+                  <Button>
+                    View on USA Baseball <ExternalLink className="ml-2 h-4 w-4" />
+                  </Button>
+                </a>
+              </>
+            )}
           </div>
         )}
 

@@ -277,7 +277,29 @@ export async function getDrillDetail(drillId: string) {
   if (!db) return null;
   try {
     const result = await db.select().from(drillDetails).where(eq(drillDetails.drillId, drillId));
-    return result[0] ?? null;
+    if (result[0]) return result[0];
+
+    // Auto-seed from customDrills if no detail record exists yet
+    const custom = await db.select().from(customDrills).where(eq(customDrills.drillId, drillId));
+    if (custom[0]) {
+      const cd = custom[0];
+      const [inserted] = await db.insert(drillDetails).values({
+        drillId: cd.drillId,
+        skillSet: cd.category,
+        difficulty: cd.difficulty,
+        athletes: 'All Ages',
+        time: cd.duration,
+        equipment: 'Bat, Tee (optional)',
+        goal: 'Improve mechanics and develop consistent habits through focused repetition.',
+        description: [cd.name + ' — click Edit to add a description.'],
+        commonMistakes: [],
+        progressions: [],
+        createdBy: cd.createdBy,
+      }).returning();
+      return inserted ?? null;
+    }
+
+    return null;
   } catch (error) {
     console.error("[Database] Failed to get drill detail:", error);
     return null;
