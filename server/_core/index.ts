@@ -9,7 +9,8 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startBatchProcessor } from "../emailBatching";
-import { storageDownload, storagePut } from "../storage";
+import { storageDownload } from "../storage";
+import { uploadVideoFile } from "../videoStorage";
 import { authenticateRequest } from "./auth";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -79,14 +80,14 @@ async function startServer() {
       const sanitizedFileName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
       const fileKey = `drill-submissions/${user.id}/${drillId}/${timestamp}-${sanitizedFileName}`;
 
-      const uploadResult = await storagePut(fileKey, file.buffer, file.mimetype);
+      const videoUrl = await uploadVideoFile(fileKey, file.buffer, file.mimetype);
 
       console.log(`[Video Upload] User ${user.id} uploaded ${file.originalname} (${(file.size / (1024 * 1024)).toFixed(1)}MB)`);
 
       return res.json({
         success: true,
-        videoUrl: uploadResult.url,
-        fileKey: uploadResult.key,
+        videoUrl,
+        fileKey,
       });
     } catch (error: any) {
       console.error("[Video Upload] Failed:", error);
