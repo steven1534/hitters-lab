@@ -44,7 +44,9 @@ async function uploadToS3(
 // Requires a "swing-videos" bucket to exist in Supabase Storage (public).
 
 function getSupabaseProjectRef(): string | null {
-  // DATABASE_URL format: postgresql://postgres.PROJECT_REF:...
+  // Explicit env var takes priority
+  if (process.env.SUPABASE_PROJECT_REF) return process.env.SUPABASE_PROJECT_REF;
+  // Derive from DATABASE_URL: postgresql://postgres.PROJECT_REF:...
   const url = ENV.databaseUrl;
   const match = url.match(/postgres\.([a-z0-9]+):/i);
   return match ? match[1] : null;
