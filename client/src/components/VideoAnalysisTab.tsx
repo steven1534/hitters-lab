@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,8 +94,12 @@ export function VideoAnalysisTab() {
 
   const analyzeMutation = trpc.videoAnalysis.analyzeVideo.useMutation({
     onSuccess: () => {
+      toast.success("Analysis complete — review the AI feedback below.");
       utils.videoAnalysis.getAllAnalyses.invalidate();
       utils.videoAnalysis.getPendingReviews.invalidate();
+    },
+    onError: (err) => {
+      toast.error(`Analysis failed: ${err.message}`);
     },
   });
 

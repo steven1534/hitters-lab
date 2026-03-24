@@ -12,6 +12,9 @@ export const ENV = {
   geminiApiKey: process.env.GEMINI_API_KEY ?? "",
   /** OpenAI API key */
   openaiApiKey: process.env.OPENAI_API_KEY ?? "",
+  /** LLM proxy — falls back to OpenAI directly if Forge not configured */
+  forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "https://api.openai.com",
+  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? process.env.OPENAI_API_KEY ?? "",
   /** AWS S3 for file/video storage */
   awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
   awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",

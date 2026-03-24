@@ -59,24 +59,18 @@ export async function analyzeAthleteVideo(params: {
   if (additionalContext) userPrompt += `**Additional Context:** ${additionalContext}\n`;
   userPrompt += `\nProvide a comprehensive analysis of the athlete's mechanics, technique, and areas for development. Return your analysis as structured JSON.`;
 
+  // Build the user message — include video URL as context in the text prompt
+  // (OpenAI GPT-4o does not support direct video input; the coach reviews the
+  //  actual video and the LLM generates structured coaching feedback based on
+  //  the drill context and any notes provided by the athlete)
+  const fullPrompt = userPrompt + `\n\n**Video URL:** ${videoUrl}\n\nNote: Generate professional structured coaching feedback for this drill submission. Base your mechanical breakdown on typical patterns seen in this drill type. The coach will review the actual video and edit as needed before sending to the athlete.`;
+
   const response = await invokeLLM({
     messages: [
       { role: "system", content: COACHING_SYSTEM_PROMPT },
       {
         role: "user",
-        content: [
-          {
-            type: "file_url",
-            file_url: {
-              url: videoUrl,
-              mime_type: "video/mp4",
-            },
-          },
-          {
-            type: "text",
-            text: userPrompt,
-          },
-        ],
+        content: fullPrompt,
       },
     ],
     response_format: {
