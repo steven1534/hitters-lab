@@ -29,11 +29,7 @@ function getStatusConfig(status: string) {
       return { label: "Queued", icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/20 border-yellow-500/30" };
     case "analyzing":
       return { label: "AI Analyzing", icon: Loader2, color: "text-[#E8425A]", bg: "bg-[#DC143C]/20 border-[#DC143C]/30", spin: true };
-    case "analyzed":
-    case "reviewed":
-      return { label: "Under Review", icon: Clock, color: "text-orange-400", bg: "bg-orange-500/20 border-orange-500/30" };
-    case "approved":
-    case "sent":
+    case "complete":
       return { label: "Feedback Ready", icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/20 border-emerald-500/30" };
     case "failed":
       return { label: "Error", icon: AlertCircle, color: "text-red-400", bg: "bg-red-500/20 border-red-500/30" };
@@ -134,10 +130,10 @@ export function SwingAnalyzer() {
 
   const swingCount = mySwings.data?.length || 0;
   const pendingCount = mySwings.data?.filter(s =>
-    ["pending", "analyzing", "analyzed", "reviewed"].includes(s.status)
+    ["pending", "analyzing"].includes(s.status)
   ).length || 0;
   const feedbackReadyCount = mySwings.data?.filter(s =>
-    ["approved", "sent"].includes(s.status)
+    ["complete"].includes(s.status)
   ).length || 0;
 
   return (
@@ -218,14 +214,14 @@ export function SwingAnalyzer() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
-                        {swing.swingType
-                          ? SWING_TYPES.find(t => t.value === swing.swingType)?.label || swing.swingType
+                        {swing.analysisType
+                          ? SWING_TYPES.find(t => t.value === swing.analysisType)?.label || swing.analysisType
                           : "Swing Video"
                         }
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        {swing.athleteNotes && ` · ${swing.athleteNotes.substring(0, 30)}${swing.athleteNotes.length > 30 ? "..." : ""}`}
+                        {swing.title && ` · ${swing.title.substring(0, 30)}${swing.title.length > 30 ? "..." : ""}`}
                       </p>
                     </div>
                   </div>

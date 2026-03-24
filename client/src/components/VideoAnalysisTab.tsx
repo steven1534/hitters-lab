@@ -35,31 +35,30 @@ import {
 import { Streamdown } from "streamdown";
 import { InlineEdit } from "./InlineEdit";
 
-type AnalysisStatus = "pending" | "analyzing" | "analyzed" | "reviewed" | "approved" | "sent" | "failed";
+// DB status enum: pending | analyzing | complete | failed
+type AnalysisStatus = "pending" | "analyzing" | "complete" | "failed";
+
+interface AiFeedback {
+  overallAssessment: string;
+  mechanicsBreakdown: { phase: string; observation: string; rating: number }[];
+  strengths: string[];
+  areasForImprovement: string[];
+  drillRecommendations: string[];
+  coachingCues: string[];
+  confidenceScore: number;
+}
 
 interface AnalysisRecord {
   id: number;
-  submissionId: number | null;
   athleteId: number;
   athleteName: string;
-  drillId: string | null;
-  swingType: string | null;
-  athleteNotes: string | null;
-  isStandalone: number;
+  title: string | null;
+  analysisType: string | null;
   videoUrl: string;
   status: AnalysisStatus;
-  aiFeedback: {
-    overallAssessment: string;
-    mechanicsBreakdown: { phase: string; observation: string; rating: number }[];
-    strengths: string[];
-    areasForImprovement: string[];
-    drillRecommendations: string[];
-    coachingCues: string[];
-    confidenceScore: number;
-  } | null;
-  coachEditedFeedback: string | null;
-  coachNotes: string | null;
-  errorMessage: string | null;
+  // aiAnalysis is stored as JSON string in DB — parsed client-side
+  aiAnalysis: string | null;
+  coachFeedbackText: string | null;
   analyzedAt: Date | null;
   reviewedAt: Date | null;
   approvedAt: Date | null;
@@ -69,14 +68,21 @@ interface AnalysisRecord {
   updatedAt: Date;
 }
 
+// Helper: parse aiAnalysis JSON string into typed object
+function parseAiFeedback(record: AnalysisRecord): AiFeedback | null {
+  if (!record.aiAnalysis) return null;
+  try {
+    return typeof record.aiAnalysis === "string"
+      ? JSON.parse(record.aiAnalysis)
+      : record.aiAnalysis as AiFeedback;
+  } catch { return null; }
+}
+
 const STATUS_CONFIG: Record<AnalysisStatus, { label: string; color: string; icon: typeof Clock }> = {
-  pending: { label: "Pending", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", icon: Clock },
-  analyzing: { label: "Analyzing", color: "bg-[#DC143C]/20 text-[#E8425A] border-[#DC143C]/30", icon: Loader2 },
-  analyzed: { label: "AI Ready", color: "bg-purple-500/20 text-purple-400 border-purple-500/30", icon: Sparkles },
-  reviewed: { label: "Reviewed", color: "bg-[#DC143C]/20 text-[#E8425A] border-[#DC143C]/30", icon: Edit3 },
-  approved: { label: "Approved", color: "bg-green-500/20 text-green-400 border-green-500/30", icon: CheckCircle },
-  sent: { label: "Sent", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", icon: Send },
-  failed: { label: "Failed", color: "bg-red-500/20 text-red-400 border-red-500/30", icon: AlertCircle },
+  pending:   { label: "Pending",   color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",  icon: Clock },
+  analyzing: { label: "Analyzing", color: "bg-[#DC143C]/20 text-[#E8425A] border-[#DC143C]/30",    icon: Loader2 },
+  complete:  { label: "Complete",  color: "bg-purple-500/20 text-purple-400 border-purple-500/30",  icon: Sparkles },
+  failed:    { label: "Failed",    color: "bg-red-500/20 text-red-400 border-red-500/30",           icon: AlertCircle },
 };
 
 export function VideoAnalysisTab() {
@@ -84,7 +90,7 @@ export function VideoAnalysisTab() {
   const [statusFilter, setStatusFilter] = useState<AnalysisStatus | "all">("all");
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisRecord | null>(null);
   const [editedFeedback, setEditedFeedback] = useState("");
-  const [coachNotes, setCoachNotes] = useState("");
+  const [ setCoachNotes] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState("");
 
@@ -134,8 +140,8 @@ export function VideoAnalysisTab() {
     return (analyses as AnalysisRecord[]).filter((a) => {
       const matchesSearch =
         a.athleteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (a.drillId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (a.swingType || "").toLowerCase().includes(searchQuery.toLowerCase());
+        (a.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (a.analysisType || "").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "all" || a.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -147,8 +153,8 @@ export function VideoAnalysisTab() {
     return {
       total: all.length,
       pending: all.filter((a) => a.status === "pending").length,
-      needsReview: all.filter((a) => a.status === "analyzed" || a.status === "reviewed").length,
-      sent: all.filter((a) => a.status === "sent").length,
+      needsReview: all.filter((a) => a.status === "complete").length,
+      sent: all.filter((a) => a.sentAt != null).length,
       failed: all.filter((a) => a.status === "failed").length,
     };
   }, [analyses]);
@@ -156,8 +162,8 @@ export function VideoAnalysisTab() {
   // Open detail view
   const openDetail = (analysis: AnalysisRecord) => {
     setSelectedAnalysis(analysis);
-    setEditedFeedback(analysis.coachEditedFeedback || "");
-    setCoachNotes(analysis.coachNotes || "");
+    setEditedFeedback(analysis.coachFeedbackText || "");
+    
   };
 
   // Handle analyze
@@ -170,8 +176,8 @@ export function VideoAnalysisTab() {
     if (!selectedAnalysis) return;
     updateFeedbackMutation.mutate({
       analysisId: selectedAnalysis.id,
-      coachEditedFeedback: editedFeedback,
-      coachNotes,
+      coachEditedFeedback: editedFeedback, // mapped to coachFeedbackText server-side
+      
     });
   };
 
@@ -217,7 +223,7 @@ export function VideoAnalysisTab() {
           <div>
             <h2 className="text-2xl font-bold text-foreground">{selectedAnalysis.athleteName}</h2>
             <p className="text-muted-foreground mt-1">
-              {selectedAnalysis.isStandalone ? "Swing Type" : "Drill"}: <span className="text-foreground font-medium">{selectedAnalysis.isStandalone ? (selectedAnalysis.swingType || "General Swing") : (selectedAnalysis.drillId || "Unknown")}</span>
+              {("Type")}: <span className="text-foreground font-medium">{selectedAnalysis.title || selectedAnalysis.analysisType || "Swing Analysis"}</span>
             </p>
           </div>
           <Badge variant="outline" className={`${statusCfg.color} border px-3 py-1.5`}>
@@ -260,7 +266,7 @@ export function VideoAnalysisTab() {
               Run AI Analysis
             </Button>
           )}
-          {(selectedAnalysis.status === "analyzed" || selectedAnalysis.status === "reviewed") && (
+          {(selectedAnalysis.status === "complete") && (
             <>
               <Button
                 onClick={handleSaveFeedback}
@@ -288,7 +294,7 @@ export function VideoAnalysisTab() {
               </Button>
             </>
           )}
-          {(selectedAnalysis.status === "approved" || selectedAnalysis.status === "reviewed" || selectedAnalysis.status === "analyzed") && (
+          {(selectedAnalysis.status === "complete") && (
             <Button
               onClick={() => {
                 setRecipientEmail("");
@@ -314,14 +320,14 @@ export function VideoAnalysisTab() {
         </div>
 
         {/* Error Message */}
-        {selectedAnalysis.status === "failed" && selectedAnalysis.errorMessage && (
+        {selectedAnalysis.status === "failed" && (
           <Card className="bg-red-500/10 border-red-500/30">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium text-red-400">Analysis Failed</p>
-                  <p className="text-sm text-red-400/80 mt-1">{selectedAnalysis.errorMessage}</p>
+                  <p className="text-sm text-red-400/80 mt-1">{"Analysis failed. Click Retry to try again."}</p>
                 </div>
               </div>
             </CardContent>
@@ -329,15 +335,15 @@ export function VideoAnalysisTab() {
         )}
 
         {/* AI Feedback (structured view) */}
-        {selectedAnalysis.aiFeedback && (
+        {parseAiFeedback(selectedAnalysis) && (
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Sparkles className="h-5 w-5 text-purple-400" />
                 AI Analysis
-                {selectedAnalysis.aiFeedback.confidenceScore > 0 && (
+                {parseAiFeedback(selectedAnalysis).confidenceScore > 0 && (
                   <Badge variant="outline" className="ml-auto text-xs">
-                    Confidence: {selectedAnalysis.aiFeedback.confidenceScore}%
+                    Confidence: {parseAiFeedback(selectedAnalysis).confidenceScore}%
                   </Badge>
                 )}
               </CardTitle>
@@ -346,14 +352,14 @@ export function VideoAnalysisTab() {
               {/* Overall Assessment */}
               <div>
                 <h4 className="font-semibold text-foreground mb-2">Overall Assessment</h4>
-                <p className="text-muted-foreground leading-relaxed">{selectedAnalysis.aiFeedback.overallAssessment}</p>
+                <p className="text-muted-foreground leading-relaxed">{parseAiFeedback(selectedAnalysis).overallAssessment}</p>
               </div>
 
               {/* Mechanics Breakdown */}
               <div>
                 <h4 className="font-semibold text-foreground mb-3">Mechanics Breakdown</h4>
                 <div className="grid gap-3">
-                  {selectedAnalysis.aiFeedback.mechanicsBreakdown.map((phase, i) => (
+                  {parseAiFeedback(selectedAnalysis).mechanicsBreakdown.map((phase, i) => (
                     <div key={i} className="bg-muted/30 rounded-lg p-4 border border-border/50">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-foreground">{phase.phase}</span>
@@ -373,11 +379,11 @@ export function VideoAnalysisTab() {
               </div>
 
               {/* Strengths */}
-              {selectedAnalysis.aiFeedback.strengths.length > 0 && (
+              {parseAiFeedback(selectedAnalysis).strengths.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-green-400 mb-2">Strengths</h4>
                   <ul className="space-y-1.5">
-                    {selectedAnalysis.aiFeedback.strengths.map((s, i) => (
+                    {parseAiFeedback(selectedAnalysis).strengths.map((s, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <CheckCircle className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
                         {s}
@@ -388,11 +394,11 @@ export function VideoAnalysisTab() {
               )}
 
               {/* Areas for Improvement */}
-              {selectedAnalysis.aiFeedback.areasForImprovement.length > 0 && (
+              {parseAiFeedback(selectedAnalysis).areasForImprovement.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-amber-400 mb-2">Areas for Improvement</h4>
                   <ul className="space-y-1.5">
-                    {selectedAnalysis.aiFeedback.areasForImprovement.map((a, i) => (
+                    {parseAiFeedback(selectedAnalysis).areasForImprovement.map((a, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <ArrowRight className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                         {a}
@@ -403,11 +409,11 @@ export function VideoAnalysisTab() {
               )}
 
               {/* Drill Recommendations */}
-              {selectedAnalysis.aiFeedback.drillRecommendations.length > 0 && (
+              {parseAiFeedback(selectedAnalysis).drillRecommendations.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-[#E8425A] mb-2">Recommended Drills</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedAnalysis.aiFeedback.drillRecommendations.map((d, i) => (
+                    {parseAiFeedback(selectedAnalysis).drillRecommendations.map((d, i) => (
                       <Badge key={i} variant="secondary" className="bg-[#DC143C]/10 text-[#E8425A] border-[#DC143C]/20">
                         {d}
                       </Badge>
@@ -417,11 +423,11 @@ export function VideoAnalysisTab() {
               )}
 
               {/* Coaching Cues */}
-              {selectedAnalysis.aiFeedback.coachingCues.length > 0 && (
+              {parseAiFeedback(selectedAnalysis).coachingCues.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-purple-400 mb-2">Coaching Cues</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedAnalysis.aiFeedback.coachingCues.map((c, i) => (
+                    {parseAiFeedback(selectedAnalysis).coachingCues.map((c, i) => (
                       <Badge key={i} variant="outline" className="border-purple-500/30 text-purple-400">
                         &ldquo;{c}&rdquo;
                       </Badge>
@@ -434,7 +440,7 @@ export function VideoAnalysisTab() {
         )}
 
         {/* Editable Feedback */}
-        {(selectedAnalysis.status === "analyzed" || selectedAnalysis.status === "reviewed") && (
+        {(selectedAnalysis.status === "complete") && (
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -457,7 +463,7 @@ export function VideoAnalysisTab() {
                   Coach Notes (private — not sent to athlete)
                 </label>
                 <Textarea
-                  value={coachNotes}
+                  value={editedFeedback}
                   onChange={(e) => setCoachNotes(e.target.value)}
                   className="min-h-[100px] bg-muted/30"
                   placeholder="Your private notes about this analysis..."
@@ -468,12 +474,12 @@ export function VideoAnalysisTab() {
         )}
 
         {/* Sent feedback preview */}
-        {(selectedAnalysis.status === "approved" || selectedAnalysis.status === "sent") && selectedAnalysis.coachEditedFeedback && (
+        {(selectedAnalysis.sentAt != null) && selectedAnalysis.coachFeedbackText && (
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Eye className="h-5 w-5 text-emerald-400" />
-                {selectedAnalysis.status === "sent" ? "Sent Feedback" : "Approved Feedback"}
+                {selectedAnalysis.sentAt ? "Sent Feedback" : "Approved Feedback"}
                 {selectedAnalysis.sentToEmail && (
                   <Badge variant="outline" className="ml-auto text-xs">
                     <Mail className="h-3 w-3 mr-1" />
@@ -484,7 +490,7 @@ export function VideoAnalysisTab() {
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm prose-invert max-w-none">
-                <Streamdown>{selectedAnalysis.coachEditedFeedback}</Streamdown>
+                <Streamdown>{selectedAnalysis.coachFeedbackText}</Streamdown>
               </div>
             </CardContent>
           </Card>
@@ -579,7 +585,7 @@ export function VideoAnalysisTab() {
           />
         </div>
         <div className="flex gap-2 flex-wrap">
-          {(["all", "pending", "analyzed", "reviewed", "approved", "sent", "failed"] as const).map((s) => (
+          {(["all", "pending", "analyzing", "complete", "failed"] as const).map((s) => (
             <Button
               key={s}
               variant={statusFilter === s ? "default" : "outline"}
@@ -647,7 +653,7 @@ export function VideoAnalysisTab() {
                           {statusCfg.label}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">{analysis.isStandalone ? (analysis.swingType || "General Swing") : `Drill: ${analysis.drillId || "Unknown"}`}</p>
+                      <p className="text-sm text-muted-foreground truncate">{analysis.title || analysis.analysisType || "Swing Analysis"}</p>
                       <p className="text-xs text-muted-foreground/60 mt-1">
                         {(analysis.createdAt instanceof Date ? analysis.createdAt : new Date(analysis.createdAt)).toLocaleDateString(undefined, {
                           month: "short",
@@ -689,7 +695,7 @@ export function VideoAnalysisTab() {
                           Retry
                         </Button>
                       )}
-                      {(analysis.status === "analyzed" || analysis.status === "reviewed") && (
+                      {(analysis.status === "complete") && (
                         <Button size="sm" variant="outline">
                           <Eye className="h-3.5 w-3.5 mr-1" />
                           Review
