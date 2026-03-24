@@ -53,7 +53,7 @@ export const videoAnalysisRouter = router({
     .mutation(async ({ ctx, input }) => {
       const database = await requireDb();
 
-      const result = await database.insert(videoAnalysis).values({
+      const [inserted] = await database.insert(videoAnalysis).values({
         athleteId: ctx.user.id,
         videoUrl: input.videoUrl,
         swingType: input.swingType || null,
@@ -62,10 +62,9 @@ export const videoAnalysisRouter = router({
         submissionId: null,
         drillId: null,
         status: "pending",
-      });
+      }).returning({ id: videoAnalysis.id });
 
-      const insertId = result[0].insertId;
-      return { id: insertId, status: "pending" as const };
+      return { id: inserted.id, status: "pending" as const };
     }),
 
   /**
@@ -112,16 +111,15 @@ export const videoAnalysisRouter = router({
         return { id: existing[0].id, status: existing[0].status };
       }
 
-      const result = await database.insert(videoAnalysis).values({
+      const [inserted] = await database.insert(videoAnalysis).values({
         submissionId: input.submissionId,
         athleteId: ctx.user.id,
         drillId: input.drillId,
         videoUrl: input.videoUrl,
         status: "pending",
-      });
+      }).returning({ id: videoAnalysis.id });
 
-      const insertId = result[0].insertId;
-      return { id: insertId, status: "pending" as const };
+      return { id: inserted.id, status: "pending" as const };
     }),
 
   /**
