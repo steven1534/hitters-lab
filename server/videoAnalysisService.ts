@@ -153,7 +153,12 @@ export async function analyzeAthleteVideo(params: {
     throw new Error("No analysis content returned from LLM");
   }
 
-  const parsed = JSON.parse(content) as VideoAnalysisResult;
+  let parsed: VideoAnalysisResult;
+  try {
+    parsed = JSON.parse(content) as VideoAnalysisResult;
+  } catch {
+    throw new Error(`LLM returned non-JSON content: ${content.substring(0, 200)}`);
+  }
 
   // Validate basic structure
   if (!parsed.overallAssessment || !Array.isArray(parsed.mechanicsBreakdown)) {
