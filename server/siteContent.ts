@@ -1,4 +1,3 @@
-import { drizzle } from "drizzle-orm/mysql2";
 import { siteContent } from "../drizzle/schema";
 import { eq, inArray } from "drizzle-orm";
 import { getDb } from "./db";
@@ -41,7 +40,7 @@ export async function upsertSiteContent(contentKey: string, value: string, updat
   const db = await getDb();
   if (!db) return;
   await db.insert(siteContent).values({ contentKey, value, updatedBy })
-    .onDuplicateKeyUpdate({ set: { value, updatedBy } });
+    .onConflictDoUpdate({ target: siteContent.contentKey, set: { value, updatedBy } });
 }
 
 /**
@@ -61,6 +60,6 @@ export async function bulkUpsertSiteContent(entries: { contentKey: string; value
   if (!db) return;
   for (const entry of entries) {
     await db.insert(siteContent).values({ contentKey: entry.contentKey, value: entry.value, updatedBy })
-      .onDuplicateKeyUpdate({ set: { value: entry.value, updatedBy } });
+      .onConflictDoUpdate({ target: siteContent.contentKey, set: { value: entry.value, updatedBy } });
   }
 }

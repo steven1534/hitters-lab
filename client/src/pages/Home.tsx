@@ -89,7 +89,7 @@ export default function Home() {
   }, [drillCustomizations]);
 
   // Fetch all drill videos to use YouTube thumbnails on first load
-  const { data: allVideos = [] } = trpc.drillVideos.getAllVideos.useQuery();
+  const { data: allVideos = [] } = trpc.videos.getAllVideos.useQuery();
   const videosMap = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v: any) => {

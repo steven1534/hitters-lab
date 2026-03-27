@@ -46,7 +46,7 @@ export const notificationsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) return null;
-      return await db.createOrUpdateNotificationPreferences(ctx.user.id, input);
+      return await db.upsertNotificationPreferences(ctx.user.id, input);
     }),
 
   getUnreadCount: protectedProcedure.query(async ({ ctx }) => {

@@ -43,8 +43,8 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     }
   }, [siteContentList]);
 
-  const setSiteContentMutation = trpc.siteContent?.set
-    ? trpc.siteContent.set.useMutation()
+  const setSiteContentMutation = trpc.siteContent?.update
+    ? trpc.siteContent.update.useMutation()
     : null;
 
   const resetSiteContentMutation = trpc.siteContent?.reset
@@ -62,7 +62,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     async (key: string, value: string) => {
       setOverrides((prev) => ({ ...prev, [key]: value }));
       try {
-        await setSiteContentMutation?.mutateAsync({ key, value });
+        await setSiteContentMutation?.mutateAsync({ contentKey: key, value });
       } catch (e) {
         console.error("Failed to persist site content:", e);
       }
@@ -78,7 +78,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
         return next;
       });
       try {
-        await resetSiteContentMutation?.mutateAsync({ key });
+        await resetSiteContentMutation?.mutateAsync({ contentKey: key });
       } catch (e) {
         console.error("Failed to reset site content:", e);
       }

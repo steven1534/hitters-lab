@@ -20,7 +20,7 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
 
   const validateVideoUrl = (url: string): boolean => {
     if (!url) return true; // Empty is valid
-    return isValidVideoUrl(url);
+    return /youtu\.be|youtube\.com|vimeo\.com/i.test(url);
   };
 
   const handleSave = () => {

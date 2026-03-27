@@ -40,7 +40,6 @@ export const submissionsRouter = router({
 
               if (latestSubmission) {
                 await database.insert(videoAnalysis).values({
-                  submissionId: latestSubmission.id,
                   athleteId: ctx.user.id,
                   drillId: input.drillId,
                   videoUrl: input.videoUrl,

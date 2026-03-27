@@ -65,7 +65,7 @@ export default function ParentDashboard() {
     });
   };
 
-  const selectedChild = children.find(c => c.id === selectedChildId);
+  const selectedChild = children.find((c: any) => c.id === selectedChildId);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -148,7 +148,7 @@ export default function ParentDashboard() {
               <SelectValue placeholder="Choose a child to manage" />
             </SelectTrigger>
             <SelectContent>
-              {children.map((child) => (
+              {children.map((child: any) => (
                 <SelectItem key={child.id} value={child.id.toString()}>
                   {child.name || child.email || `Child ${child.id}`}
                 </SelectItem>

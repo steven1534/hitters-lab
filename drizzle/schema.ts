@@ -84,6 +84,7 @@ export type InsertAssignmentProgress = typeof assignmentProgress.$inferInsert;
 // ============================================================
 export const invites = pgTable("invites", {
   id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 320 }).notNull(),
   inviteToken: varchar("inviteToken", { length: 255 }).notNull().unique(),
   role: inviteRoleEnum("role").default("user").notNull(),
@@ -577,6 +578,7 @@ export const athleteProfiles = pgTable("athleteProfiles", {
   profileImageUrl: text("profileImageUrl"),
   bio: text("bio"),
   goals: text("goals"),
+  coachProfileNotes: text("coachProfileNotes"),
   parentName: varchar("parentName", { length: 255 }),
   parentEmail: varchar("parentEmail", { length: 320 }),
   parentPhone: varchar("parentPhone", { length: 30 }),
@@ -617,6 +619,10 @@ export const videoAnalysis = pgTable("videoAnalysis", {
   thumbnailUrl: text("thumbnailUrl"),
   title: varchar("title", { length: 255 }),
   analysisType: varchar("analysisType", { length: 100 }),
+  swingType: varchar("swingType", { length: 50 }),
+  drillId: varchar("drillId", { length: 255 }),
+  isStandalone: integer("isStandalone").default(0),
+  athleteNotes: text("athleteNotes"),
   status: videoAnalysisStatusEnum("status").default("pending").notNull(),
   aiAnalysis: text("aiAnalysis"),
   coachFeedbackText: text("coachFeedbackText"),
@@ -715,3 +721,16 @@ export const playerReports = pgTable("playerReports", {
 
 export type PlayerReport = typeof playerReports.$inferSelect;
 export type InsertPlayerReport = typeof playerReports.$inferInsert;
+
+// ============================================================
+// Parent-Child Relationships
+// ============================================================
+export const parentChildren = pgTable("parentChildren", {
+  id: serial("id").primaryKey(),
+  parentId: integer("parentId").notNull(),
+  childId: integer("childId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ParentChild = typeof parentChildren.$inferSelect;
+export type InsertParentChild = typeof parentChildren.$inferInsert;

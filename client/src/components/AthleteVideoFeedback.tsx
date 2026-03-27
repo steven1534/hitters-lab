@@ -143,6 +143,9 @@ export function AthleteVideoFeedback() {
   const [showAll, setShowAll] = useState(false);
 
   const selectedAnalysis = analyses.find((a: any) => a.id === selectedId);
+  const parsedAiFeedback = selectedAnalysis?.aiAnalysis
+    ? (() => { try { return JSON.parse(selectedAnalysis.aiAnalysis as string); } catch { return null; } })()
+    : null;
 
   // Categorize
   const feedbackReady = analyses.filter((a: any) => a.status === "approved" || a.status === "sent");
@@ -344,33 +347,33 @@ export function AthleteVideoFeedback() {
                 )}
 
                 {/* AI Feedback structured view — only for approved/sent */}
-                {selectedAnalysis.aiFeedback && (
+                {parsedAiFeedback && (
                   <div className="space-y-4">
                     {/* Overall Assessment */}
                     <div className="bg-gradient-to-br from-purple-500/10 to-electric/5 rounded-xl p-4 border border-purple-500/20">
                       <div className="flex items-center gap-2 mb-2">
                         <Target className="w-4 h-4 text-purple-400" />
                         <h4 className="font-bold text-foreground text-sm">Overall Assessment</h4>
-                        {(selectedAnalysis.aiFeedback as any).confidenceScore && (
+                        {(parsedAiFeedback as any).confidenceScore && (
                           <Badge className="ml-auto bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px]">
-                            {(selectedAnalysis.aiFeedback as any).confidenceScore}% confidence
+                            {(parsedAiFeedback as any).confidenceScore}% confidence
                           </Badge>
                         )}
                       </div>
                       <p className="text-foreground/80 text-sm leading-relaxed">
-                        {(selectedAnalysis.aiFeedback as any).overallAssessment}
+                        {(parsedAiFeedback as any).overallAssessment}
                       </p>
                     </div>
 
                     {/* Mechanics Breakdown */}
-                    {(selectedAnalysis.aiFeedback as any).mechanicsBreakdown?.length > 0 && (
+                    {(parsedAiFeedback as any).mechanicsBreakdown?.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <Dumbbell className="w-4 h-4 text-[#E8425A]" />
                           <h4 className="font-bold text-foreground text-sm">Mechanics Breakdown</h4>
                         </div>
                         <div className="grid gap-2">
-                          {(selectedAnalysis.aiFeedback as any).mechanicsBreakdown.map((phase: any, i: number) => (
+                          {(parsedAiFeedback as any).mechanicsBreakdown.map((phase: any, i: number) => (
                             <div key={i} className="bg-white/[0.04] rounded-xl p-3.5 border border-white/[0.06]">
                               <div className="flex items-center justify-between mb-1.5">
                                 <span className="font-semibold text-foreground text-sm">{phase.phase}</span>
@@ -395,14 +398,14 @@ export function AthleteVideoFeedback() {
                     )}
 
                     {/* Strengths */}
-                    {(selectedAnalysis.aiFeedback as any).strengths?.length > 0 && (
+                    {(parsedAiFeedback as any).strengths?.length > 0 && (
                       <div className="bg-emerald-500/5 rounded-xl p-4 border border-emerald-500/15">
                         <div className="flex items-center gap-2 mb-3">
                           <CheckCircle className="w-4 h-4 text-emerald-400" />
                           <h4 className="font-bold text-emerald-400 text-sm">What You're Doing Well</h4>
                         </div>
                         <ul className="space-y-2">
-                          {(selectedAnalysis.aiFeedback as any).strengths.map((s: string, i: number) => (
+                          {(parsedAiFeedback as any).strengths.map((s: string, i: number) => (
                             <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/75">
                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
                               {s}
@@ -413,14 +416,14 @@ export function AthleteVideoFeedback() {
                     )}
 
                     {/* Areas for Improvement */}
-                    {(selectedAnalysis.aiFeedback as any).areasForImprovement?.length > 0 && (
+                    {(parsedAiFeedback as any).areasForImprovement?.length > 0 && (
                       <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/15">
                         <div className="flex items-center gap-2 mb-3">
                           <ArrowRight className="w-4 h-4 text-amber-400" />
                           <h4 className="font-bold text-amber-400 text-sm">Focus Areas</h4>
                         </div>
                         <ul className="space-y-2">
-                          {(selectedAnalysis.aiFeedback as any).areasForImprovement.map((a: string, i: number) => (
+                          {(parsedAiFeedback as any).areasForImprovement.map((a: string, i: number) => (
                             <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/75">
                               <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
                               {a}
@@ -431,14 +434,14 @@ export function AthleteVideoFeedback() {
                     )}
 
                     {/* Drill Recommendations */}
-                    {(selectedAnalysis.aiFeedback as any).drillRecommendations?.length > 0 && (
+                    {(parsedAiFeedback as any).drillRecommendations?.length > 0 && (
                       <div className="bg-[#DC143C]/5 rounded-xl p-4 border border-[#DC143C]/15">
                         <div className="flex items-center gap-2 mb-3">
                           <Dumbbell className="w-4 h-4 text-[#E8425A]" />
                           <h4 className="font-bold text-[#E8425A] text-sm">Recommended Drills</h4>
                         </div>
                         <ul className="space-y-2">
-                          {(selectedAnalysis.aiFeedback as any).drillRecommendations.map((d: string, i: number) => (
+                          {(parsedAiFeedback as any).drillRecommendations.map((d: string, i: number) => (
                             <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/75">
                               <div className="w-1.5 h-1.5 rounded-full bg-[#DC143C] mt-2 flex-shrink-0" />
                               {d}
@@ -449,14 +452,14 @@ export function AthleteVideoFeedback() {
                     )}
 
                     {/* Coaching Cues */}
-                    {(selectedAnalysis.aiFeedback as any).coachingCues?.length > 0 && (
+                    {(parsedAiFeedback as any).coachingCues?.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <Lightbulb className="w-4 h-4 text-purple-400" />
                           <h4 className="font-bold text-purple-400 text-sm">Remember These Cues</h4>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {(selectedAnalysis.aiFeedback as any).coachingCues.map((c: string, i: number) => (
+                          {(parsedAiFeedback as any).coachingCues.map((c: string, i: number) => (
                             <div
                               key={i}
                               className="bg-purple-500/10 border border-purple-500/25 rounded-lg px-3 py-2 text-sm text-purple-300"
@@ -471,14 +474,14 @@ export function AthleteVideoFeedback() {
                 )}
 
                 {/* Coach edited feedback (markdown) — fallback when no structured AI feedback */}
-                {selectedAnalysis.coachEditedFeedback && !selectedAnalysis.aiFeedback && (
+                {selectedAnalysis.coachFeedbackText && !parsedAiFeedback && (
                   <div className="bg-white/[0.04] rounded-xl p-4 border border-white/[0.08]">
                     <div className="flex items-center gap-2 mb-3">
                       <Sparkles className="w-4 h-4 text-purple-400" />
                       <h4 className="font-bold text-foreground text-sm">Coach Feedback</h4>
                     </div>
                     <div className="prose prose-sm prose-invert max-w-none">
-                      <Streamdown>{selectedAnalysis.coachEditedFeedback}</Streamdown>
+                      <Streamdown>{selectedAnalysis.coachFeedbackText}</Streamdown>
                     </div>
                   </div>
                 )}
