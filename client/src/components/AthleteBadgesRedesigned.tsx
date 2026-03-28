@@ -19,10 +19,10 @@ export function AthleteBadgesRedesigned() {
   if (isLoading) {
     return (
       <div className="glass-card rounded-2xl p-4 animate-pulse">
-        <div className="h-5 bg-white/10 rounded w-32 mb-3" />
+        <div className="h-5 bg-muted rounded w-32 mb-3" />
         <div className="grid grid-cols-3 gap-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-white/5 rounded-xl" />
+            <div key={i} className="h-20 bg-muted/50 rounded-xl" />
           ))}
         </div>
       </div>
@@ -63,7 +63,7 @@ export function AthleteBadgesRedesigned() {
             {earnedBadges.map((badge) => (
               <div
                 key={badge.id}
-                className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] transition-all duration-200"
+                className="flex flex-col items-center gap-1 p-3 rounded-xl bg-muted/40 border border-border hover:bg-muted transition-all duration-200"
                 title={badge.badgeDescription || ""}
               >
                 <span className="text-2xl">{badge.badgeIcon}</span>
@@ -91,7 +91,7 @@ export function AthleteBadgesRedesigned() {
               {nextBadge.target - nextBadge.progress} more
             </Badge>
           </div>
-          <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+          <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
             <div
               className="bg-gradient-to-r from-purple-500 to-electric h-2.5 rounded-full transition-all duration-700 ease-out"
               style={{ width: `${Math.min(100, (nextBadge.progress / nextBadge.target) * 100)}%` }}

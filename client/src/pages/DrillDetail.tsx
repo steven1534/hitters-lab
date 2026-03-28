@@ -1378,7 +1378,7 @@ export default function DrillDetail() {
               <Lock className="h-8 w-8 text-[#DC143C]" />
             </div>
             <div>
-              <h2 className="text-2xl font-heading font-bold text-white mb-2">Free Preview Limit Reached</h2>
+              <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Free Preview Limit Reached</h2>
               <p className="text-white/50 text-sm leading-relaxed">
                 You've viewed your 2 free drills. Log in to access all 200+ professional training drills.
               </p>
@@ -1407,7 +1407,7 @@ export default function DrillDetail() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.45_0.15_250/0.15),transparent_60%)]" />
         <div className="container relative z-10 py-6 md:py-10">
           <Link href={backHref}>
-            <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10 mb-4 pl-0 gap-2 text-sm">
+            <Button variant="ghost" className="text-white/70 hover:text-foreground hover:bg-white/10 mb-4 pl-0 gap-2 text-sm">
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Back to Directory</span>
               <span className="sm:hidden">Back</span>
@@ -1429,7 +1429,7 @@ export default function DrillDetail() {
                   </Badge>
                 ))}
               </div>
-              <InlineEdit contentKey={`drill.detail.${id}.title`} defaultValue={drill.name} as="h1" className="text-3xl md:text-5xl font-heading font-black text-white leading-tight tracking-tight" />
+              <InlineEdit contentKey={`drill.detail.${id}.title`} defaultValue={drill.name} as="h1" className="text-3xl md:text-5xl font-heading font-black text-foreground leading-tight tracking-tight" />
             </div>
             
             <div className="flex gap-2 w-full md:w-auto">

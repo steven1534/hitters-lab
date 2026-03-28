@@ -251,9 +251,9 @@ function TemplatePicker({
       </Button>
 
       {isOpen && (
-        <div className="absolute z-30 top-full mt-1 left-0 right-0 min-w-[320px] max-w-[calc(100vw-2rem)] bg-card/95 backdrop-blur-xl border border-white/[0.12] rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute z-30 top-full mt-1 left-0 right-0 min-w-[320px] max-w-[calc(100vw-2rem)] bg-card/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Filter tabs */}
-          <div className="flex items-center gap-1 px-3 py-2 border-b border-white/[0.08] bg-white/[0.02]">
+          <div className="flex items-center gap-1 px-3 py-2 border-b border-border bg-white/[0.02]">
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">
               <InlineEdit contentKey="sessionNote.quickFill.showLabel" defaultValue="Show:" />
             </span>
@@ -300,7 +300,7 @@ function TemplatePicker({
                   key={idx}
                   type="button"
                   onClick={() => handleSelect(template)}
-                  className="w-full text-left px-3 py-2.5 hover:bg-white/[0.06] transition-colors border-b border-white/[0.04] last:border-0 group"
+                  className="w-full text-left px-3 py-2.5 hover:bg-muted/60 transition-colors border-b border-border/40 last:border-0 group"
                 >
                   <div className="flex items-start gap-2">
                     <Zap className="h-3.5 w-3.5 text-[#DC143C]/60 mt-0.5 shrink-0 group-hover:text-[#DC143C] transition-colors" />
@@ -324,7 +324,7 @@ function TemplatePicker({
           </div>
 
           {/* Add custom quick fill */}
-          <div className="border-t border-white/[0.08]">
+          <div className="border-t border-border">
             {isAddingTemplate ? (
               <div className="p-3 space-y-2">
                 <input
@@ -332,7 +332,7 @@ function TemplatePicker({
                   value={newTemplateLabel}
                   onChange={(e) => setNewTemplateLabel(e.target.value)}
                   placeholder="Template title..."
-                  className="w-full text-sm bg-white/[0.06] border border-white/[0.15] rounded px-2 py-1.5 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-[#DC143C]/40"
+                  className="w-full text-sm bg-muted/60 border border-border rounded px-2 py-1.5 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-[#DC143C]/40"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === "Escape") { setIsAddingTemplate(false); setNewTemplateLabel(""); setNewTemplateText(""); }
@@ -343,7 +343,7 @@ function TemplatePicker({
                   onChange={(e) => setNewTemplateText(e.target.value)}
                   placeholder="Template text to insert..."
                   rows={2}
-                  className="w-full text-sm bg-white/[0.06] border border-white/[0.15] rounded px-2 py-1.5 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-[#DC143C]/40 resize-none"
+                  className="w-full text-sm bg-muted/60 border border-border rounded px-2 py-1.5 text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-[#DC143C]/40 resize-none"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addCustomTemplate(); }
                     if (e.key === "Escape") { setIsAddingTemplate(false); setNewTemplateLabel(""); setNewTemplateText(""); }
@@ -361,7 +361,7 @@ function TemplatePicker({
                   <button
                     type="button"
                     onClick={() => { setIsAddingTemplate(false); setNewTemplateLabel(""); setNewTemplateText(""); }}
-                    className="flex-1 text-xs font-medium py-1.5 rounded text-muted-foreground hover:bg-white/[0.06] transition-colors"
+                    className="flex-1 text-xs font-medium py-1.5 rounded text-muted-foreground hover:bg-muted/60 transition-colors"
                   >
                     Cancel
                   </button>
@@ -371,7 +371,7 @@ function TemplatePicker({
               <button
                 type="button"
                 onClick={() => { setIsAddingTemplate(true); setTimeout(() => newTemplateLabelRef.current?.focus(), 50); }}
-                className="w-full text-left px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-colors flex items-center gap-2"
+                className="w-full text-left px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors flex items-center gap-2"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add Custom Quick Fill
@@ -383,7 +383,7 @@ function TemplatePicker({
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="w-full text-center py-2 text-xs text-muted-foreground hover:bg-white/[0.04] border-t border-white/[0.08]"
+            className="w-full text-center py-2 text-xs text-muted-foreground hover:bg-muted/40 border-t border-border"
           >
             <InlineEdit contentKey={`sessionNote.quickFill.${label}.closeLabel`} defaultValue="Close" />
           </button>
@@ -691,7 +691,7 @@ export function SessionNotesForm({
             type="date"
             value={sessionDate}
             onChange={(e) => setSessionDate(e.target.value)}
-            className="bg-white/[0.04] border-white/[0.08] h-11"
+            className="bg-muted/40 border-border h-11"
           />
         </div>
         <div>
@@ -703,7 +703,7 @@ export function SessionNotesForm({
             placeholder="60"
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
-            className="bg-white/[0.04] border-white/[0.08] h-11"
+            className="bg-muted/40 border-border h-11"
           />
         </div>
       </div>
@@ -731,7 +731,7 @@ export function SessionNotesForm({
                   ${
                     isSelected
                       ? colorClass + " ring-1 ring-white/20"
-                      : "bg-white/[0.04] text-white/50 border-white/[0.08] hover:bg-white/[0.08] hover:text-white/70"
+                      : "bg-muted/40 text-muted-foreground border-border hover:bg-muted hover:text-foreground/80"
                   }
                 `}
               >
@@ -761,7 +761,7 @@ export function SessionNotesForm({
                   if (e.key === "Escape") { setNewSkillName(""); setIsAddingSkill(false); }
                 }}
                 placeholder="Skill name..."
-                className="h-9 w-40 text-sm bg-white/[0.06] border-white/[0.15] px-2"
+                className="h-9 w-40 text-sm bg-muted/60 border-border px-2"
                 autoFocus
               />
             </div>
@@ -769,7 +769,7 @@ export function SessionNotesForm({
             <button
               type="button"
               onClick={() => { setIsAddingSkill(true); setTimeout(() => newSkillRef.current?.focus(), 50); }}
-              className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border border-dashed border-white/[0.15] text-white/40 hover:text-white/70 hover:border-white/[0.25] hover:bg-white/[0.04] touch-manipulation"
+              className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 border border-dashed border-border text-muted-foreground hover:text-foreground/80 hover:border-white/[0.25] hover:bg-muted/40 touch-manipulation"
             >
               <Plus className="h-3.5 w-3.5 inline mr-1" />
               Add Skill
@@ -803,7 +803,7 @@ export function SessionNotesForm({
           value={whatImproved}
           onChange={(e) => setWhatImproved(e.target.value)}
           rows={3}
-          className="bg-white/[0.04] border-white/[0.08] resize-none text-sm"
+          className="bg-muted/40 border-border resize-none text-sm"
         />
       </div>
 
@@ -827,7 +827,7 @@ export function SessionNotesForm({
           value={whatNeedsWork}
           onChange={(e) => setWhatNeedsWork(e.target.value)}
           rows={3}
-          className="bg-white/[0.04] border-white/[0.08] resize-none text-sm"
+          className="bg-muted/40 border-border resize-none text-sm"
         />
       </div>
 
@@ -851,7 +851,7 @@ export function SessionNotesForm({
                 <button
                   type="button"
                   onClick={() => removeHomeworkDrill(d.drillId)}
-                  className="ml-1 hover:bg-white/10 rounded p-0.5"
+                  className="ml-1 hover:bg-muted rounded p-0.5"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -873,14 +873,14 @@ export function SessionNotesForm({
                   setShowDrillPicker(true);
                 }}
                 onFocus={() => setShowDrillPicker(true)}
-                className="pl-9 bg-white/[0.04] border-white/[0.08] h-10"
+                className="pl-9 bg-muted/40 border-border h-10"
               />
             </div>
           </div>
 
           {/* Drill picker dropdown */}
           {showDrillPicker && (
-            <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-card border border-white/[0.1] rounded-lg shadow-xl max-h-48 overflow-y-auto">
+            <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-card border border-border rounded-lg shadow-xl max-h-48 overflow-y-auto">
               {filteredDrills.length === 0 ? (
                 <div className="p-3 text-sm text-muted-foreground text-center">
                   No drills found
@@ -898,10 +898,10 @@ export function SessionNotesForm({
                         !isAdded && addHomeworkDrill(drill)
                       }
                       disabled={isAdded}
-                      className={`w-full text-left px-3 py-2.5 text-sm transition-colors border-b border-white/[0.04] last:border-0 ${
+                      className={`w-full text-left px-3 py-2.5 text-sm transition-colors border-b border-border/40 last:border-0 ${
                         isAdded
                           ? "text-muted-foreground opacity-50"
-                          : "hover:bg-white/[0.06] text-foreground"
+                          : "hover:bg-muted/60 text-foreground"
                       }`}
                     >
                       <span className="flex items-center gap-2">
@@ -915,7 +915,7 @@ export function SessionNotesForm({
               <button
                 type="button"
                 onClick={() => setShowDrillPicker(false)}
-                className="w-full text-center py-2 text-xs text-muted-foreground hover:bg-white/[0.04] border-t border-white/[0.08]"
+                className="w-full text-center py-2 text-xs text-muted-foreground hover:bg-muted/40 border-t border-border"
               >
                 Close
               </button>
@@ -944,7 +944,7 @@ export function SessionNotesForm({
                 className={`h-7 w-7 transition-colors ${
                   n <= overallRating
                     ? "fill-yellow-400 text-yellow-400"
-                    : "text-white/20 hover:text-white/40"
+                    : "text-muted-foreground/40 hover:text-muted-foreground"
                 }`}
               />
             </button>
@@ -978,7 +978,7 @@ export function SessionNotesForm({
             value={privateNotes}
             onChange={(e) => setPrivateNotes(e.target.value)}
             rows={2}
-            className="bg-white/[0.04] border-white/[0.08] resize-none text-sm"
+            className="bg-muted/40 border-border resize-none text-sm"
           />
         </div>
       )}

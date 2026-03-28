@@ -254,23 +254,23 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleReset(); onOpenChange(o); }}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto bg-[#1a1a1a] border-border text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5 text-green-400" />
             Import Blast Sessions from CSV
           </DialogTitle>
-          <DialogDescription className="text-white/50">
-            Import sessions for <span className="text-white/80 font-medium">{playerName}</span>
+          <DialogDescription className="text-muted-foreground">
+            Import sessions for <span className="text-foreground font-medium">{playerName}</span>
           </DialogDescription>
         </DialogHeader>
 
         {/* Step 1: Upload */}
         {step === "upload" && (
           <div className="space-y-6 py-4">
-            <div className="border-2 border-dashed border-white/[0.12] rounded-xl p-8 text-center hover:border-green-500/30 transition-colors">
-              <Upload className="h-10 w-10 text-white/20 mx-auto mb-4" />
-              <p className="text-white/60 mb-3">
+            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-green-500/30 transition-colors">
+              <Upload className="h-10 w-10 text-muted-foreground/40 mx-auto mb-4" />
+              <p className="text-muted-foreground mb-3">
                 Drop a CSV file or click to browse
               </p>
               <input
@@ -290,20 +290,20 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
               </label>
             </div>
 
-            <div className="bg-white/[0.03] rounded-lg p-4 border border-white/[0.06]">
-              <div className="flex items-start gap-2 text-white/50 text-sm">
+            <div className="bg-muted/30 rounded-lg p-4 border border-border/60">
+              <div className="flex items-start gap-2 text-muted-foreground text-sm">
                 <Info className="h-4 w-4 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-white/70 mb-1">Expected CSV format</p>
-                  <p>The importer auto-detects Blast Motion export columns. At minimum, include a <span className="text-white/80">Date</span> column. Recognized metrics: Bat Speed, On-Plane Efficiency, Attack Angle, Exit Velocity.</p>
+                  <p className="font-medium text-foreground/80 mb-1">Expected CSV format</p>
+                  <p>The importer auto-detects Blast Motion export columns. At minimum, include a <span className="text-foreground">Date</span> column. Recognized metrics: Bat Speed, On-Plane Efficiency, Attack Angle, Exit Velocity.</p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-white/60 text-sm">Default Session Type (when not in CSV)</label>
+              <label className="text-muted-foreground text-sm">Default Session Type (when not in CSV)</label>
               <Select value={defaultSessionType} onValueChange={setDefaultSessionType}>
-                <SelectTrigger className="bg-white/[0.06] border-white/[0.1] text-white w-48">
+                <SelectTrigger className="bg-muted/60 border-border text-foreground w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -331,7 +331,7 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
                 </Badge>
               )}
               {unmappedHeaders.length > 0 && (
-                <Badge variant="outline" className="text-white/40 border-white/10">
+                <Badge variant="outline" className="text-muted-foreground border-border">
                   {unmappedHeaders.length} unmapped columns
                 </Badge>
               )}
@@ -353,10 +353,10 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
                 className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 text-left ${
                   createNotes
                     ? "bg-[#DC143C]/10 border-[#DC143C]/30 text-white"
-                    : "bg-white/[0.02] border-white/[0.08] text-white/50"
+                    : "bg-white/[0.02] border-border text-muted-foreground"
                 }`}
               >
-                <Link2 className={`h-4 w-4 shrink-0 ${createNotes ? "text-[#DC143C]" : "text-white/30"}`} />
+                <Link2 className={`h-4 w-4 shrink-0 ${createNotes ? "text-[#DC143C]" : "text-muted-foreground/60"}`} />
                 <span className="text-sm">
                   {createNotes ? "Session Notes will be auto-created for each imported session" : "No Session Notes will be created"}
                 </span>
@@ -371,27 +371,27 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
             )}
 
             {/* Preview table */}
-            <div className="overflow-x-auto max-h-[300px] overflow-y-auto rounded-lg border border-white/[0.08]">
+            <div className="overflow-x-auto max-h-[300px] overflow-y-auto rounded-lg border border-border">
               <table className="w-full text-xs">
                 <thead className="sticky top-0 bg-[#1a1a1a]">
-                  <tr className="border-b border-white/[0.1]">
-                    <th className="text-left py-2 px-3 text-white/50">#</th>
-                    <th className="text-left py-2 px-3 text-white/50">Date</th>
-                    <th className="text-left py-2 px-3 text-white/50">Type</th>
-                    <th className="text-center py-2 px-2 text-white/50">Bat Speed</th>
-                    <th className="text-center py-2 px-2 text-white/50">On-Plane Eff.</th>
-                    <th className="text-center py-2 px-2 text-white/50">Attack Angle</th>
-                    <th className="text-center py-2 px-2 text-white/50">Exit Velo</th>
-                    <th className="text-left py-2 px-2 text-white/50">Warnings</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-muted-foreground">#</th>
+                    <th className="text-left py-2 px-3 text-muted-foreground">Date</th>
+                    <th className="text-left py-2 px-3 text-muted-foreground">Type</th>
+                    <th className="text-center py-2 px-2 text-muted-foreground">Bat Speed</th>
+                    <th className="text-center py-2 px-2 text-muted-foreground">On-Plane Eff.</th>
+                    <th className="text-center py-2 px-2 text-muted-foreground">Attack Angle</th>
+                    <th className="text-center py-2 px-2 text-muted-foreground">Exit Velo</th>
+                    <th className="text-left py-2 px-2 text-muted-foreground">Warnings</th>
                   </tr>
                 </thead>
                 <tbody>
                   {parsedRows.map((row, idx) => (
-                    <tr key={idx} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
-                      <td className="py-2 px-3 text-white/30">{idx + 1}</td>
-                      <td className="py-2 px-3 text-white/80">{row.sessionDate}</td>
+                    <tr key={idx} className="border-b border-border/40 hover:bg-white/[0.02]">
+                      <td className="py-2 px-3 text-muted-foreground/60">{idx + 1}</td>
+                      <td className="py-2 px-3 text-foreground">{row.sessionDate}</td>
                       <td className="py-2 px-3">
-                        <Badge variant="outline" className="text-white/60 border-white/10 text-[10px]">
+                        <Badge variant="outline" className="text-muted-foreground border-border text-[10px]">
                           {row.sessionType}
                         </Badge>
                       </td>
@@ -419,7 +419,7 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
         {step === "importing" && (
           <div className="py-12 text-center space-y-4">
             <Loader2 className="h-10 w-10 text-green-400 animate-spin mx-auto" />
-            <p className="text-white/60">Importing {parsedRows.length} sessions...</p>
+            <p className="text-muted-foreground">Importing {parsedRows.length} sessions...</p>
           </div>
         )}
 
@@ -428,23 +428,23 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
           <div className="py-6 space-y-4">
             <div className="text-center space-y-3">
               <CheckCircle2 className="h-12 w-12 text-green-400 mx-auto" />
-              <h3 className="text-lg font-bold text-white">Import Complete</h3>
+              <h3 className="text-lg font-bold text-foreground">Import Complete</h3>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-400">{importResult.imported}</p>
-                <p className="text-xs text-white/50">Sessions Imported</p>
+                <p className="text-xs text-muted-foreground">Sessions Imported</p>
               </div>
               <div className="bg-[#DC143C]/10 border border-[#DC143C]/20 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-[#E8425A]">{importResult.notesCreated}</p>
-                <p className="text-xs text-white/50">Notes Created</p>
+                <p className="text-xs text-muted-foreground">Notes Created</p>
               </div>
-              <div className={`${importResult.errors.length > 0 ? "bg-red-500/10 border-red-500/20" : "bg-white/[0.04] border-white/[0.08]"} border rounded-lg p-3 text-center`}>
-                <p className={`text-2xl font-bold ${importResult.errors.length > 0 ? "text-red-400" : "text-white/30"}`}>
+              <div className={`${importResult.errors.length > 0 ? "bg-red-500/10 border-red-500/20" : "bg-muted/40 border-border"} border rounded-lg p-3 text-center`}>
+                <p className={`text-2xl font-bold ${importResult.errors.length > 0 ? "text-red-400" : "text-muted-foreground/60"}`}>
                   {importResult.errors.length}
                 </p>
-                <p className="text-xs text-white/50">Errors</p>
+                <p className="text-xs text-muted-foreground">Errors</p>
               </div>
             </div>
 
@@ -463,7 +463,7 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
             <Button
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
             >
               Cancel
             </Button>
@@ -473,7 +473,7 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
               <Button
                 variant="ghost"
                 onClick={handleReset}
-                className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
               >
                 <X className="h-4 w-4 mr-1" />
                 Start Over

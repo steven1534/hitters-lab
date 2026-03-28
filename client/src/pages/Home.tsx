@@ -72,7 +72,7 @@ export default function Home() {
     return map;
   }, [drillCustomizations]);
 
-  const { data: allVideos = [] } = trpc.drillVideos.getAllVideos.useQuery();
+  const { data: allVideos = [] } = trpc.videos.getAllVideos.useQuery();
   const videosMap = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v: any) => {
@@ -116,7 +116,7 @@ export default function Home() {
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm max-w-md w-full p-10 text-center">
           <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-600/20">
-            <Target className="h-7 w-7 text-white" />
+            <Target className="h-7 w-7 text-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Coach Steve's<br/>Hitters Lab</h1>
           <p className="text-slate-500 text-sm leading-relaxed mb-8">
@@ -145,7 +145,7 @@ export default function Home() {
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center shadow-sm shadow-red-600/30">
-              <Target className="h-4 w-4 text-white" />
+              <Target className="h-4 w-4 text-foreground" />
             </div>
             <div className="hidden sm:block">
               <span className="font-bold text-slate-900 text-sm tracking-tight">Coach Steve's Hitters Lab</span>
@@ -462,7 +462,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center">
-              <Target className="h-3.5 w-3.5 text-white" />
+              <Target className="h-3.5 w-3.5 text-foreground" />
             </div>
             <span className="font-bold text-slate-900 text-sm">Coach Steve's Hitters Lab</span>
           </div>

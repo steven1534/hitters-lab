@@ -66,22 +66,22 @@ export function RetroactiveBlastNotes({ open, onOpenChange, playerId, playerName
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-border text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <FileText className="h-5 w-5 text-[#E8425A]" />
             Create Retroactive Notes
           </DialogTitle>
-          <DialogDescription className="text-white/50">
-            Create session notes for <span className="text-white/80 font-medium">{playerName}</span>'s existing Blast sessions that don't have linked notes yet.
+          <DialogDescription className="text-muted-foreground">
+            Create session notes for <span className="text-foreground font-medium">{playerName}</span>'s existing Blast sessions that don't have linked notes yet.
           </DialogDescription>
         </DialogHeader>
 
         {!result && !processing && (
           <div className="py-4 space-y-4">
-            <div className="bg-[#DC143C]/5 border border-[#DC143C]/15 rounded-lg p-4 text-sm text-white/60">
+            <div className="bg-[#DC143C]/5 border border-[#DC143C]/15 rounded-lg p-4 text-sm text-muted-foreground">
               <p>This will scan all of {playerName}'s Blast sessions and create a Session Note for each one that doesn't already have one.</p>
-              <p className="mt-2 text-white/40">Each note will include the Blast metrics summary and be visible in the Session Notes timeline.</p>
+              <p className="mt-2 text-muted-foreground">Each note will include the Blast metrics summary and be visible in the Session Notes timeline.</p>
             </div>
           </div>
         )}
@@ -89,7 +89,7 @@ export function RetroactiveBlastNotes({ open, onOpenChange, playerId, playerName
         {processing && (
           <div className="py-8 text-center space-y-3">
             <Loader2 className="h-8 w-8 text-[#E8425A] animate-spin mx-auto" />
-            <p className="text-white/50">Creating session notes...</p>
+            <p className="text-muted-foreground">Creating session notes...</p>
           </div>
         )}
 
@@ -97,17 +97,17 @@ export function RetroactiveBlastNotes({ open, onOpenChange, playerId, playerName
           <div className="py-4 space-y-4">
             <div className="text-center space-y-2">
               <CheckCircle2 className="h-10 w-10 text-green-400 mx-auto" />
-              <h3 className="text-lg font-bold text-white">Complete</h3>
+              <h3 className="text-lg font-bold text-foreground">Complete</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-400">{result.notesCreated}</p>
-                <p className="text-xs text-white/50">Notes Created</p>
+                <p className="text-xs text-muted-foreground">Notes Created</p>
               </div>
-              <div className="bg-white/[0.04] border border-white/[0.08] rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-white/40">{result.alreadyLinked}</p>
-                <p className="text-xs text-white/50">Already Linked</p>
+              <div className="bg-muted/40 border border-border rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-muted-foreground">{result.alreadyLinked}</p>
+                <p className="text-xs text-muted-foreground">Already Linked</p>
               </div>
             </div>
 
@@ -131,7 +131,7 @@ export function RetroactiveBlastNotes({ open, onOpenChange, playerId, playerName
               <Button
                 variant="ghost"
                 onClick={handleClose}
-                className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
               >
                 Cancel
               </Button>

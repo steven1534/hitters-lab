@@ -183,22 +183,22 @@ export default function PracticePlanner() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <InlineEdit contentKey="coach.planner.title" defaultValue="Practice Plans" as="h2" className="text-2xl font-heading font-bold text-white" />
-          <p className="text-sm text-white/40 mt-1">{plans?.length || 0} plans created</p>
+          <InlineEdit contentKey="coach.planner.title" defaultValue="Practice Plans" as="h2" className="text-2xl font-heading font-bold text-foreground" />
+          <p className="text-sm text-muted-foreground mt-1">{plans?.length || 0} plans created</p>
         </div>
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="flex bg-white/[0.04] rounded-lg border border-white/[0.08] p-0.5">
+          <div className="flex bg-muted/40 rounded-lg border border-border p-0.5">
             <button
               onClick={() => setView("list")}
-              className="p-2 rounded-md transition-all bg-white/[0.1] text-white"
+              className="p-2 rounded-md transition-all bg-white/[0.1] text-foreground"
               aria-label="List view"
             >
               <List className="h-4 w-4" />
             </button>
             <button
               onClick={() => setView("calendar")}
-              className="p-2 rounded-md transition-all text-white/40 hover:text-white/70"
+              className="p-2 rounded-md transition-all text-muted-foreground hover:text-foreground/80"
               aria-label="Calendar view"
             >
               <CalendarDays className="h-4 w-4" />
@@ -213,12 +213,12 @@ export default function PracticePlanner() {
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search plans or athletes..."
-            className="pl-9 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25"
+            className="pl-9 bg-muted/40 border-border text-foreground placeholder:text-muted-foreground/50"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -229,7 +229,7 @@ export default function PracticePlanner() {
               className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 statusFilter === s
                   ? "bg-[#DC143C] text-white shadow-lg shadow-[#DC143C]/20"
-                  : "bg-white/[0.04] text-white/50 hover:text-white/80 hover:bg-white/[0.08]"
+                  : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
               {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -242,16 +242,16 @@ export default function PracticePlanner() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-48 bg-white/[0.03] rounded-xl animate-pulse border border-white/[0.06]" />
+            <div key={i} className="h-48 bg-muted/30 rounded-xl animate-pulse border border-border/60" />
           ))}
         </div>
       ) : filteredPlans.length === 0 ? (
-        <div className="text-center py-16 bg-white/[0.02] rounded-xl border border-dashed border-white/[0.08]">
+        <div className="text-center py-16 bg-white/[0.02] rounded-xl border border-dashed border-border">
           <FileText className="h-12 w-12 text-white/15 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-white/60 mb-2">
+          <h3 className="text-lg font-bold text-muted-foreground mb-2">
             {plans?.length === 0 ? "No practice plans yet" : "No plans match your filters"}
           </h3>
-          <p className="text-sm text-white/30 mb-6 max-w-md mx-auto">
+          <p className="text-sm text-muted-foreground/60 mb-6 max-w-md mx-auto">
             {plans?.length === 0
               ? "Create your first session plan to stay organized during training."
               : "Try adjusting your search or filter criteria."}
@@ -304,7 +304,7 @@ function PlanCard({ plan, onView, onEdit, onStartSession, onDuplicate, onDelete,
 
   return (
     <Card
-      className="bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-300 cursor-pointer group overflow-hidden"
+      className="bg-muted/30 border-border hover:bg-muted/50 hover:border-border transition-all duration-300 cursor-pointer group overflow-hidden"
       onClick={onView}
     >
       <CardContent className="p-0">
@@ -315,11 +315,11 @@ function PlanCard({ plan, onView, onEdit, onStartSession, onDuplicate, onDelete,
           {/* Header row */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h3 className="font-heading font-bold text-white text-lg leading-tight truncate group-hover:text-[#E8425A] transition-colors">
+              <h3 className="font-heading font-bold text-foreground text-lg leading-tight truncate group-hover:text-[#E8425A] transition-colors">
                 {plan.title}
               </h3>
               {plan.athleteName && (
-                <p className="text-sm text-white/40 mt-0.5 truncate">{plan.athleteName}</p>
+                <p className="text-sm text-muted-foreground mt-0.5 truncate">{plan.athleteName}</p>
               )}
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -329,28 +329,28 @@ function PlanCard({ plan, onView, onEdit, onStartSession, onDuplicate, onDelete,
               <div className="relative">
                 <button
                   onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
-                  className="p-1.5 rounded-lg hover:bg-white/[0.1] text-white/30 hover:text-white transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-white/[0.1] text-muted-foreground/60 hover:text-foreground transition-colors"
                 >
                   <MoreVertical className="h-4 w-4" />
                 </button>
                 {menuOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
-                    <div className="absolute right-0 top-full mt-1 z-50 bg-[#1a1f2e] border border-white/[0.1] rounded-xl shadow-2xl py-1.5 min-w-[180px]">
-                      <button onClick={(e) => { e.stopPropagation(); onStartSession(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] flex items-center gap-2.5 transition-colors">
+                    <div className="absolute right-0 top-full mt-1 z-50 bg-[#1a1f2e] border border-border rounded-xl shadow-2xl py-1.5 min-w-[180px]">
+                      <button onClick={(e) => { e.stopPropagation(); onStartSession(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-foreground/80 hover:text-foreground hover:bg-muted/60 flex items-center gap-2.5 transition-colors">
                         <Play className="h-4 w-4 text-green-400" /> Start Session
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); onEdit(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] flex items-center gap-2.5 transition-colors">
+                      <button onClick={(e) => { e.stopPropagation(); onEdit(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-foreground/80 hover:text-foreground hover:bg-muted/60 flex items-center gap-2.5 transition-colors">
                         <Edit3 className="h-4 w-4 text-[#E8425A]" /> Edit Plan
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); onDuplicate(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] flex items-center gap-2.5 transition-colors">
+                      <button onClick={(e) => { e.stopPropagation(); onDuplicate(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-foreground/80 hover:text-foreground hover:bg-muted/60 flex items-center gap-2.5 transition-colors">
                         <Copy className="h-4 w-4 text-[#E8425A]" /> Duplicate
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); onToggleShare(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] flex items-center gap-2.5 transition-colors">
+                      <button onClick={(e) => { e.stopPropagation(); onToggleShare(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-foreground/80 hover:text-foreground hover:bg-muted/60 flex items-center gap-2.5 transition-colors">
                         {plan.isShared ? <EyeOff className="h-4 w-4 text-yellow-400" /> : <Share2 className="h-4 w-4 text-yellow-400" />}
                         {plan.isShared ? "Unshare" : "Share with Athlete"}
                       </button>
-                      <div className="border-t border-white/[0.06] my-1" />
+                      <div className="border-t border-border/60 my-1" />
                       <button onClick={(e) => { e.stopPropagation(); onDelete(); setMenuOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 flex items-center gap-2.5 transition-colors">
                         <Trash2 className="h-4 w-4" /> Delete
                       </button>
@@ -379,12 +379,12 @@ function PlanCard({ plan, onView, onEdit, onStartSession, onDuplicate, onDelete,
           {focusAreas.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
               {focusAreas.slice(0, 4).map((area) => (
-                <span key={area} className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/[0.05] text-white/40 border border-white/[0.06]">
+                <span key={area} className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-muted/50 text-muted-foreground border border-border/60">
                   {area}
                 </span>
               ))}
               {focusAreas.length > 4 && (
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-medium text-white/25">+{focusAreas.length - 4}</span>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-medium text-muted-foreground/50">+{focusAreas.length - 4}</span>
               )}
             </div>
           )}
@@ -399,7 +399,7 @@ function PlanCard({ plan, onView, onEdit, onStartSession, onDuplicate, onDelete,
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.04] text-white/50 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white/80 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/40 text-muted-foreground border border-border/60 hover:bg-muted hover:text-foreground transition-all"
             >
               <Edit3 className="h-3 w-3" /> Edit
             </button>
@@ -423,16 +423,16 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
 
   if (isLoading) return (
     <div className="space-y-4">
-      <div className="h-8 w-48 bg-white/[0.06] rounded animate-pulse" />
-      <div className="h-64 bg-white/[0.04] rounded-xl animate-pulse" />
+      <div className="h-8 w-48 bg-muted/60 rounded animate-pulse" />
+      <div className="h-64 bg-muted/40 rounded-xl animate-pulse" />
     </div>
   );
 
   if (!plan) return (
     <div className="text-center py-16">
-      <AlertCircle className="h-12 w-12 text-white/20 mx-auto mb-4" />
-      <p className="text-white/40">Plan not found</p>
-      <Button variant="outline" onClick={onBack} className="mt-4 bg-transparent border-white/[0.1] text-white/60">Go Back</Button>
+      <AlertCircle className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
+      <p className="text-muted-foreground">Plan not found</p>
+      <Button variant="outline" onClick={onBack} className="mt-4 bg-transparent border-border text-muted-foreground">Go Back</Button>
     </div>
   );
 
@@ -444,34 +444,34 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
     <div className="space-y-6 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-lg hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors">
+        <button onClick={onBack} className="p-2 rounded-lg hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-heading font-bold text-white truncate">{plan.title}</h2>
-          {plan.athleteName && <p className="text-sm text-white/40">{plan.athleteName}</p>}
+          <h2 className="text-2xl font-heading font-bold text-foreground truncate">{plan.title}</h2>
+          {plan.athleteName && <p className="text-sm text-muted-foreground">{plan.athleteName}</p>}
         </div>
       </div>
 
       {/* Session Overview Card */}
-      <Card className="bg-gradient-to-br from-[#DC143C]/10 via-white/[0.03] to-[#DC143C]/5 border-white/[0.08] overflow-hidden">
+      <Card className="bg-gradient-to-br from-[#DC143C]/10 via-white/[0.03] to-[#DC143C]/5 border-border overflow-hidden">
         <CardContent className="p-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
             <div>
-              <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-1">Duration</p>
-              <p className="text-xl font-bold text-white flex items-center gap-1.5"><Clock className="h-4 w-4 text-[#E8425A]" /> {plan.duration} min</p>
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-1">Duration</p>
+              <p className="text-xl font-bold text-foreground flex items-center gap-1.5"><Clock className="h-4 w-4 text-[#E8425A]" /> {plan.duration} min</p>
             </div>
             <div>
-              <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-1">Blocks</p>
-              <p className="text-xl font-bold text-white flex items-center gap-1.5"><Activity className="h-4 w-4 text-[#E8425A]" /> {blocks.length}</p>
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-1">Blocks</p>
+              <p className="text-xl font-bold text-foreground flex items-center gap-1.5"><Activity className="h-4 w-4 text-[#E8425A]" /> {blocks.length}</p>
             </div>
             <div>
-              <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-1">Status</p>
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-1">Status</p>
               <Badge className="bg-[#DC143C]/20 text-[#E8425A] border border-[#DC143C]/30 text-xs">{plan.status}</Badge>
             </div>
             <div>
-              <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-1">Date</p>
-              <p className="text-sm font-medium text-white/70">
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-1">Date</p>
+              <p className="text-sm font-medium text-foreground/80">
                 {plan.sessionDate ? new Date(plan.sessionDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not set"}
               </p>
             </div>
@@ -480,15 +480,15 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
           {focusAreas.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {focusAreas.map((area) => (
-                <Badge key={area} className="bg-white/[0.06] text-white/50 border border-white/[0.08] text-xs">{area}</Badge>
+                <Badge key={area} className="bg-muted/60 text-muted-foreground border border-border text-xs">{area}</Badge>
               ))}
             </div>
           )}
 
           {plan.sessionNotes && (
-            <div className="bg-white/[0.04] rounded-lg p-3 border border-white/[0.06]">
-              <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-1.5 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Session Notes</p>
-              <p className="text-sm text-white/60 whitespace-pre-wrap leading-relaxed">{plan.sessionNotes}</p>
+            <div className="bg-muted/40 rounded-lg p-3 border border-border/60">
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-1.5 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Session Notes</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{plan.sessionNotes}</p>
             </div>
           )}
         </CardContent>
@@ -496,7 +496,7 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
 
       {/* Session Timeline */}
       <div>
-        <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
           <Timer className="h-4 w-4" /> Session Timeline
         </h3>
 
@@ -523,10 +523,10 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
       </div>
 
       {/* Sticky Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a]/95 backdrop-blur-xl border-t border-white/[0.08] px-4 py-3 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a]/95 backdrop-blur-xl border-t border-border px-4 py-3 z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={onEdit} className="bg-transparent border-white/[0.1] text-white/60 hover:text-white hover:bg-white/[0.06] gap-2">
+            <Button variant="outline" onClick={onEdit} className="bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-muted/60 gap-2">
               <Edit3 className="h-4 w-4" /> Edit
             </Button>
             <button
@@ -534,7 +534,7 @@ function PlanDetail({ planId, onBack, onEdit, onStartSession, onShare }: {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
                 plan.isShared === 1
                   ? "bg-green-500/15 text-green-400 border-green-500/30 hover:bg-green-500/25"
-                  : "bg-white/[0.04] text-white/50 border-white/[0.08] hover:bg-white/[0.08]"
+                  : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"
               }`}
             >
               {plan.isShared === 1 ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
@@ -568,7 +568,7 @@ function DetailBlock({ block, index, startTime, config, intensityConf }: {
       >
         {/* Timeline indicator */}
         <div className="flex flex-col items-center gap-0.5 flex-shrink-0 w-12">
-          <span className="text-[10px] font-mono text-white/30">{startTime}m</span>
+          <span className="text-[10px] font-mono text-muted-foreground/60">{startTime}m</span>
           <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${config.bg}`}>
             <Icon className={`h-4 w-4 ${config.color}`} />
           </div>
@@ -577,7 +577,7 @@ function DetailBlock({ block, index, startTime, config, intensityConf }: {
         {/* Block info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-sm font-bold text-white truncate">{block.title}</span>
+            <span className="text-sm font-bold text-foreground truncate">{block.title}</span>
             {intensityConf && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded ${intensityConf.bg} ${intensityConf.color} font-medium`}>
                 {intensityConf.label}
@@ -594,7 +594,7 @@ function DetailBlock({ block, index, startTime, config, intensityConf }: {
 
         {/* Expand toggle */}
         {hasDetails && (
-          <div className="text-white/20">
+          <div className="text-muted-foreground/40">
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </div>
         )}
@@ -608,7 +608,7 @@ function DetailBlock({ block, index, startTime, config, intensityConf }: {
               <Target className="h-3.5 w-3.5 text-[#E8425A] mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-[10px] font-medium text-[#E8425A]/60 uppercase tracking-wider mb-0.5">Goal</p>
-                <p className="text-sm text-white/70">{block.goal}</p>
+                <p className="text-sm text-foreground/80">{block.goal}</p>
               </div>
             </div>
           )}
@@ -618,7 +618,7 @@ function DetailBlock({ block, index, startTime, config, intensityConf }: {
               <p className="text-[10px] font-medium text-amber-400/70 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <Lightbulb className="h-3 w-3" /> Coaching Cues
               </p>
-              <p className="text-sm text-white/70 whitespace-pre-wrap leading-relaxed">{block.coachingCues}</p>
+              <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{block.coachingCues}</p>
             </div>
           )}
 
@@ -627,16 +627,16 @@ function DetailBlock({ block, index, startTime, config, intensityConf }: {
               <p className="text-[10px] font-medium text-[#E8425A]/70 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" /> Key Points / What to Watch
               </p>
-              <p className="text-sm text-white/70 whitespace-pre-wrap leading-relaxed">{block.keyPoints}</p>
+              <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">{block.keyPoints}</p>
             </div>
           )}
 
           {block.notes && (
             <div>
-              <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <FileText className="h-3 w-3" /> Notes
               </p>
-              <p className="text-sm text-white/50 whitespace-pre-wrap">{block.notes}</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{block.notes}</p>
             </div>
           )}
         </div>
@@ -693,7 +693,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
 
   if (isLoading) return (
     <div className="fixed inset-0 bg-[#1a1a1a] z-[100] flex items-center justify-center">
-      <div className="animate-pulse text-white/30 text-lg">Loading session...</div>
+      <div className="animate-pulse text-muted-foreground/60 text-lg">Loading session...</div>
     </div>
   );
 
@@ -710,11 +710,11 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
   if (!sessionStarted) {
     return (
       <div className="fixed inset-0 bg-[#1a1a1a] z-[100] flex flex-col safe-area-inset-top safe-area-inset-bottom" role="dialog" aria-label="Session Mode">
-        <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
-          <button onClick={onExit} aria-label="Exit session" className="p-2 rounded-lg hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors touch-target">
+        <div className="flex items-center justify-between p-4 border-b border-border/60">
+          <button onClick={onExit} aria-label="Exit session" className="p-2 rounded-lg hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-colors touch-target">
             <X className="h-5 w-5" />
           </button>
-          <span className="text-sm text-white/30 font-medium">Session Mode</span>
+          <span className="text-sm text-muted-foreground/60 font-medium">Session Mode</span>
           <div className="w-9" />
         </div>
 
@@ -722,9 +722,9 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
           <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-[#DC143C]/20 to-[#DC143C]/10 flex items-center justify-center mb-6 border border-[#DC143C]/20">
             <Play className="h-10 w-10 text-[#E8425A]" />
           </div>
-          <h2 className="text-3xl font-heading font-bold text-white mb-2">{plan.title}</h2>
-          {plan.athleteName && <p className="text-lg text-white/40 mb-2">{plan.athleteName}</p>}
-          <p className="text-white/30 mb-8">{totalBlocks} blocks · {plan.duration} min</p>
+          <h2 className="text-3xl font-heading font-bold text-foreground mb-2">{plan.title}</h2>
+          {plan.athleteName && <p className="text-lg text-muted-foreground mb-2">{plan.athleteName}</p>}
+          <p className="text-muted-foreground/60 mb-8">{totalBlocks} blocks · {plan.duration} min</p>
 
           {/* Block preview list */}
           <div className="w-full max-w-sm space-y-2 mb-8 max-h-[40vh] overflow-y-auto">
@@ -733,10 +733,10 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               const BIcon = bConfig.icon;
               return (
                 <div key={b.id} className={`flex items-center gap-3 px-4 py-2.5 rounded-lg ${bConfig.bg} border ${bConfig.border}`}>
-                  <span className="text-xs text-white/25 font-mono w-5">{i + 1}</span>
+                  <span className="text-xs text-muted-foreground/50 font-mono w-5">{i + 1}</span>
                   <BIcon className={`h-4 w-4 ${bConfig.color} flex-shrink-0`} />
-                  <span className="text-sm text-white/70 flex-1 truncate text-left">{b.title}</span>
-                  <span className="text-xs text-white/30">{b.duration}m</span>
+                  <span className="text-sm text-foreground/80 flex-1 truncate text-left">{b.title}</span>
+                  <span className="text-xs text-muted-foreground/60">{b.duration}m</span>
                 </div>
               );
             })}
@@ -754,17 +754,17 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
   return (
     <div className="fixed inset-0 bg-[#1a1a1a] z-[100] flex flex-col safe-area-inset-top safe-area-inset-bottom" role="dialog" aria-label="Active Session">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-[#1a1a1a]/95 backdrop-blur-lg flex-shrink-0">
-        <button onClick={() => { setIsTimerRunning(false); onExit(); }} aria-label="Exit session" className="p-2 rounded-lg hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors touch-target">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 bg-[#1a1a1a]/95 backdrop-blur-lg flex-shrink-0">
+        <button onClick={() => { setIsTimerRunning(false); onExit(); }} aria-label="Exit session" className="p-2 rounded-lg hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-colors touch-target">
           <X className="h-5 w-5" />
         </button>
         <div className="text-center">
-          <p className="text-[10px] text-white/30 uppercase tracking-wider font-medium">Session</p>
-          <p className="text-sm text-white/70 font-medium truncate max-w-[200px]">{plan.title}</p>
+          <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider font-medium">Session</p>
+          <p className="text-sm text-foreground/80 font-medium truncate max-w-[200px]">{plan.title}</p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] text-white/30 uppercase tracking-wider">Block</p>
-          <p className="text-sm text-white/70 font-mono">{currentBlockIdx + 1}/{totalBlocks}</p>
+          <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Block</p>
+          <p className="text-sm text-foreground/80 font-mono">{currentBlockIdx + 1}/{totalBlocks}</p>
         </div>
       </div>
 
@@ -774,7 +774,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-all cursor-pointer ${
-              i < currentBlockIdx ? "bg-green-500" : i === currentBlockIdx ? "bg-[#DC143C]" : "bg-white/[0.08]"
+              i < currentBlockIdx ? "bg-green-500" : i === currentBlockIdx ? "bg-[#DC143C]" : "bg-muted"
             }`}
             onClick={() => goToBlock(i)}
           />
@@ -796,23 +796,23 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               )}
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white mb-3 leading-tight px-2">
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-3 leading-tight px-2">
               {currentBlock.title}
             </h2>
 
             {/* Timer */}
             <div className="mb-4">
-              <p className={`text-5xl sm:text-6xl font-mono font-bold tracking-tight ${isOvertime ? "text-red-400" : "text-white"}`}>
+              <p className={`text-5xl sm:text-6xl font-mono font-bold tracking-tight ${isOvertime ? "text-red-400" : "text-foreground"}`}>
                 {formatTime(elapsedSeconds)}
               </p>
-              <p className="text-sm text-white/30 mt-1">
+              <p className="text-sm text-muted-foreground/60 mt-1">
                 {isOvertime ? "Over time!" : `of ${currentBlock.duration}:00`}
               </p>
             </div>
 
             {/* Progress */}
             <div className="max-w-xs mx-auto mb-2">
-              <Progress value={progress} className="h-2 bg-white/[0.06]" />
+              <Progress value={progress} className="h-2 bg-muted/60" />
             </div>
 
             {/* Timer controls */}
@@ -831,7 +831,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               <button
                 onClick={() => setElapsedSeconds(0)}
                 aria-label="Reset timer"
-                className="h-10 w-10 rounded-full flex items-center justify-center bg-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.1] transition-all border border-white/[0.08] touch-target"
+                className="h-10 w-10 rounded-full flex items-center justify-center bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-all border border-border touch-target"
               >
                 <Timer className="h-4 w-4" />
               </button>
@@ -842,15 +842,15 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
           {(currentBlock.sets || currentBlock.reps) && (
             <div className="flex justify-center gap-6 mb-6">
               {currentBlock.sets && (
-                <div className="text-center bg-white/[0.04] rounded-xl px-6 py-3 border border-white/[0.06]">
-                  <p className="text-3xl font-bold text-white">{currentBlock.sets}</p>
-                  <p className="text-xs text-white/30 uppercase tracking-wider mt-0.5">Sets</p>
+                <div className="text-center bg-muted/40 rounded-xl px-6 py-3 border border-border/60">
+                  <p className="text-3xl font-bold text-foreground">{currentBlock.sets}</p>
+                  <p className="text-xs text-muted-foreground/60 uppercase tracking-wider mt-0.5">Sets</p>
                 </div>
               )}
               {currentBlock.reps && (
-                <div className="text-center bg-white/[0.04] rounded-xl px-6 py-3 border border-white/[0.06]">
-                  <p className="text-3xl font-bold text-white">{currentBlock.reps}</p>
-                  <p className="text-xs text-white/30 uppercase tracking-wider mt-0.5">Reps</p>
+                <div className="text-center bg-muted/40 rounded-xl px-6 py-3 border border-border/60">
+                  <p className="text-3xl font-bold text-foreground">{currentBlock.reps}</p>
+                  <p className="text-xs text-muted-foreground/60 uppercase tracking-wider mt-0.5">Reps</p>
                 </div>
               )}
             </div>
@@ -858,7 +858,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
 
           {/* Equipment */}
           {currentBlock.equipment && (
-            <div className="flex items-center justify-center gap-2 mb-4 text-white/40">
+            <div className="flex items-center justify-center gap-2 mb-4 text-muted-foreground">
               <Wrench className="h-4 w-4" />
               <span className="text-sm">{currentBlock.equipment}</span>
             </div>
@@ -870,7 +870,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               <p className="text-[10px] font-medium text-[#E8425A]/60 uppercase tracking-wider mb-1.5 flex items-center gap-1 justify-center">
                 <Target className="h-3 w-3" /> Block Goal
               </p>
-              <p className="text-base text-white/80 text-center leading-relaxed">{currentBlock.goal}</p>
+              <p className="text-base text-foreground text-center leading-relaxed">{currentBlock.goal}</p>
             </div>
           )}
 
@@ -880,7 +880,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               <p className="text-xs font-bold text-amber-400/80 uppercase tracking-wider mb-2 flex items-center gap-1.5 justify-center">
                 <Lightbulb className="h-4 w-4" /> Coaching Cues
               </p>
-              <p className="text-lg text-white/80 text-center leading-relaxed whitespace-pre-wrap font-medium">{currentBlock.coachingCues}</p>
+              <p className="text-lg text-foreground text-center leading-relaxed whitespace-pre-wrap font-medium">{currentBlock.coachingCues}</p>
             </div>
           )}
 
@@ -890,29 +890,29 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               <p className="text-[10px] font-medium text-[#E8425A]/60 uppercase tracking-wider mb-1.5 flex items-center gap-1 justify-center">
                 <AlertCircle className="h-3 w-3" /> What to Watch
               </p>
-              <p className="text-base text-white/70 text-center leading-relaxed whitespace-pre-wrap">{currentBlock.keyPoints}</p>
+              <p className="text-base text-foreground/80 text-center leading-relaxed whitespace-pre-wrap">{currentBlock.keyPoints}</p>
             </div>
           )}
 
           {/* Notes */}
           {currentBlock.notes && (
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 max-w-lg mx-auto">
-              <p className="text-[10px] font-medium text-white/25 uppercase tracking-wider mb-1.5 flex items-center gap-1 justify-center">
+            <div className="bg-muted/30 border border-border/60 rounded-xl p-4 max-w-lg mx-auto">
+              <p className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider mb-1.5 flex items-center gap-1 justify-center">
                 <FileText className="h-3 w-3" /> Notes
               </p>
-              <p className="text-sm text-white/50 text-center whitespace-pre-wrap">{currentBlock.notes}</p>
+              <p className="text-sm text-muted-foreground text-center whitespace-pre-wrap">{currentBlock.notes}</p>
             </div>
           )}
         </div>
       )}
 
       {/* Bottom navigation */}
-      <div className="flex items-center justify-between px-4 py-4 border-t border-white/[0.06] bg-[#1a1a1a]/95 backdrop-blur-lg flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-4 border-t border-border/60 bg-[#1a1a1a]/95 backdrop-blur-lg flex-shrink-0">
         <button
           onClick={() => goToBlock(currentBlockIdx - 1)}
           disabled={currentBlockIdx === 0}
           aria-label="Previous block"
-          className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] disabled:opacity-20 disabled:cursor-not-allowed transition-all border border-white/[0.06] touch-target"
+          className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-20 disabled:cursor-not-allowed transition-all border border-border/60 touch-target"
         >
           <ArrowLeft className="h-4 w-4" /> Prev
         </button>
@@ -924,7 +924,7 @@ function SessionMode({ planId, onExit }: { planId: number; onExit: () => void; }
               key={i}
               onClick={() => goToBlock(i)}
               className={`h-2.5 w-2.5 rounded-full transition-all flex-shrink-0 ${
-                i === currentBlockIdx ? "bg-[#DC143C] scale-125" : i < currentBlockIdx ? "bg-green-500/60" : "bg-white/[0.15]"
+                i === currentBlockIdx ? "bg-[#DC143C] scale-125" : i < currentBlockIdx ? "bg-green-500/60" : "bg-muted"
               }`}
             />
           ))}
@@ -1093,34 +1093,34 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
 
   if (planId && loadingPlan) return (
     <div className="space-y-4">
-      <div className="h-8 w-48 bg-white/[0.06] rounded animate-pulse" />
-      <div className="h-64 bg-white/[0.04] rounded-xl animate-pulse" />
+      <div className="h-8 w-48 bg-muted/60 rounded animate-pulse" />
+      <div className="h-64 bg-muted/40 rounded-xl animate-pulse" />
     </div>
   );
 
   return (
     <div className="space-y-6 pb-24">
       <div className="flex items-center gap-3">
-        <button onClick={onCancel} className="p-2 rounded-lg hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors">
+        <button onClick={onCancel} className="p-2 rounded-lg hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h2 className="text-2xl font-heading font-bold text-white">{planId ? "Edit Plan" : "New Practice Plan"}</h2>
+        <h2 className="text-2xl font-heading font-bold text-foreground">{planId ? "Edit Plan" : "New Practice Plan"}</h2>
       </div>
 
       {/* Plan Details Card */}
-      <Card className="bg-white/[0.03] border-white/[0.08]">
+      <Card className="bg-muted/30 border-border">
         <CardContent className="p-4 sm:p-6 space-y-5">
           <div>
-            <label className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Plan Title</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Plan Title</label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Hitting Mechanics - Joey T"
-              className="bg-white/[0.06] border-white/[0.08] text-white placeholder:text-white/25 text-lg font-medium" />
+              className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground/50 text-lg font-medium" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Athlete</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Athlete</label>
               <Select value={selectedAthlete} onValueChange={setSelectedAthlete}>
-                <SelectTrigger className="bg-white/[0.06] border-white/[0.08] text-white"><SelectValue placeholder="Select athlete (optional)" /></SelectTrigger>
+                <SelectTrigger className="bg-muted/60 border-border text-foreground"><SelectValue placeholder="Select athlete (optional)" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No specific athlete</SelectItem>
                   {athleteOptions.map((a: any) => <SelectItem key={a.id} value={a.id}>{a.name} ({a.email})</SelectItem>)}
@@ -1128,18 +1128,18 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Session Date</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Session Date</label>
               <Input type="datetime-local" value={sessionDate} onChange={(e) => setSessionDate(e.target.value)}
-                className="bg-white/[0.06] border-white/[0.08] text-white" />
+                className="bg-muted/60 border-border text-foreground" />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Status</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Status</label>
             <div className="flex flex-wrap gap-2">
               {(["draft", "scheduled", "completed", "cancelled"] as const).map((s) => (
                 <button key={s} onClick={() => setStatus(s)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${status === s ? "bg-[#DC143C] text-white" : "bg-white/[0.06] text-white/50 hover:text-white/80"}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${status === s ? "bg-[#DC143C] text-white" : "bg-muted/60 text-muted-foreground hover:text-foreground"}`}>
                   {s.charAt(0).toUpperCase() + s.slice(1)}
                 </button>
               ))}
@@ -1147,11 +1147,11 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
           </div>
 
           <div>
-            <label className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Focus Areas</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Focus Areas</label>
             <div className="flex flex-wrap gap-2">
               {FOCUS_AREAS.map((area) => (
                 <button key={area} onClick={() => toggleFocusArea(area)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${focusAreas.includes(area) ? "bg-[#DC143C] text-white" : "bg-white/[0.06] text-white/50 hover:text-white/80"}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${focusAreas.includes(area) ? "bg-[#DC143C] text-white" : "bg-muted/60 text-muted-foreground hover:text-foreground"}`}>
                   {area}
                 </button>
               ))}
@@ -1159,10 +1159,10 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
           </div>
 
           <div>
-            <label className="text-xs font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Session Notes</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Session Notes</label>
             <Textarea value={sessionNotes} onChange={(e) => setSessionNotes(e.target.value)}
               placeholder="Pre-session notes, goals, things to focus on..." rows={3}
-              className="bg-white/[0.06] border-white/[0.08] text-white placeholder:text-white/25 resize-none" />
+              className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground/50 resize-none" />
           </div>
         </CardContent>
       </Card>
@@ -1170,8 +1170,8 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
       {/* Session Blocks */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider">Session Blocks ({blocks.length})</h3>
-          <div className="flex items-center gap-2 text-sm text-white/40"><Clock className="h-3.5 w-3.5" />{totalDuration} min total</div>
+          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Session Blocks ({blocks.length})</h3>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground"><Clock className="h-3.5 w-3.5" />{totalDuration} min total</div>
         </div>
 
         {blocks.map((block, idx) => (
@@ -1195,11 +1195,11 @@ function PlanForm({ planId, onCancel, onSaved }: { planId: number | null; onCanc
       </div>
 
       {/* Sticky Save Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a]/95 backdrop-blur-xl border-t border-white/[0.08] px-4 py-3 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a]/95 backdrop-blur-xl border-t border-border px-4 py-3 z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <Button variant="outline" onClick={onCancel} className="bg-transparent border-white/[0.1] text-white/60 hover:text-white hover:bg-white/[0.06]">Cancel</Button>
+          <Button variant="outline" onClick={onCancel} className="bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-muted/60">Cancel</Button>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-white/40 hidden sm:inline">{blocks.length} blocks · {totalDuration} min</span>
+            <span className="text-sm text-muted-foreground hidden sm:inline">{blocks.length} blocks · {totalDuration} min</span>
             <Button onClick={handleSubmit} disabled={!title.trim() || isSaving} className="bg-[#DC143C] hover:bg-[#B91030] text-white gap-2 min-w-[120px]">
               {isSaving ? <span className="animate-pulse">Saving...</span> : <><Check className="h-4 w-4" />{planId ? "Save Changes" : "Create Plan"}</>}
             </Button>
@@ -1224,37 +1224,37 @@ function BlockEditor({ block, index, total, onUpdate, onRemove, onMoveUp, onMove
     <div className={`rounded-xl border transition-all ${config.border} ${config.bg}`}>
       {/* Block header */}
       <div className="flex items-center gap-2 p-3 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-        <div className="flex flex-col gap-0.5 text-white/20">
-          <button onClick={(e) => { e.stopPropagation(); onMoveUp(); }} disabled={index === 0} className="hover:text-white/60 disabled:opacity-20"><ChevronUp className="h-3.5 w-3.5" /></button>
-          <button onClick={(e) => { e.stopPropagation(); onMoveDown(); }} disabled={index === total - 1} className="hover:text-white/60 disabled:opacity-20"><ChevronDown className="h-3.5 w-3.5" /></button>
+        <div className="flex flex-col gap-0.5 text-muted-foreground/40">
+          <button onClick={(e) => { e.stopPropagation(); onMoveUp(); }} disabled={index === 0} className="hover:text-muted-foreground disabled:opacity-20"><ChevronUp className="h-3.5 w-3.5" /></button>
+          <button onClick={(e) => { e.stopPropagation(); onMoveDown(); }} disabled={index === total - 1} className="hover:text-muted-foreground disabled:opacity-20"><ChevronDown className="h-3.5 w-3.5" /></button>
         </div>
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${config.bg}`}><Icon className={`h-4 w-4 ${config.color}`} /></div>
         <div className="flex-1 min-w-0">
-          <span className="text-sm font-medium text-white truncate block">{block.title}</span>
-          <span className="text-[10px] text-white/30">{block.duration} min{block.intensity ? ` · ${block.intensity}` : ""}</span>
+          <span className="text-sm font-medium text-foreground truncate block">{block.title}</span>
+          <span className="text-[10px] text-muted-foreground/60">{block.duration} min{block.intensity ? ` · ${block.intensity}` : ""}</span>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); onRemove(); }} className="p-1.5 rounded-lg hover:bg-red-500/20 text-white/20 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
-        {expanded ? <ChevronUp className="h-4 w-4 text-white/20" /> : <ChevronDown className="h-4 w-4 text-white/20" />}
+        <button onClick={(e) => { e.stopPropagation(); onRemove(); }} className="p-1.5 rounded-lg hover:bg-red-500/20 text-muted-foreground/40 hover:text-red-400 transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+        {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground/40" /> : <ChevronDown className="h-4 w-4 text-muted-foreground/40" />}
       </div>
 
       {expanded && (
-        <div className="px-3 pb-4 space-y-3 border-t border-white/[0.06] pt-3">
+        <div className="px-3 pb-4 space-y-3 border-t border-border/60 pt-3">
           {/* Title + Duration */}
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
             <div>
-              <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block">Title</label>
-              <Input value={block.title} onChange={(e) => onUpdate({ title: e.target.value })} className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9" />
+              <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block">Title</label>
+              <Input value={block.title} onChange={(e) => onUpdate({ title: e.target.value })} className="bg-muted/60 border-border/60 text-foreground text-sm h-9" />
             </div>
             <div className="w-24">
-              <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block">Minutes</label>
-              <Input type="number" min={1} value={block.duration} onChange={(e) => onUpdate({ duration: parseInt(e.target.value) || 1 })} className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9" />
+              <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block">Minutes</label>
+              <Input type="number" min={1} value={block.duration} onChange={(e) => onUpdate({ duration: parseInt(e.target.value) || 1 })} className="bg-muted/60 border-border/60 text-foreground text-sm h-9" />
             </div>
           </div>
 
           {/* Drill Library Picker */}
           {block.blockType === "drill" && (
             <div>
-              <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block">Drill from Library</label>
+              <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block">Drill from Library</label>
               <DrillPickerButton currentDrillId={block.drillId || null} onSelect={(drill) => onUpdate({ drillId: drill.id, title: drill.name })} />
             </div>
           )}
@@ -1262,17 +1262,17 @@ function BlockEditor({ block, index, total, onUpdate, onRemove, onMoveUp, onMove
           {/* Sets, Reps, Intensity */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block">Sets</label>
-              <Input type="number" min={0} value={block.sets || ""} onChange={(e) => onUpdate({ sets: parseInt(e.target.value) || null })} placeholder="—" className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9" />
+              <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block">Sets</label>
+              <Input type="number" min={0} value={block.sets || ""} onChange={(e) => onUpdate({ sets: parseInt(e.target.value) || null })} placeholder="—" className="bg-muted/60 border-border/60 text-foreground text-sm h-9" />
             </div>
             <div>
-              <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block">Reps</label>
-              <Input type="number" min={0} value={block.reps || ""} onChange={(e) => onUpdate({ reps: parseInt(e.target.value) || null })} placeholder="—" className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9" />
+              <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block">Reps</label>
+              <Input type="number" min={0} value={block.reps || ""} onChange={(e) => onUpdate({ reps: parseInt(e.target.value) || null })} placeholder="—" className="bg-muted/60 border-border/60 text-foreground text-sm h-9" />
             </div>
             <div>
-              <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block">Intensity</label>
+              <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block">Intensity</label>
               <Select value={block.intensity || "none"} onValueChange={(v) => onUpdate({ intensity: v === "none" ? null : v as any })}>
-                <SelectTrigger className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-muted/60 border-border/60 text-foreground text-sm h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">—</SelectItem>
                   <SelectItem value="low">Low</SelectItem>
@@ -1285,16 +1285,16 @@ function BlockEditor({ block, index, total, onUpdate, onRemove, onMoveUp, onMove
 
           {/* Equipment */}
           <div>
-            <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block flex items-center gap-1"><Wrench className="h-3 w-3" /> Equipment</label>
+            <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block flex items-center gap-1"><Wrench className="h-3 w-3" /> Equipment</label>
             <Input value={block.equipment || ""} onChange={(e) => onUpdate({ equipment: e.target.value || null })}
-              placeholder="e.g., Tee, Batting cage, Cones..." className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9 placeholder:text-white/20" />
+              placeholder="e.g., Tee, Batting cage, Cones..." className="bg-muted/60 border-border/60 text-foreground text-sm h-9 placeholder:text-muted-foreground/40" />
           </div>
 
           {/* Goal */}
           <div>
-            <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block flex items-center gap-1"><Target className="h-3 w-3" /> Block Goal</label>
+            <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block flex items-center gap-1"><Target className="h-3 w-3" /> Block Goal</label>
             <Input value={block.goal || ""} onChange={(e) => onUpdate({ goal: e.target.value || null })}
-              placeholder="What should the athlete achieve in this block?" className="bg-white/[0.06] border-white/[0.06] text-white text-sm h-9 placeholder:text-white/20" />
+              placeholder="What should the athlete achieve in this block?" className="bg-muted/60 border-border/60 text-foreground text-sm h-9 placeholder:text-muted-foreground/40" />
           </div>
 
           {/* Coaching Cues */}
@@ -1302,7 +1302,7 @@ function BlockEditor({ block, index, total, onUpdate, onRemove, onMoveUp, onMove
             <label className="text-[10px] font-medium text-amber-400/60 uppercase mb-1 block flex items-center gap-1"><Lightbulb className="h-3 w-3" /> Coaching Cues</label>
             <Textarea value={block.coachingCues || ""} onChange={(e) => onUpdate({ coachingCues: e.target.value || null })}
               placeholder="Key verbal cues to give during this drill (e.g., 'Stay back, let it travel, hands inside the ball')"
-              rows={2} className="bg-amber-500/5 border-amber-500/10 text-white text-sm resize-none placeholder:text-white/20" />
+              rows={2} className="bg-amber-500/5 border-amber-500/10 text-white text-sm resize-none placeholder:text-muted-foreground/40" />
           </div>
 
           {/* Key Points */}
@@ -1310,15 +1310,15 @@ function BlockEditor({ block, index, total, onUpdate, onRemove, onMoveUp, onMove
             <label className="text-[10px] font-medium text-[#E8425A]/60 uppercase mb-1 block flex items-center gap-1"><AlertCircle className="h-3 w-3" /> Key Points / What to Watch</label>
             <Textarea value={block.keyPoints || ""} onChange={(e) => onUpdate({ keyPoints: e.target.value || null })}
               placeholder="What to observe and correct (e.g., 'Watch for early hip rotation, head movement off the ball')"
-              rows={2} className="bg-[#DC143C]/5 border-[#DC143C]/10 text-white text-sm resize-none placeholder:text-white/20" />
+              rows={2} className="bg-[#DC143C]/5 border-[#DC143C]/10 text-white text-sm resize-none placeholder:text-muted-foreground/40" />
           </div>
 
           {/* Notes */}
           <div>
-            <label className="text-[10px] font-medium text-white/30 uppercase mb-1 block flex items-center gap-1"><FileText className="h-3 w-3" /> Notes</label>
+            <label className="text-[10px] font-medium text-muted-foreground/60 uppercase mb-1 block flex items-center gap-1"><FileText className="h-3 w-3" /> Notes</label>
             <Textarea value={block.notes || ""} onChange={(e) => onUpdate({ notes: e.target.value || null })}
               placeholder="Additional notes, modifications, progressions..." rows={2}
-              className="bg-white/[0.06] border-white/[0.06] text-white text-sm resize-none placeholder:text-white/20" />
+              className="bg-muted/60 border-border/60 text-foreground text-sm resize-none placeholder:text-muted-foreground/40" />
           </div>
         </div>
       )}
@@ -1342,31 +1342,31 @@ function DrillPickerButton({ currentDrillId, onSelect }: { currentDrillId: strin
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.06] text-left hover:bg-white/[0.08] transition-colors">
-          <BookOpen className="h-3.5 w-3.5 text-white/30 flex-shrink-0" />
-          <span className={`text-sm truncate ${currentDrill ? "text-white" : "text-white/30"}`}>{currentDrill ? currentDrill.name : "Select from drill library..."}</span>
+        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/60 border border-border/60 text-left hover:bg-muted transition-colors">
+          <BookOpen className="h-3.5 w-3.5 text-muted-foreground/60 flex-shrink-0" />
+          <span className={`text-sm truncate ${currentDrill ? "text-foreground" : "text-muted-foreground/60"}`}>{currentDrill ? currentDrill.name : "Select from drill library..."}</span>
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-[#1a1f2e] border-white/[0.1] text-white max-w-md max-h-[80vh]">
-        <DialogHeader><DialogTitle className="font-heading text-white">Drill Library</DialogTitle></DialogHeader>
+      <DialogContent className="bg-[#1a1f2e] border-border text-white max-w-md max-h-[80vh]">
+        <DialogHeader><DialogTitle className="font-heading text-foreground">Drill Library</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
             <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search drills..."
-              className="pl-9 bg-white/[0.06] border-white/[0.08] text-white placeholder:text-white/30" autoFocus />
+              className="pl-9 bg-muted/60 border-border text-foreground placeholder:text-muted-foreground/60" autoFocus />
           </div>
           <div className="max-h-[50vh] overflow-y-auto space-y-1">
             {filtered.map((drill) => (
               <button key={drill.id} onClick={() => { onSelect(drill); setOpen(false); setSearch(""); }}
-                className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center justify-between gap-2 ${currentDrillId === drill.id ? "bg-[#DC143C]/20 text-[#E8425A]" : "hover:bg-white/[0.06] text-white/70"}`}>
+                className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center justify-between gap-2 ${currentDrillId === drill.id ? "bg-[#DC143C]/20 text-[#E8425A]" : "hover:bg-muted/60 text-foreground/80"}`}>
                 <div className="min-w-0">
                   <span className="text-sm font-medium block truncate">{drill.name}</span>
-                  <span className="text-[10px] text-white/30">{drill.difficulty} · {drill.duration} · {drill.categories.join(", ")}</span>
+                  <span className="text-[10px] text-muted-foreground/60">{drill.difficulty} · {drill.duration} · {drill.categories.join(", ")}</span>
                 </div>
                 {currentDrillId === drill.id && <Check className="h-4 w-4 text-[#E8425A] flex-shrink-0" />}
               </button>
             ))}
-            {filtered.length === 0 && <p className="text-sm text-white/30 text-center py-4">No drills found</p>}
+            {filtered.length === 0 && <p className="text-sm text-muted-foreground/60 text-center py-4">No drills found</p>}
           </div>
         </div>
       </DialogContent>
@@ -1471,33 +1471,33 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 rounded-lg hover:bg-white/[0.08] text-white/50 hover:text-white transition-colors" aria-label="Back to list">
+          <button onClick={onBack} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Back to list">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <InlineEdit contentKey="coach.planner.schedule" defaultValue="Schedule" as="h2" className="text-2xl font-heading font-bold text-white" />
-            <p className="text-sm text-white/40">{monthNames[month]} {year}</p>
+            <InlineEdit contentKey="coach.planner.schedule" defaultValue="Schedule" as="h2" className="text-2xl font-heading font-bold text-foreground" />
+            <p className="text-sm text-muted-foreground">{monthNames[month]} {year}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={goToToday} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.1] transition-colors border border-white/[0.08]">
+          <button onClick={goToToday} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-white/[0.1] transition-colors border border-border">
             Today
           </button>
-          <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-white/[0.08] text-white/50 hover:text-white transition-colors" aria-label="Previous month">
+          <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Previous month">
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-white/[0.08] text-white/50 hover:text-white transition-colors" aria-label="Next month">
+          <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Next month">
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
       </div>
 
       {/* Calendar Grid */}
-      <div className="glass-card rounded-xl overflow-hidden border border-white/[0.08]">
+      <div className="glass-card rounded-xl overflow-hidden border border-border">
         {/* Day headers */}
-        <div className="grid grid-cols-7 border-b border-white/[0.06]">
+        <div className="grid grid-cols-7 border-b border-border/60">
           {dayNames.map((d) => (
-            <div key={d} className="px-1 py-2.5 text-center text-[10px] font-semibold text-white/40 uppercase tracking-wider">
+            <div key={d} className="px-1 py-2.5 text-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
               {d}
             </div>
           ))}
@@ -1516,17 +1516,17 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
                 key={idx}
                 onClick={() => setSelectedDate(day.date)}
                 className={`
-                  relative min-h-[72px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-white/[0.04] text-left transition-all
+                  relative min-h-[72px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-border/40 text-left transition-all
                   ${!day.isCurrentMonth ? "opacity-30" : ""}
-                  ${isSelectedCell ? "bg-[#DC143C]/10 ring-1 ring-inset ring-[#DC143C]/30" : "hover:bg-white/[0.03]"}
-                  ${isTodayCell ? "bg-white/[0.03]" : ""}
+                  ${isSelectedCell ? "bg-[#DC143C]/10 ring-1 ring-inset ring-[#DC143C]/30" : "hover:bg-muted/30"}
+                  ${isTodayCell ? "bg-muted/30" : ""}
                 `}
                 aria-label={`${day.date.toLocaleDateString()}, ${dayPlans.length} sessions`}
               >
                 {/* Date number */}
                 <span className={`
                   inline-flex items-center justify-center h-6 w-6 rounded-full text-xs font-medium
-                  ${isTodayCell ? "bg-[#DC143C] text-white font-bold" : day.isCurrentMonth ? "text-white/70" : "text-white/20"}
+                  ${isTodayCell ? "bg-[#DC143C] text-white font-bold" : day.isCurrentMonth ? "text-foreground/80" : "text-muted-foreground/40"}
                 `}>
                   {day.date.getDate()}
                 </span>
@@ -1535,14 +1535,14 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
                 {hasPlans && (
                   <div className="mt-0.5 space-y-0.5">
                     {dayPlans.slice(0, 3).map((p: any) => (
-                      <div key={p.id} className="flex items-center gap-1 px-1 py-0.5 rounded text-[9px] sm:text-[10px] truncate bg-white/[0.04]">
+                      <div key={p.id} className="flex items-center gap-1 px-1 py-0.5 rounded text-[9px] sm:text-[10px] truncate bg-muted/40">
                         <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${statusColors[p.status] || "bg-gray-400"}`} />
-                        <span className="truncate text-white/60 hidden sm:inline">{p.title}</span>
-                        <span className="truncate text-white/60 sm:hidden">{p.title.slice(0, 8)}</span>
+                        <span className="truncate text-muted-foreground hidden sm:inline">{p.title}</span>
+                        <span className="truncate text-muted-foreground sm:hidden">{p.title.slice(0, 8)}</span>
                       </div>
                     ))}
                     {dayPlans.length > 3 && (
-                      <span className="text-[9px] text-white/30 px-1">+{dayPlans.length - 3} more</span>
+                      <span className="text-[9px] text-muted-foreground/60 px-1">+{dayPlans.length - 3} more</span>
                     )}
                   </div>
                 )}
@@ -1554,9 +1554,9 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
 
       {/* Selected Date Detail */}
       {selectedDate && (
-        <div className="glass-card rounded-xl p-4 border border-white/[0.08] animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="glass-card rounded-xl p-4 border border-border animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-heading font-bold text-white">
+            <h3 className="text-lg font-heading font-bold text-foreground">
               {selectedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
             </h3>
             <Button
@@ -1569,7 +1569,7 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
           </div>
 
           {selectedPlans.length === 0 ? (
-            <div className="text-center py-8 text-white/30">
+            <div className="text-center py-8 text-muted-foreground/60">
               <CalendarDays className="h-8 w-8 mx-auto mb-2 opacity-40" />
               <p className="text-sm">No sessions scheduled</p>
               <p className="text-xs mt-1">Click "New Session" to plan one</p>
@@ -1581,21 +1581,21 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
                 return (
                   <div
                     key={plan.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-colors group"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/60 hover:bg-muted/60 transition-colors group"
                   >
                     {/* Status dot */}
                     <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${statusColors[plan.status] || "bg-gray-400"}`} />
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{plan.title}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{plan.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         {plan.athleteName && (
-                          <span className="text-[10px] text-white/40">{plan.athleteName}</span>
+                          <span className="text-[10px] text-muted-foreground">{plan.athleteName}</span>
                         )}
-                        <span className="text-[10px] text-white/30">{plan.duration} min</span>
+                        <span className="text-[10px] text-muted-foreground/60">{plan.duration} min</span>
                         {focusAreas.slice(0, 2).map((fa: string) => (
-                          <span key={fa} className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.06] text-white/40">{fa}</span>
+                          <span key={fa} className="text-[9px] px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground">{fa}</span>
                         ))}
                       </div>
                     </div>
@@ -1626,7 +1626,7 @@ function CalendarView({ plans, onBack, onViewPlan, onCreatePlan, onStartSession 
       )}
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-[10px] text-white/30 px-1">
+      <div className="flex items-center gap-4 text-[10px] text-muted-foreground/60 px-1">
         <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-gray-400" /> Draft</span>
         <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#DC143C]" /> Scheduled</span>
         <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Completed</span>

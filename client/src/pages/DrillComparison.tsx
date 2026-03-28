@@ -83,7 +83,7 @@ function DrillSelector({
   }
 
   return (
-    <div className="glass-card rounded-xl border-2 border-dashed border-white/10">
+    <div className="glass-card rounded-xl border-2 border-dashed border-border">
       <div className="p-4 pb-3">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
         <div className="flex gap-2 mt-2">
@@ -274,12 +274,12 @@ export default function DrillComparison() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.45_0.15_250/0.15),transparent_60%)]" />
         <div className="container relative z-10 py-6">
           <Link href="/coach-dashboard">
-            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 mb-3 gap-2">
+            <Button variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground hover:bg-muted mb-3 gap-2">
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
             </Button>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-heading font-black text-white">Drill Comparison</h1>
-          <p className="text-white/60 mt-1">Compare two drills side-by-side to find the best fit for your athletes</p>
+          <h1 className="text-3xl md:text-4xl font-heading font-black text-foreground">Drill Comparison</h1>
+          <p className="text-muted-foreground mt-1">Compare two drills side-by-side to find the best fit for your athletes</p>
         </div>
       </header>
 
@@ -339,7 +339,7 @@ export default function DrillComparison() {
               </div>
               <div className="px-0">
                 {/* Column Headers */}
-                <div className="grid grid-cols-3 gap-4 py-3 px-4 bg-white/[0.03] border-b border-white/[0.06]">
+                <div className="grid grid-cols-3 gap-4 py-3 px-4 bg-muted/30 border-b border-border/60">
                   <div className="text-sm font-medium text-muted-foreground">Attribute</div>
                   <div className="text-sm font-bold text-center text-foreground">{drillA.name}</div>
                   <div className="text-sm font-bold text-center text-foreground">{drillB.name}</div>
@@ -467,7 +467,7 @@ export default function DrillComparison() {
         {/* Empty State */}
         {!bothSelected && (
           <div className="text-center py-16">
-            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#DC143C]/10 to-purple-500/10 border border-white/[0.06] flex items-center justify-center mx-auto mb-4">
+            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#DC143C]/10 to-purple-500/10 border border-border/60 flex items-center justify-center mx-auto mb-4">
               <ArrowLeftRight className="h-10 w-10 text-[#E8425A]/60" />
             </div>
             <h3 className="text-xl font-heading font-bold mb-2">Select Two Drills to Compare</h3>

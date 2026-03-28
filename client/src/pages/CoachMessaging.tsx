@@ -92,7 +92,7 @@ export default function CoachMessaging() {
 
   // Get unique drills
   const uniqueDrills = useMemo(() => {
-    const drillSet = new Set(allQuestions.map((q: any) => q.drillId));
+    const drillSet = new Set<string>(allQuestions.map((q: any) => q.drillId as string));
     return Array.from(drillSet);
   }, [allQuestions]);
 

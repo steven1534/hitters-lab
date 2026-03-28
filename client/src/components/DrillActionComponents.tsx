@@ -16,7 +16,7 @@ export function DrillCoachFocus({ drillId }: { drillId: string }) {
   if (isLoading) {
     return (
       <div className="bg-electric/10 border border-electric/20 rounded-xl p-4 animate-pulse">
-        <div className="h-4 bg-white/10 rounded w-3/4" />
+        <div className="h-4 bg-muted rounded w-3/4" />
       </div>
     );
   }
@@ -116,7 +116,7 @@ export function DrillQuickNotes({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="How did it feel? Any questions for Coach?"
-            className="w-full h-20 bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-electric/50"
+            className="w-full h-20 bg-muted/50 border border-border rounded-xl p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-electric/50"
             maxLength={500}
           />
           <p className="text-xs text-muted-foreground text-right mt-1">

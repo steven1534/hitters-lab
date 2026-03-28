@@ -138,14 +138,14 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-[#1a1a1a] border-border text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Pencil className="h-5 w-5 text-amber-400" />
             Edit Blast Session
           </DialogTitle>
-          <DialogDescription className="text-white/50">
-            Update session data for <span className="text-white/80 font-medium">{playerName}</span>
+          <DialogDescription className="text-muted-foreground">
+            Update session data for <span className="text-foreground font-medium">{playerName}</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -153,18 +153,18 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
           {/* Session Info Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white/70 text-sm">Session Date *</Label>
+              <Label className="text-foreground/80 text-sm">Session Date *</Label>
               <Input
                 type="date"
                 value={sessionDate}
                 onChange={(e) => setSessionDate(e.target.value)}
-                className="bg-white/[0.06] border-white/[0.1] text-white [color-scheme:dark]"
+                className="bg-muted/60 border-border text-foreground [color-scheme:dark]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white/70 text-sm">Session Type *</Label>
+              <Label className="text-foreground/80 text-sm">Session Type *</Label>
               <Select value={sessionType} onValueChange={setSessionType}>
-                <SelectTrigger className="bg-white/[0.06] border-white/[0.1] text-white">
+                <SelectTrigger className="bg-muted/60 border-border text-foreground">
                   <SelectValue placeholder="Select type..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,9 +178,9 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
 
           {/* Divider */}
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/[0.08]" />
-            <span className="text-xs text-white/30 uppercase tracking-wider font-medium">Swing Metrics</span>
-            <div className="h-px flex-1 bg-white/[0.08]" />
+            <div className="h-px flex-1 bg-muted" />
+            <span className="text-xs text-muted-foreground/60 uppercase tracking-wider font-medium">Swing Metrics</span>
+            <div className="h-px flex-1 bg-muted" />
           </div>
 
           {/* Metrics Grid */}
@@ -189,10 +189,10 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
               const Icon = field.icon;
               return (
                 <div key={field.key} className="space-y-1.5">
-                  <Label className="text-white/60 text-xs flex items-center gap-1.5">
+                  <Label className="text-muted-foreground text-xs flex items-center gap-1.5">
                     <Icon className={`h-3 w-3 ${field.color}`} />
                     {field.label}
-                    {field.unit && <span className="text-white/30">({field.unit})</span>}
+                    {field.unit && <span className="text-muted-foreground/60">({field.unit})</span>}
                   </Label>
                   <Input
                     type="number"
@@ -200,14 +200,14 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
                     placeholder={field.placeholder}
                     value={metrics[field.key] || ""}
                     onChange={(e) => handleMetricChange(field.key, e.target.value)}
-                    className="bg-white/[0.06] border-white/[0.1] text-white h-8 text-sm"
+                    className="bg-muted/60 border-border text-foreground h-8 text-sm"
                   />
                 </div>
               );
             })}
           </div>
 
-          <p className="text-xs text-white/30 italic">
+          <p className="text-xs text-muted-foreground/60 italic">
             Clear a field to remove that metric. Changes will also update any linked session note.
           </p>
         </div>
@@ -216,7 +216,7 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
           <Button
             variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
           >
             Cancel
           </Button>

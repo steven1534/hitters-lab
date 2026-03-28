@@ -106,9 +106,9 @@ export function DrillModalRedesigned({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg mx-auto max-h-[90vh] flex flex-col p-0 gap-0 glass-card border-white/10">
+      <DialogContent className="max-w-lg mx-auto max-h-[90vh] flex flex-col p-0 gap-0 glass-card border-border">
         {/* Header */}
-        <DialogHeader className="p-5 pb-4 border-b border-white/10 bg-gradient-to-r from-navy to-charcoal flex-shrink-0">
+        <DialogHeader className="p-5 pb-4 border-b border-border bg-gradient-to-r from-navy to-charcoal flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold pr-8 text-foreground leading-tight">
               {assignment.drillName}
@@ -123,7 +123,7 @@ export function DrillModalRedesigned({
           {/* Meta badges */}
           {drill && (
             <div className="flex items-center gap-2 flex-wrap mt-2">
-              <Badge className="bg-white/10 text-foreground border border-white/20 text-xs px-2.5 py-1">
+              <Badge className="bg-muted text-foreground border border-border text-xs px-2.5 py-1">
                 <Clock className="w-3 h-3 mr-1" />
                 {drill.duration || "10 min"}
               </Badge>
@@ -236,7 +236,7 @@ export function DrillModalRedesigned({
 
           {/* 6. Watch Video Button */}
           <Link href={`/drill/${assignment.drillId}`}>
-            <Button variant="outline" className="w-full gap-2 border-white/20 hover:bg-white/10 text-foreground">
+            <Button variant="outline" className="w-full gap-2 border-border hover:bg-muted text-foreground">
               <Play className="w-4 h-4" />
               Watch Video Instructions
             </Button>
@@ -247,7 +247,7 @@ export function DrillModalRedesigned({
             <>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/10" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center text-xs">
                   <span className="bg-background px-3 text-muted-foreground uppercase tracking-wider">
@@ -270,7 +270,7 @@ export function DrillModalRedesigned({
                         className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all duration-200 ${
                           isSelected
                             ? `${option.color} ring-2 ring-white/20 scale-[1.02]`
-                            : "bg-white/[0.04] border-white/10 hover:bg-white/[0.08] text-muted-foreground"
+                            : "bg-muted/40 border-border hover:bg-muted text-muted-foreground"
                         }`}
                       >
                         <Icon className="w-5 h-5" />
@@ -297,7 +297,7 @@ export function DrillModalRedesigned({
                     value={customNote}
                     onChange={(e) => setCustomNote(e.target.value)}
                     placeholder="What went well? What was tough? Any questions?"
-                    className="w-full h-20 bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-electric/50"
+                    className="w-full h-20 bg-muted/50 border border-border rounded-xl p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-electric/50"
                     maxLength={500}
                   />
                   <p className="text-xs text-muted-foreground text-right mt-1">{customNote.length}/500</p>

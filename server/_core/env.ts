@@ -22,4 +22,8 @@ export const ENV = {
   awsBucketName: process.env.AWS_BUCKET_NAME ?? "",
   /** App URL (for email links, CORS, etc.) */
   appUrl: process.env.APP_URL ?? "http://localhost:5000",
+  /** OAuth server URL for SDK auth */
+  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
+  /** App ID for SDK session tokens */
+  appId: process.env.APP_ID ?? "",
 };

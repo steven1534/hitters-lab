@@ -206,7 +206,7 @@ export default function AthletePortal() {
           {/* Logo wordmark */}
           <div className="flex items-center gap-1.5">
             <div className="w-6 h-6 bg-red-600 rounded-md flex items-center justify-center">
-              <Target className="w-3.5 h-3.5 text-white" />
+              <Target className="w-3.5 h-3.5 text-foreground" />
             </div>
             <span className="font-bold text-slate-900 text-sm tracking-tight">Hitters Lab</span>
           </div>
@@ -236,12 +236,12 @@ export default function AthletePortal() {
           <div className="flex items-center gap-4 mt-3">
             <div className="flex items-center gap-1.5">
               <Flame className="w-4 h-4 text-orange-300" />
-              <span className="text-sm font-semibold text-white">{progressStats.streak} day streak</span>
+              <span className="text-sm font-semibold text-foreground">{progressStats.streak} day streak</span>
             </div>
             <div className="w-px h-4 bg-red-500" />
             <div className="flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4 text-emerald-300" />
-              <span className="text-sm font-semibold text-white">{progressStats.completed} completed</span>
+              <span className="text-sm font-semibold text-foreground">{progressStats.completed} completed</span>
             </div>
           </div>
         </div>
@@ -286,24 +286,24 @@ export default function AthletePortal() {
                 <div className="bg-gradient-to-r from-red-600 to-red-500 rounded-xl p-4 mb-0">
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" />
-                    <span className="text-xs font-semibold text-white/80 uppercase tracking-widest">Up Next</span>
+                    <span className="text-xs font-semibold text-foreground uppercase tracking-widest">Up Next</span>
                   </div>
-                  <h2 className="text-lg font-bold text-white leading-tight mb-3">
+                  <h2 className="text-lg font-bold text-foreground leading-tight mb-3">
                     {upNextDrill.drillName}
                   </h2>
                   <div className="flex items-center gap-2 flex-wrap">
                     {drill?.duration && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-xs font-medium">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-foreground text-xs font-medium">
                         <Clock className="w-3 h-3" />{drill.duration}
                       </span>
                     )}
                     {drill?.difficulty && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-white text-xs font-medium capitalize">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-foreground text-xs font-medium capitalize">
                         {drill.difficulty}
                       </span>
                     )}
                     {drill?.categories?.[0] && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-white text-xs font-medium">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-foreground text-xs font-medium">
                         {drill.categories[0]}
                       </span>
                     )}

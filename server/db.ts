@@ -87,6 +87,40 @@ export async function getUserByEmail(email: string) {
   return result[0] ?? undefined;
 }
 
+export async function getUserByOpenId(openId: string) {
+  // This app uses email-based auth; treat openId as email for SDK compatibility
+  return getUserByEmail(openId);
+}
+
+export async function upsertUser(user: {
+  openId: string;
+  name: string | null;
+  email: string | null;
+  loginMethod: string | null;
+  lastSignedIn: Date;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  const emailKey = (user.email || user.openId).toLowerCase();
+  const existing = await db.select().from(users).where(eq(users.email, emailKey)).limit(1);
+  if (existing[0]) {
+    await db.update(users).set({
+      name: user.name ?? existing[0].name,
+      loginMethod: user.loginMethod ?? existing[0].loginMethod,
+      lastSignedIn: user.lastSignedIn,
+    }).where(eq(users.email, emailKey));
+  } else {
+    await db.insert(users).values({
+      email: emailKey,
+      name: user.name ?? "",
+      passwordHash: "",
+      loginMethod: user.loginMethod ?? "oauth",
+      lastSignedIn: user.lastSignedIn,
+      role: "athlete",
+    });
+  }
+}
+
 export async function getUserById(userId: number) {
   const db = await getDb();
   if (!db) return undefined;

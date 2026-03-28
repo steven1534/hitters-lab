@@ -133,7 +133,7 @@ export function AthletePlayerReports() {
                 <button
                   onClick={(e) => handleDownload(report, e)}
                   disabled={isExporting}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/50 hover:text-white text-xs transition-colors disabled:opacity-40 mr-1 shrink-0"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground text-xs transition-colors disabled:opacity-40 mr-1 shrink-0"
                   title="Download PDF"
                 >
                   <Download className="h-3.5 w-3.5" />

@@ -216,9 +216,9 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] glass-card border-white/10 bg-card/95 backdrop-blur-xl">
+      <DialogContent className="sm:max-w-[600px] glass-card border-border bg-card/95 backdrop-blur-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-heading text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-heading text-foreground flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-electric animate-pulse" />
             Edit Drill Card
           </DialogTitle>
@@ -228,7 +228,7 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
           {/* Drill Name (read-only) */}
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">Drill Name</Label>
-            <div className="px-3 py-2 bg-muted/30 rounded-lg text-white font-medium">
+            <div className="px-3 py-2 bg-muted/30 rounded-lg text-foreground font-medium">
               {drill.name}
             </div>
           </div>
@@ -238,7 +238,7 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
             <Label className="text-sm text-muted-foreground">Thumbnail Image</Label>
             <div className="flex gap-4">
               {/* Preview */}
-              <div className="relative w-32 h-24 rounded-lg overflow-hidden bg-muted/30 border border-white/10 flex items-center justify-center">
+              <div className="relative w-32 h-24 rounded-lg overflow-hidden bg-muted/30 border border-border flex items-center justify-center">
                 {previewUrl ? (
                   <>
                     <img
@@ -250,7 +250,7 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
                       onClick={handleRemoveImage}
                       className="absolute top-1 right-1 p-1 bg-black/60 rounded-full hover:bg-red-500/80 transition-colors"
                     >
-                      <X className="w-3 h-3 text-white" />
+                      <X className="w-3 h-3 text-foreground" />
                     </button>
                   </>
                 ) : (
@@ -277,7 +277,7 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="glass border-white/10 hover:border-electric/50 hover:bg-electric/10"
+                  className="glass border-border hover:border-electric/50 hover:bg-electric/10"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   {isUploading ? "Uploading..." : "Upload Image"}
@@ -296,7 +296,7 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
               value={briefDescription}
               onChange={(e) => setBriefDescription(e.target.value)}
               placeholder="Enter a brief description for the drill card..."
-              className="glass border-white/10 focus:border-electric/50 bg-muted/20 text-white placeholder:text-muted-foreground resize-none"
+              className="glass border-border focus:border-electric/50 bg-muted/20 text-foreground placeholder:text-muted-foreground resize-none"
               rows={3}
             />
             <p className="text-xs text-muted-foreground">
@@ -310,12 +310,12 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
             <div className="space-y-2">
               <Label className="text-sm text-muted-foreground">Difficulty</Label>
               <Select value={difficulty} onValueChange={setDifficulty}>
-                <SelectTrigger className="glass border-white/10 focus:border-electric/50 bg-muted/20 text-white">
+                <SelectTrigger className="glass border-border focus:border-electric/50 bg-muted/20 text-foreground">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
-                <SelectContent className="glass-card border-white/10 bg-card">
+                <SelectContent className="glass-card border-border bg-card">
                   {DIFFICULTIES.map((d) => (
-                    <SelectItem key={d} value={d} className="text-white hover:bg-electric/20">
+                    <SelectItem key={d} value={d} className="text-foreground hover:bg-electric/20">
                       <div className="flex items-center gap-2">
                         <span
                           className={`w-2 h-2 rounded-full ${
@@ -338,12 +338,12 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
             <div className="space-y-2">
               <Label className="text-sm text-muted-foreground">Category</Label>
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="glass border-white/10 focus:border-electric/50 bg-muted/20 text-white">
+                <SelectTrigger className="glass border-border focus:border-electric/50 bg-muted/20 text-foreground">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent className="glass-card border-white/10 bg-card">
+                <SelectContent className="glass-card border-border bg-card">
                   {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c} className="text-white hover:bg-electric/20">
+                    <SelectItem key={c} value={c} className="text-foreground hover:bg-electric/20">
                       {c}
                     </SelectItem>
                   ))}
@@ -357,14 +357,14 @@ export function DrillEditModal({ isOpen, onClose, drill, customization, onSaved 
           <Button
             variant="outline"
             onClick={onClose}
-            className="glass border-white/10 hover:border-white/30"
+            className="glass border-border hover:border-white/30"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={saveMutation.isPending || isUploading}
-            className="bg-electric hover:bg-electric/90 text-white"
+            className="bg-electric hover:bg-electric/90 text-foreground"
           >
             {saveMutation.isPending ? (
               <>

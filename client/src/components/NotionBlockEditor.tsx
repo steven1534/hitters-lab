@@ -228,7 +228,7 @@ function ImageBlockUploader({ onImageUploaded }: { onImageUploaded: (url: string
         "w-full border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer",
         dragOver
           ? "border-secondary bg-secondary/10"
-          : "border-white/15 hover:border-white/30 hover:bg-white/5"
+          : "border-white/15 hover:border-white/30 hover:bg-muted/50"
       )}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
@@ -250,7 +250,7 @@ function ImageBlockUploader({ onImageUploaded }: { onImageUploaded: (url: string
         </div>
       ) : (
         <div className="flex flex-col items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center">
+          <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
             <Upload className="h-6 w-6 text-muted-foreground" />
           </div>
           <div>
@@ -285,7 +285,7 @@ function ImageToolbar({
   return (
     <div className="flex items-center gap-1 bg-background/95 backdrop-blur-sm border border-white/15 rounded-lg p-1 shadow-lg">
       {/* Size controls */}
-      <div className="flex items-center gap-0.5 border-r border-white/10 pr-1 mr-1">
+      <div className="flex items-center gap-0.5 border-r border-border pr-1 mr-1">
         {(["small", "medium", "large", "full"] as const).map((size) => (
           <button
             key={size}
@@ -294,7 +294,7 @@ function ImageToolbar({
               "px-2 py-1 rounded text-xs font-medium transition-colors capitalize",
               imageSize === size
                 ? "bg-secondary/20 text-secondary"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/10"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
             title={`${size} width`}
           >
@@ -304,14 +304,14 @@ function ImageToolbar({
       </div>
 
       {/* Alignment controls */}
-      <div className="flex items-center gap-0.5 border-r border-white/10 pr-1 mr-1">
+      <div className="flex items-center gap-0.5 border-r border-border pr-1 mr-1">
         <button
           onClick={() => onAlignChange("left")}
           className={cn(
             "p-1.5 rounded transition-colors",
             imageAlign === "left"
               ? "bg-secondary/20 text-secondary"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/10"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
           title="Align left"
         >
@@ -323,7 +323,7 @@ function ImageToolbar({
             "p-1.5 rounded transition-colors",
             imageAlign === "center"
               ? "bg-secondary/20 text-secondary"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/10"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
           title="Align center"
         >
@@ -335,7 +335,7 @@ function ImageToolbar({
             "p-1.5 rounded transition-colors",
             imageAlign === "right"
               ? "bg-secondary/20 text-secondary"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/10"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
           title="Align right"
         >
@@ -396,10 +396,10 @@ function SlashMenu({
   return (
     <div
       ref={menuRef}
-      className="fixed z-50 w-72 glass-card rounded-lg shadow-xl border border-white/10 overflow-hidden animate-fade-in-up"
+      className="fixed z-50 w-72 glass-card rounded-lg shadow-xl border border-border overflow-hidden animate-fade-in-up"
       style={{ top: position.top, left: position.left }}
     >
-      <div className="p-2 border-b border-white/10">
+      <div className="p-2 border-b border-border">
         <span className="text-xs text-muted-foreground font-medium">
           BASIC BLOCKS
         </span>
@@ -411,12 +411,12 @@ function SlashMenu({
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors",
               index === selectedIndex
-                ? "bg-secondary/20 text-white"
-                : "hover:bg-white/5 text-foreground"
+                ? "bg-secondary/20 text-foreground"
+                : "hover:bg-muted/50 text-foreground"
             )}
             onClick={() => onSelect(bt.type)}
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-md bg-white/10 flex items-center justify-center">
+            <div className="flex-shrink-0 w-10 h-10 rounded-md bg-muted flex items-center justify-center">
               {bt.icon}
             </div>
             <div className="flex-1 min-w-0">
@@ -426,7 +426,7 @@ function SlashMenu({
               </div>
             </div>
             {bt.shortcut && (
-              <span className="text-xs text-muted-foreground bg-white/5 px-1.5 py-0.5 rounded">
+              <span className="text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
                 {bt.shortcut}
               </span>
             )}
@@ -733,8 +733,8 @@ function BlockItem({
                   className={cn(
                     "px-2 py-1 rounded text-xs capitalize transition-colors",
                     calloutType === type
-                      ? "bg-white/20 text-white"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                      ? "bg-white/20 text-foreground"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
                   )}
                 >
                   {type}
@@ -747,7 +747,7 @@ function BlockItem({
       case "divider":
         return (
           <div className="py-4 w-full">
-            <hr className="border-white/20" />
+            <hr className="border-border" />
           </div>
         );
 
@@ -758,7 +758,7 @@ function BlockItem({
               value={block.url || ""}
               onChange={(e) => onUpdate({ url: e.target.value })}
               placeholder="Paste YouTube URL..."
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-foreground outline-none focus:border-secondary transition-colors"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-foreground outline-none focus:border-secondary transition-colors"
             />
             {block.url && renderVideoPreview(block.url)}
           </div>
@@ -776,9 +776,9 @@ function BlockItem({
                   }}
                 />
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-white/10" />
+                  <div className="flex-1 h-px bg-muted" />
                   <span className="text-xs text-muted-foreground">or</span>
-                  <div className="flex-1 h-px bg-white/10" />
+                  <div className="flex-1 h-px bg-muted" />
                 </div>
                 {showUrlInput ? (
                   <div className="flex gap-2">
@@ -786,7 +786,7 @@ function BlockItem({
                       value={urlInputValue}
                       onChange={(e) => setUrlInputValue(e.target.value)}
                       placeholder="Paste image URL..."
-                      className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-foreground outline-none focus:border-secondary transition-colors"
+                      className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-foreground outline-none focus:border-secondary transition-colors"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && urlInputValue.trim()) {
                           onUpdate({ url: urlInputValue.trim(), imageSize: "large", imageAlign: "center" });
@@ -805,7 +805,7 @@ function BlockItem({
                           setShowUrlInput(false);
                         }
                       }}
-                      className="bg-white/5 border-white/10"
+                      className="bg-muted/50 border-border"
                     >
                       Embed
                     </Button>
@@ -939,7 +939,7 @@ function BlockItem({
           </div>
         );
       case "divider":
-        return <hr className="border-white/10 my-4" />;
+        return <hr className="border-border my-4" />;
       case "video":
         return block.url ? renderVideoPreview(block.url) : null;
       case "image":
@@ -1002,7 +1002,7 @@ function BlockItem({
     <div
       className={cn(
         "group relative flex items-start gap-2 py-1 px-2 -mx-2 rounded-lg transition-colors",
-        isSelected && "bg-white/5"
+        isSelected && "bg-muted/50"
       )}
       draggable
       onDragStart={onDragStart}
@@ -1017,13 +1017,13 @@ function BlockItem({
             e.stopPropagation();
             onAddBelow();
           }}
-          className="p-1 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded transition-colors"
+          className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
           title="Add block below"
         >
           <Plus className="h-4 w-4" />
         </button>
         <button
-          className="p-1 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded cursor-grab active:cursor-grabbing transition-colors"
+          className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded cursor-grab active:cursor-grabbing transition-colors"
           title="Drag to reorder"
         >
           <GripVertical className="h-4 w-4" />
@@ -1037,11 +1037,11 @@ function BlockItem({
       <div className="opacity-0 group-hover:opacity-100 transition-opacity pt-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-1 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded transition-colors">
+            <button className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors">
               <MoreHorizontal className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="glass-card border-white/10">
+          <DropdownMenuContent align="end" className="glass-card border-border">
             <DropdownMenuItem onClick={onDuplicate}>
               <Copy className="h-4 w-4 mr-2" /> Duplicate
             </DropdownMenuItem>
@@ -1327,8 +1327,8 @@ export function NotionBlockEditor({
     >
       {/* Help text */}
       <div className="text-xs text-muted-foreground mb-4 flex items-center gap-2">
-        <span className="bg-white/5 px-2 py-1 rounded">✨</span>
-        <span>Type <code className="bg-white/10 px-1 rounded">/</code> for commands, use markdown shortcuts like <code className="bg-white/10 px-1 rounded">#</code>, <code className="bg-white/10 px-1 rounded">-</code>, <code className="bg-white/10 px-1 rounded">1.</code> — or <strong className="text-foreground/70">paste Markdown</strong> from Notion</span>
+        <span className="bg-muted/50 px-2 py-1 rounded">✨</span>
+        <span>Type <code className="bg-muted px-1 rounded">/</code> for commands, use markdown shortcuts like <code className="bg-muted px-1 rounded">#</code>, <code className="bg-muted px-1 rounded">-</code>, <code className="bg-muted px-1 rounded">1.</code> — or <strong className="text-foreground/70">paste Markdown</strong> from Notion</span>
       </div>
 
       {blocks.map((block, index) => (
@@ -1361,7 +1361,7 @@ export function NotionBlockEditor({
       {/* Add block button */}
       <button
         onClick={() => addBlock("paragraph")}
-        className="w-full py-3 mt-2 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors flex items-center justify-center gap-2 border border-dashed border-white/10"
+        className="w-full py-3 mt-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors flex items-center justify-center gap-2 border border-dashed border-border"
       >
         <Plus className="h-4 w-4" /> Add a block
       </button>
