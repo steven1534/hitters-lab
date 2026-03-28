@@ -173,7 +173,7 @@ function App() {
     <ErrorBoundary>
       <NotificationProvider>
         <ThemeProvider
-          defaultTheme="light"
+          defaultTheme="dark"
           // switchable
         >
           <TooltipProvider>

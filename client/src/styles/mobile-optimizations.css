@@ -37,11 +37,6 @@
     margin-top: 12px;
   }
 
-  /* Optimize grid layout for mobile */
-  .grid {
-    gap: 12px;
-  }
-
   /* Optimize text for mobile readability */
   body {
     font-size: 16px;
@@ -61,11 +56,6 @@
     max-width: 100%;
     margin: 0;
     border-radius: 16px 16px 0 0;
-  }
-
-  /* Optimize sticky elements for mobile */
-  .sticky {
-    position: relative;
   }
 
   /* Optimize file input for mobile */
@@ -113,11 +103,6 @@
 
   .text-xl {
     font-size: 18px;
-  }
-
-  /* Stack layout for small screens */
-  .grid {
-    grid-template-columns: 1fr;
   }
 
   .lg\:col-span-2,

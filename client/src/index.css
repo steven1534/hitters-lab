@@ -57,6 +57,7 @@
 }
 
 :root {
+  color-scheme: dark;
   /* Coach Steve Baseball — Charcoal + Crimson Palette */
   --primary: oklch(0.14 0.005 0);
   --primary-foreground: oklch(0.98 0.005 0);
