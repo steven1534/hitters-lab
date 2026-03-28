@@ -57,59 +57,59 @@
 }
 
 :root {
-  /* Coach Steve Baseball — Charcoal + Crimson Palette */
-  --primary: oklch(0.14 0.005 0);
-  --primary-foreground: oklch(0.98 0.005 0);
-  
-  --secondary: oklch(0.50 0.20 25);
+  /* Coach Steve Baseball — Clean Light Theme */
+  --primary: oklch(0.13 0.005 0);          /* near-black text */
+  --primary-foreground: oklch(1 0 0);       /* white */
+
+  --secondary: oklch(0.48 0.20 25);         /* crimson red */
   --secondary-foreground: oklch(1 0 0);
-  
-  --background: oklch(0.13 0.005 0);
-  --foreground: oklch(0.95 0.005 0);
-  
-  --card: oklch(0.19 0.005 0);
-  --card-foreground: oklch(0.95 0.005 0);
-  
-  --popover: oklch(0.21 0.005 0);
-  --popover-foreground: oklch(0.95 0.005 0);
-  
-  --muted: oklch(0.22 0.005 0);
-  --muted-foreground: oklch(0.65 0.005 0);
-  
-  --accent: oklch(0.24 0.005 0);
-  --accent-foreground: oklch(0.95 0.005 0);
-  
-  --destructive: oklch(0.55 0.22 25);
+
+  --background: oklch(0.97 0.002 250);      /* off-white slate-50 */
+  --foreground: oklch(0.13 0.005 0);        /* near-black */
+
+  --card: oklch(1 0 0);                     /* pure white cards */
+  --card-foreground: oklch(0.13 0.005 0);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.13 0.005 0);
+
+  --muted: oklch(0.94 0.003 250);           /* light gray */
+  --muted-foreground: oklch(0.48 0.005 250);/* medium gray text */
+
+  --accent: oklch(0.94 0.003 250);
+  --accent-foreground: oklch(0.13 0.005 0);
+
+  --destructive: oklch(0.48 0.20 25);       /* crimson */
   --destructive-foreground: oklch(1 0 0);
-  
-  --border: oklch(0.28 0.005 0);
-  --input: oklch(0.22 0.005 0);
-  --ring: oklch(0.50 0.20 25);
-  
+
+  --border: oklch(0.88 0.004 250);          /* light border */
+  --input: oklch(0.92 0.003 250);
+  --ring: oklch(0.48 0.20 25);              /* crimson focus ring */
+
   --radius: 0.75rem;
-  
-  /* Crimson Red Accent Colors (replaces Electric Blue) */
-  --electric: oklch(0.50 0.20 25);
-  --electric-glow: oklch(0.55 0.22 25);
-  
-  /* Sidebar */
+
+  /* Brand crimson (used as accent throughout) */
+  --electric: oklch(0.48 0.20 25);
+  --electric-glow: oklch(0.52 0.22 25);
+
+  /* Sidebar — keep dark for coach dashboard contrast */
   --sidebar: oklch(0.11 0.005 0);
   --sidebar-foreground: oklch(0.95 0.005 0);
-  --sidebar-primary: oklch(0.50 0.20 25);
+  --sidebar-primary: oklch(0.48 0.20 25);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.19 0.005 0);
   --sidebar-accent-foreground: oklch(0.95 0.005 0);
   --sidebar-border: oklch(0.25 0.005 0);
-  --sidebar-ring: oklch(0.50 0.20 25);
-  
-  /* Chart Colors — crimson-based palette */
-  --chart-1: oklch(0.50 0.20 25);
+  --sidebar-ring: oklch(0.48 0.20 25);
+
+  /* Chart colors */
+  --chart-1: oklch(0.48 0.20 25);
   --chart-2: oklch(0.55 0.15 15);
   --chart-3: oklch(0.60 0.12 35);
   --chart-4: oklch(0.45 0.18 20);
   --chart-5: oklch(0.65 0.10 40);
-  
-  /* Category Colors — keep functional, softer variants */
+
+  /* Category colors */
   --category-hitting: oklch(0.60 0.20 25);
   --category-throwing: oklch(0.55 0.15 250);
   --category-fielding: oklch(0.60 0.18 150);
@@ -186,29 +186,26 @@
     }
   }
   
-  /* ===== GLASSMORPHISM EFFECTS ===== */
+  /* ===== CARD / SURFACE EFFECTS (light theme) ===== */
   .glass {
-    background: oklch(0.19 0.005 0 / 0.55);
-    backdrop-filter: blur(20px) saturate(1.3);
-    -webkit-backdrop-filter: blur(20px) saturate(1.3);
-    border: 1px solid oklch(0.40 0.005 0 / 0.15);
+    background: oklch(1 0 0 / 0.85);
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    border: 1px solid oklch(0.88 0.004 250);
   }
-  
+
   .glass-card {
-    background: oklch(0.19 0.005 0 / 0.65);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
-    border: 1px solid oklch(1 0 0 / 0.10);
-    box-shadow: 
-      0 8px 32px oklch(0 0 0 / 0.25),
-      0 2px 8px oklch(0 0 0 / 0.15),
-      inset 0 1px 0 oklch(1 0 0 / 0.04);
+    background: oklch(1 0 0);
+    border: 1px solid oklch(0.88 0.004 250);
+    box-shadow:
+      0 1px 3px oklch(0 0 0 / 0.06),
+      0 4px 16px oklch(0 0 0 / 0.04);
   }
-  
+
   .glass-subtle {
-    background: oklch(0.16 0.005 0 / 0.35);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: oklch(0.97 0.002 250 / 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   
   /* ===== GRADIENT BACKGROUNDS ===== */
@@ -249,19 +246,14 @@
   
   /* ===== CARD HOVER EFFECTS ===== */
   .card-hover {
-    transition: all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform: translateY(0) scale(1);
-    box-shadow: 
-      0 4px 20px oklch(0 0 0 / 0.2),
-      0 0 0 1px oklch(0.30 0.005 0 / 0.2);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(0);
+    box-shadow: 0 1px 3px oklch(0 0 0 / 0.06), 0 4px 16px oklch(0 0 0 / 0.04);
   }
-  
+
   .card-hover:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 
-      0 20px 40px oklch(0 0 0 / 0.4),
-      0 0 0 1px oklch(0.50 0.20 25 / 0.4),
-      0 0 30px oklch(0.50 0.20 25 / 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px oklch(0 0 0 / 0.10), 0 0 0 1px oklch(0.48 0.20 25 / 0.2);
   }
   
   /* Drill card specific hover */
@@ -291,11 +283,10 @@
   }
   
   .drill-card-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: 
-      0 24px 48px oklch(0 0 0 / 0.35),
-      0 0 0 1px oklch(0.50 0.20 25 / 0.3),
-      0 0 40px oklch(0.50 0.20 25 / 0.1);
+    transform: translateY(-4px);
+    box-shadow:
+      0 12px 32px oklch(0 0 0 / 0.10),
+      0 0 0 1px oklch(0.48 0.20 25 / 0.25);
   }
   
   .drill-card-hover:hover::after {
@@ -491,9 +482,9 @@
   .animate-shimmer {
     background: linear-gradient(
       90deg,
-      oklch(0.22 0.005 0) 0%,
-      oklch(0.28 0.005 0) 50%,
-      oklch(0.22 0.005 0) 100%
+      oklch(0.93 0.003 250) 0%,
+      oklch(0.97 0.002 250) 50%,
+      oklch(0.93 0.003 250) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.8s infinite;
@@ -556,9 +547,8 @@
   .text-gradient {
     background: linear-gradient(
       135deg,
-      oklch(0.55 0.22 25) 0%,
-      oklch(0.65 0.18 30) 50%,
-      oklch(0.50 0.20 20) 100%
+      oklch(0.42 0.22 25) 0%,
+      oklch(0.52 0.20 25) 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -645,18 +635,18 @@
   }
   
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: oklch(0.14 0.005 0);
+    background: oklch(0.94 0.003 250);
     border-radius: 3px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: oklch(0.30 0.005 0);
+    background: oklch(0.78 0.005 250);
     border-radius: 3px;
     transition: background 0.3s ease;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.50 0.20 25 / 0.5);
+    background: oklch(0.48 0.20 25 / 0.6);
   }
   
   /* ===== PWA SAFE AREAS ===== */
@@ -683,9 +673,9 @@
   .skeleton {
     background: linear-gradient(
       90deg,
-      oklch(0.22 0.005 0) 0%,
-      oklch(0.28 0.005 0) 50%,
-      oklch(0.22 0.005 0) 100%
+      oklch(0.93 0.003 250) 0%,
+      oklch(0.97 0.002 250) 50%,
+      oklch(0.93 0.003 250) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
