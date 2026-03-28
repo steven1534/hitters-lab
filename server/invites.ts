@@ -37,7 +37,7 @@ export async function createInvite(
     status: "pending",
     expiresAt,
     createdByUserId,
-  });
+  } as any);
 
   const inviteUrl = `https://coachstevemobilecoach.com/accept-invite/${inviteToken}`;
 
@@ -207,7 +207,7 @@ export async function resendInvite(inviteId: number) {
     oldInvite.role as any,
     7,
     true,
-    oldInvite.name || undefined
+    (oldInvite as any).name || undefined
   );
 }
 
@@ -382,7 +382,7 @@ export async function sendExpirationReminder(inviteId: number) {
   // Send reminder email
   await sendInviteExpirationReminderEmail({
     toEmail: invite.email,
-    athleteName: invite.name || invite.email.split("@")[0], // Use name if available, otherwise email prefix
+    athleteName: (invite as any).name || invite.email.split("@")[0], // Use name if available, otherwise email prefix
     inviteLink: inviteUrl,
     expiresAt: invite.expiresAt,
   });
