@@ -224,6 +224,17 @@ export function AthleteTable() {
   const pendingCount = athletes.filter((a) => a.type === "invite").length;
   const inactiveCount = athletes.filter((a) => !a.isActiveClient && a.type !== "invite").length;
 
+  const sendReminderMutation = trpc.drillAssignments.sendFollowUpReminder.useMutation();
+  const utils = trpc.useUtils();
+  const impersonateMutation = trpc.auth.impersonate.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+      await utils.auth.isImpersonating.invalidate();
+      window.location.href = "/athlete-portal";
+    },
+    onError: (err) => alert("Could not switch view: " + err.message),
+  });
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -238,17 +249,6 @@ export function AthleteTable() {
       </div>
     );
   }
-
-  const sendReminderMutation = trpc.drillAssignments.sendFollowUpReminder.useMutation();
-  const utils = trpc.useUtils();
-  const impersonateMutation = trpc.auth.impersonate.useMutation({
-    onSuccess: async () => {
-      await utils.auth.me.invalidate();
-      await utils.auth.isImpersonating.invalidate();
-      window.location.href = "/athlete-portal";
-    },
-    onError: (err) => alert("Could not switch view: " + err.message),
-  });
 
   return (
     <div className="space-y-4">

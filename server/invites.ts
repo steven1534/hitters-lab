@@ -3,6 +3,7 @@ import { invites } from "../drizzle/schema";
 import { eq, and, lt, gt } from "drizzle-orm";
 import crypto from "crypto";
 import { sendInviteEmail } from "./email";
+import { ENV } from "./_core/env";
 
 /**
  * Generate a unique invite token
@@ -39,7 +40,8 @@ export async function createInvite(
     createdByUserId,
   });
 
-  const inviteUrl = `https://coachstevemobilecoach.com/accept-invite/${inviteToken}`;
+  const appBase = ENV.appUrl.replace(/\/$/, "");
+  const inviteUrl = `${appBase}/accept-invite/${inviteToken}`;
 
   // Send invite email if enabled
   if (sendEmail) {
@@ -279,7 +281,7 @@ export async function generateEmailVerificationToken(userId: number, email: stri
   const user = userResult[0];
 
   // Send verification email
-  const verificationLink = `https://coachstevemobilecoach.com/verify-email/${verificationToken}`;
+  const verificationLink = `${ENV.appUrl.replace(/\/$/, "")}/verify-email/${verificationToken}`;
   await sendEmailVerificationEmail({
     toEmail: email,
     verificationLink,
@@ -377,7 +379,7 @@ export async function sendExpirationReminder(inviteId: number) {
   }
 
   const invite = inviteResult[0];
-  const inviteUrl = `https://coachstevemobilecoach.com/accept-invite/${invite.inviteToken}`;
+  const inviteUrl = `${ENV.appUrl.replace(/\/$/, "")}/accept-invite/${invite.inviteToken}`;
 
   // Send reminder email
   await sendInviteExpirationReminderEmail({
