@@ -230,9 +230,9 @@ export default function Home() {
           style={{ animationDelay: '3.5s' }}
         />
         
-        <div className="container relative z-10 pt-6 pb-12 md:pt-8 md:pb-20">
+        <div className="container relative z-10 pt-4 pb-8 md:pt-8 md:pb-20">
           {/* Top Navigation Bar */}
-          <nav className="flex justify-between items-center mb-10 md:mb-16 animate-fade-in-down">
+          <nav className="flex justify-between items-center mb-6 md:mb-16 animate-fade-in-down">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 bg-gradient-to-br from-secondary to-electric rounded-lg flex items-center justify-center font-heading font-bold text-lg text-white shadow-lg shadow-secondary/20">
                 CS
@@ -301,16 +301,16 @@ export default function Home() {
             {/* Main heading */}
             <div className="animate-fade-in-up stagger-2">
               <h1 className="font-heading font-black tracking-tight leading-none">
-                <span className="block text-foreground text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+                <span className="block text-foreground text-4xl sm:text-6xl md:text-7xl lg:text-8xl">
                   COACH STEVE'S
                 </span>
-                <span className="block text-6xl sm:text-7xl md:text-8xl lg:text-9xl mt-1 text-gradient">
+                <span className="block text-5xl sm:text-7xl md:text-8xl lg:text-9xl mt-1 text-gradient">
                   HITTERS LAB
                 </span>
               </h1>
             </div>
-            
-            <h2 className="text-sm md:text-lg text-muted-foreground mt-6 mb-8 max-w-xl mx-auto leading-relaxed animate-fade-in-up stagger-3 font-normal">
+
+            <h2 className="text-xs md:text-lg text-muted-foreground mt-4 mb-6 max-w-xl mx-auto leading-relaxed animate-fade-in-up stagger-3 font-normal">
               Professional training drills designed to build{" "}
               <span className="text-foreground font-semibold">elite mechanics</span>,{" "}
               <span className="text-foreground font-semibold">explosive power</span>, and{" "}
@@ -340,60 +340,53 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
       </header>
 
-      {/* ===== MAIN CONTENT ===== */}
-      <main className="flex-1 container py-6 md:py-10">
-        {/* Search + Filters Section */}
-        <div className="max-w-5xl mx-auto mb-8">
+      {/* ===== STICKY SEARCH + FILTER BAR ===== */}
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm shadow-black/20">
+        <div className="container max-w-5xl py-3 md:py-4 space-y-2.5">
           {/* Search Bar */}
-          <div className="mb-6 animate-fade-in-up">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-electric transition-colors duration-300" />
-              </div>
-              <Input
-                type="text"
-                placeholder="Search drills..."
-                className="pl-12 py-6 text-base bg-card/80 text-foreground border-border/50 rounded-xl focus-visible:ring-2 focus-visible:ring-electric/50 focus-visible:border-electric/30 font-medium transition-all duration-300 hover:border-electric/20 placeholder:text-muted-foreground/60"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-electric transition-colors duration-300" />
             </div>
+            <Input
+              type="text"
+              placeholder="Search drills..."
+              className="pl-10 h-11 text-sm bg-card/60 text-foreground border-border/40 rounded-xl focus-visible:ring-2 focus-visible:ring-electric/50 focus-visible:border-electric/30 font-medium transition-all duration-200 hover:border-electric/20 placeholder:text-muted-foreground/50"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
-          {/* Filters */}
-          <div className="space-y-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            {/* Difficulty */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Level</span>
+          {/* Difficulty Filter — horizontal scroll */}
+          <div className="-mx-4 px-4 md:mx-0 md:px-0">
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest flex-shrink-0">Level</span>
               {["All", "Easy", "Medium", "Hard"].map((level) => (
                 <button
                   key={level}
                   onClick={() => setDifficultyFilter(level)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
                     difficultyFilter === level
-                      ? level === "Easy" ? "badge-easy"
-                        : level === "Medium" ? "badge-medium"
-                        : level === "Hard" ? "badge-hard"
-                        : "bg-electric text-white shadow-lg shadow-electric/25"
-                      : "bg-card text-muted-foreground hover:bg-accent hover:text-foreground border border-border/50"
+                      ? level === "Easy" ? "badge-easy shadow-sm"
+                        : level === "Medium" ? "badge-medium shadow-sm"
+                        : level === "Hard" ? "badge-hard shadow-sm"
+                        : "bg-electric text-white shadow-md shadow-electric/30"
+                      : "bg-card/80 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/40"
                   }`}
                 >
                   {level === "All" ? "All Levels" : level}
                 </button>
               ))}
-            </div>
-
-            {/* Category */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Skill</span>
+              <div className="flex-shrink-0 w-px h-5 bg-border/40 mx-0.5" />
+              <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest flex-shrink-0">Skill</span>
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
                     categoryFilter === cat
-                      ? "bg-electric text-white shadow-lg shadow-electric/25"
-                      : "bg-card text-muted-foreground hover:bg-accent hover:text-foreground border border-border/50"
+                      ? "bg-electric text-white shadow-md shadow-electric/30"
+                      : "bg-card/80 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/40"
                   }`}
                 >
                   {cat === "All" ? "All Skills" : cat}
@@ -402,37 +395,47 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ===== MAIN CONTENT ===== */}
+      <main className="flex-1 container py-5 md:py-8">
 
         {/* Results Header */}
-        <div className="flex items-center justify-between mb-6 max-w-5xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-heading font-bold text-foreground">Training Library</h2>
+        <div className="flex items-center justify-between mb-5 max-w-5xl mx-auto">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-lg font-heading font-bold text-foreground">Training Library</h2>
             <span className="text-xs font-semibold text-electric bg-electric/10 px-2.5 py-1 rounded-full">
-              {filteredDrills.length} drills
+              {filteredDrills.length}
             </span>
           </div>
+          {(searchQuery || difficultyFilter !== "All" || categoryFilter !== "All") && (
+            <button
+              onClick={() => resetAll()}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors py-1.5 px-3 rounded-lg hover:bg-accent active:scale-95"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
 
         {/* ===== DRILL CARDS GRID ===== */}
         {paginatedDrills.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 max-w-5xl mx-auto">
             {paginatedDrills.map((drill, index) => {
               const customization = customizationsMap.get(drill.id);
               const displayDifficulty = customization?.difficulty || drill.difficulty;
               const displayCategory = customization?.category || drill.categories[0] || "General";
               const displayDescription = customization?.briefDescription || `Master this drill to improve your ${drill.categories[0]?.toLowerCase() || "baseball"} skills.`;
-              const imageSource = customization?.thumbnailUrl 
+              const imageSource = customization?.thumbnailUrl
                 || (customization?.imageBase64 && customization?.imageMimeType
                   ? `data:${customization.imageMimeType};base64,${customization.imageBase64}`
                   : null)
-                || videosMap.get(drill.id)  // YouTube thumbnail from video data (loads instantly)
+                || videosMap.get(drill.id)
               const diffConfig = DIFFICULTY_CONFIG[displayDifficulty] || DIFFICULTY_CONFIG.Easy;
-
-              // Build drill detail URL preserving current query params
               const drillDetailHref = `/drill/${drill.id}${currentQuery}`;
 
               return (
-                <div 
+                <div
                   key={drill.id}
                   className="group animate-fade-in-up relative"
                   style={{ animationDelay: `${Math.min(index * 0.04, 0.4)}s` }}
@@ -446,7 +449,7 @@ export default function Home() {
                         setEditingDrill(drill);
                         setEditModalOpen(true);
                       }}
-                      className="absolute top-3 left-3 z-20 p-2 rounded-lg bg-black/60 hover:bg-electric/80 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm"
+                      className="absolute top-2.5 left-2.5 z-20 p-2 rounded-lg bg-black/60 hover:bg-electric/80 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm"
                       title="Edit drill card"
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -458,63 +461,67 @@ export default function Home() {
                     className="block h-full"
                     onClick={() => handleDrillClick(drill.id)}
                   >
-                    <div className="glass-card rounded-xl overflow-hidden drill-card-hover cursor-pointer h-full flex flex-col">
+                    <div className="glass-card rounded-xl overflow-hidden drill-card-hover cursor-pointer h-full flex flex-col active:scale-[0.98] transition-transform duration-150">
                       {/* Card Image */}
-                      <div className="relative h-44 bg-gradient-to-br from-card to-accent overflow-hidden">
-                        {imageSource && (
-                          <img 
+                      <div className="relative h-32 sm:h-44 bg-gradient-to-br from-card to-accent overflow-hidden">
+                        {imageSource ? (
+                          <img
                             src={imageSource}
                             alt={drill.name}
-                            className="w-full h-full object-cover opacity-90 group-hover:scale-108 transition-transform duration-700 ease-out"
+                            className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
+                        ) : (
+                          <div className="absolute inset-0 bg-gradient-to-br from-electric/10 via-card to-accent/30 flex items-center justify-center">
+                            <Target className="h-8 w-8 text-electric/20" />
+                          </div>
                         )}
-                        
+
                         {/* Gradient overlays */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
                         <div className="absolute inset-0 bg-gradient-to-br from-electric/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
+
                         {/* Difficulty Badge */}
-                        <div className="absolute top-3 right-3">
-                          <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${diffConfig.class}`}>
+                        <div className="absolute top-2 right-2">
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${diffConfig.class}`}>
                             {displayDifficulty}
                           </span>
                         </div>
-                        
+
                         {/* Duration badge */}
                         {drill.duration && drill.duration !== "Unknown" && (
-                          <div className="absolute bottom-3 right-3">
-                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-black/50 text-white/80 backdrop-blur-sm">
-                              <Clock className="h-2.5 w-2.5" />
-                              {drill.duration}
+                          <div className="absolute bottom-2 right-2">
+                            <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-black/60 text-white/80 backdrop-blur-sm">
+                              <Clock className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                              <span className="hidden sm:inline">{drill.duration}</span>
                             </span>
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Card Body */}
-                      <div className="p-4 flex-1 flex flex-col">
+                      <div className="p-3 sm:p-4 flex-1 flex flex-col">
                         {/* Category */}
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <div className={`w-1.5 h-1.5 rounded-full ${diffConfig.dotClass}`} />
-                          <span className="text-electric text-[10px] font-bold uppercase tracking-wider">
+                        <div className="flex items-center gap-1 mb-1.5">
+                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${diffConfig.dotClass}`} />
+                          <span className="text-electric text-[9px] sm:text-[10px] font-bold uppercase tracking-wider truncate">
                             {displayCategory}
                           </span>
                         </div>
-                        
+
                         {/* Title */}
-                        <h3 className="text-base font-heading font-bold text-foreground mb-2 group-hover:text-electric transition-colors duration-300 leading-tight">
+                        <h3 className="text-sm sm:text-base font-heading font-bold text-foreground mb-1.5 group-hover:text-electric transition-colors duration-300 leading-tight line-clamp-2">
                           {drill.name}
                         </h3>
-                        
-                        {/* Description */}
-                        <p className="text-xs text-muted-foreground mb-3 flex-1 line-clamp-2 leading-relaxed">
+
+                        {/* Description — hidden on very small screens */}
+                        <p className="hidden sm:block text-xs text-muted-foreground mb-3 flex-1 line-clamp-2 leading-relaxed">
                           {displayDescription}
                         </p>
-                        
+
                         {/* Footer */}
-                        <div className="flex items-center text-muted-foreground group-hover:text-electric transition-all duration-300 pt-2 border-t border-border/30">
-                          <span className="text-xs font-semibold">View Details</span>
+                        <div className="flex items-center text-muted-foreground group-hover:text-electric transition-all duration-300 pt-2 border-t border-border/30 mt-auto">
+                          <span className="text-xs font-semibold">View</span>
                           <ChevronRight className="h-3.5 w-3.5 ml-auto group-hover:translate-x-1 transition-transform duration-300" />
                         </div>
                       </div>
@@ -525,17 +532,17 @@ export default function Home() {
             })}
           </div>
         ) : (
-          <div className="text-center py-16 glass-card rounded-2xl border-dashed border border-border/30 max-w-md mx-auto">
+          <div className="text-center py-16 glass-card rounded-2xl border-dashed border border-border/30 max-w-sm mx-auto">
             <div className="bg-accent/50 h-14 w-14 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Search className="h-6 w-6 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-heading font-bold mb-2">No drills found</h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">
-              No drills match your current filters. Try adjusting your search or filters.
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto mb-6">
+              Try adjusting your search or filters.
             </p>
-            <Button 
+            <Button
               onClick={() => resetAll()}
-              className="btn-premium text-white text-sm"
+              className="btn-premium text-white text-sm px-6 py-2.5 active:scale-95"
             >
               Clear All Filters
             </Button>
@@ -544,17 +551,17 @@ export default function Home() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-3 mt-10 animate-fade-in-up">
+          <div className="flex justify-center items-center gap-2 mt-10">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              onClick={() => { setCurrentPage(Math.max(1, currentPage - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage === 1}
-              className="glass border-border/50 hover:border-electric/30 hover:bg-electric/5 disabled:opacity-40 transition-all duration-300"
+              className="glass border-border/40 hover:border-electric/30 hover:bg-electric/5 disabled:opacity-40 transition-all duration-300 h-10 px-4 active:scale-95"
             >
               Previous
             </Button>
-            
+
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                 let page: number;
@@ -570,8 +577,8 @@ export default function Home() {
                 return (
                   <button
                     key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-300 ${
+                    onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 ${
                       currentPage === page
                         ? "bg-electric text-white shadow-lg shadow-electric/25"
                         : "text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -582,13 +589,13 @@ export default function Home() {
                 );
               })}
             </div>
-            
+
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              onClick={() => { setCurrentPage(Math.min(totalPages, currentPage + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage === totalPages}
-              className="glass border-border/50 hover:border-electric/30 hover:bg-electric/5 disabled:opacity-40 transition-all duration-300"
+              className="glass border-border/40 hover:border-electric/30 hover:bg-electric/5 disabled:opacity-40 transition-all duration-300 h-10 px-4 active:scale-95"
             >
               Next
             </Button>
