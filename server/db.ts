@@ -7,7 +7,7 @@ import postgres from "postgres";
 import {
   InsertUser, users, notifications, notificationPreferences,
   InsertNotificationPreference, invites, drillVideos, drillDetails,
-  drillSubmissions, coachFeedback, customDrills,
+  drillSubmissions, coachFeedback, customDrills, drillQuestions, drillAnswers,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc } from "drizzle-orm";
@@ -640,6 +640,223 @@ export async function getCustomDrills() {
   try {
     return await db.select().from(customDrills).orderBy(customDrills.name);
   } catch {
+    return [];
+  }
+}
+
+export async function deleteNotification(notificationId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(notifications).where(eq(notifications.id, notificationId));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export async function createOrUpdateNotificationPreferences(userId: number, prefs: Partial<InsertNotificationPreference>) {
+  return upsertNotificationPreferences(userId, prefs);
+}
+
+export async function updateDrillSubmission(submissionId: number, data: { notes?: string; videoUrl?: string }) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    const updateData: Record<string, any> = {};
+    if (data.notes !== undefined) updateData.notes = data.notes;
+    if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
+    await db.update(drillSubmissions).set(updateData).where(eq(drillSubmissions.id, submissionId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update drill submission:", error);
+    return false;
+  }
+}
+
+export async function deleteDrillSubmission(submissionId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(drillSubmissions).where(eq(drillSubmissions.id, submissionId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete drill submission:", error);
+    return false;
+  }
+}
+
+export async function updateCoachFeedback(feedbackId: number, feedbackText: string) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.update(coachFeedback).set({ feedback: feedbackText }).where(eq(coachFeedback.id, feedbackId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update coach feedback:", error);
+    return false;
+  }
+}
+
+export async function deleteCoachFeedback(feedbackId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(coachFeedback).where(eq(coachFeedback.id, feedbackId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete coach feedback:", error);
+    return false;
+  }
+}
+
+export async function bulkImportDrillDescriptions(drillsData: { drillName: string; description: string }[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  let imported = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+  for (const item of drillsData) {
+    try {
+      const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, item.drillName));
+      if (existing.length > 0) {
+        await db.update(drillDetails).set({ description: [item.description], updatedAt: new Date() }).where(eq(drillDetails.drillId, item.drillName));
+      } else {
+        await db.insert(drillDetails).values({
+          drillId: item.drillName,
+          description: [item.description],
+          skillSet: "Custom", difficulty: "Medium", athletes: "Varies",
+          time: "Varies", equipment: "Varies", goal: "",
+          createdBy: 0,
+        });
+      }
+      imported++;
+    } catch (e: any) {
+      skipped++;
+      errors.push(`${item.drillName}: ${e.message}`);
+    }
+  }
+  return { imported, skipped, errors };
+}
+
+export async function bulkImportDrillGoals(goalsData: { drillName: string; goal: string }[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  let imported = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+  for (const item of goalsData) {
+    try {
+      const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, item.drillName));
+      if (existing.length > 0) {
+        await db.update(drillDetails).set({ goal: item.goal, updatedAt: new Date() }).where(eq(drillDetails.drillId, item.drillName));
+      } else {
+        await db.insert(drillDetails).values({
+          drillId: item.drillName,
+          goal: item.goal,
+          description: [],
+          skillSet: "Custom", difficulty: "Medium", athletes: "Varies",
+          time: "Varies", equipment: "Varies",
+          createdBy: 0,
+        });
+      }
+      imported++;
+    } catch (e: any) {
+      skipped++;
+      errors.push(`${item.drillName}: ${e.message}`);
+    }
+  }
+  return { imported, skipped, errors };
+}
+
+export async function updateDrillGoal(drillId: string, goal: string, userId: number = 0): Promise<boolean> {
+  return saveDrillGoal(drillId, goal, userId);
+}
+
+export async function updateDrillInstructions(drillId: string, instructions: string, userId: number = 0): Promise<boolean> {
+  return saveDrillInstructions(drillId, instructions, userId);
+}
+
+export async function linkChildToParent(childUserId: number, parentUserId: number): Promise<boolean> {
+  // Stub: parent-child linking not yet implemented in schema
+  console.warn("[Database] linkChildToParent not yet implemented");
+  return false;
+}
+
+export async function getChildrenByParent(parentUserId: number): Promise<any[]> {
+  // Stub: parent-child lookup not yet implemented in schema
+  console.warn("[Database] getChildrenByParent not yet implemented");
+  return [];
+}
+
+export async function isParentOf(parentUserId: number, childUserId: number): Promise<boolean> {
+  // Stub: parent-child relationship not yet implemented in schema
+  console.warn("[Database] isParentOf not yet implemented");
+  return false;
+}
+
+// ── Q&A ──────────────────────────────────────────────────────
+
+export async function createDrillQuestion(data: { athleteId: number; drillId: string; question: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.insert(drillQuestions).values(data).returning({ id: drillQuestions.id });
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to create drill question:", error);
+    throw error;
+  }
+}
+
+export async function getDrillQuestions(drillId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillQuestions).where(eq(drillQuestions.drillId, drillId));
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function getAthleteQuestions(athleteId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillQuestions).where(eq(drillQuestions.athleteId, athleteId));
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function getAllQuestions() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillQuestions);
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function createDrillAnswer(data: { questionId: number; coachId: number; answer: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.insert(drillAnswers).values(data).returning({ id: drillAnswers.id });
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to create drill answer:", error);
+    throw error;
+  }
+}
+
+export async function getAnswersByQuestion(questionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillAnswers).where(eq(drillAnswers.questionId, questionId));
+  } catch (error) {
     return [];
   }
 }
