@@ -138,6 +138,36 @@
   --input: oklch(0.90 0.005 0);
 }
 
+/* Coach Dashboard dark scope — restores original dark theme variables
+   so all sub-components (AthleteTable, SessionNotesTab, etc.) render
+   correctly with white text on dark backgrounds, independent of the
+   global light theme. */
+.coach-dark {
+  --background:          oklch(0.10 0.005 0);
+  --foreground:          oklch(0.95 0.005 0);
+  --card:                oklch(0.16 0.005 0);
+  --card-foreground:     oklch(0.95 0.005 0);
+  --popover:             oklch(0.18 0.005 0);
+  --popover-foreground:  oklch(0.95 0.005 0);
+  --primary:             oklch(0.95 0.005 0);
+  --primary-foreground:  oklch(0.13 0.005 0);
+  --secondary:           oklch(0.48 0.20 25);
+  --secondary-foreground:oklch(1 0 0);
+  --muted:               oklch(0.20 0.005 0);
+  --muted-foreground:    oklch(0.58 0.005 0);
+  --accent:              oklch(0.22 0.005 0);
+  --accent-foreground:   oklch(0.95 0.005 0);
+  --destructive:         oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border:              oklch(0.26 0.005 0);
+  --input:               oklch(0.20 0.005 0);
+  --ring:                oklch(0.48 0.20 25);
+  --electric:            oklch(0.48 0.20 25);
+  color-scheme: dark;
+  color: oklch(0.95 0.005 0);
+  background: oklch(0.10 0.005 0);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -323,7 +323,7 @@ export default function CoachDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+      <div className="coach-dark min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 rounded-full border-2 border-[#DC143C]/30 border-t-[#DC143C] animate-spin" />
           <p className="text-white/40 animate-pulse">Loading dashboard...</p>
@@ -334,7 +334,7 @@ export default function CoachDashboard() {
 
   if (user?.role !== "admin") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#0a0a0a' }}>
+      <div className="coach-dark min-h-screen flex items-center justify-center p-4">
         <div className="glass-card rounded-2xl p-8 max-w-md text-center space-y-4">
           <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
             <Shield className="h-8 w-8 text-destructive" />
@@ -440,7 +440,7 @@ export default function CoachDashboard() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a', color: '#f5f5f5' }}>
+    <div className="coach-dark min-h-screen flex flex-col">
       <ImpersonationBanner />
       <BulkGoalUpload isOpen={isBulkGoalOpen} onClose={() => setIsBulkGoalOpen(false)} />
 
@@ -494,7 +494,7 @@ export default function CoachDashboard() {
           </div>
 
           {/* Tab content */}
-          <main className="flex-1 p-5 md:p-7 max-w-7xl w-full mx-auto" style={{ background: '#0a0a0a' }}>
+          <main className="flex-1 p-5 md:p-7 max-w-7xl w-full mx-auto">
 
             {activeTab === "overview" && (
               <AthleteAssignmentOverview
