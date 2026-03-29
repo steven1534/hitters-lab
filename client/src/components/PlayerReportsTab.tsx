@@ -568,17 +568,16 @@ export function PlayerReportsTab({ initialAthleteId }: { initialAthleteId?: numb
   const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
   const athletes = (allUsers as any[]).filter((u: any) => u.role === "athlete");
 
-  // Auto-select athlete if navigated from another tab
-  const initialAthlete = initialAthleteId
-    ? athletes.find((a: any) => a.id === initialAthleteId)
-    : null;
-
-  const [view, setView] = useState<View>(
-    initialAthlete
-      ? { type: "list", athleteId: initialAthlete.id, athleteName: initialAthlete.name }
-      : { type: "select-athlete" }
-  );
+  const [view, setView] = useState<View>({ type: "select-athlete" });
   const [athleteSearch, setAthleteSearch] = useState("");
+
+  // Auto-select athlete once data loads (navigated from Blast Metrics)
+  useEffect(() => {
+    if (initialAthleteId && athletes.length > 0) {
+      const a = athletes.find((u: any) => u.id === initialAthleteId);
+      if (a) setView({ type: "list", athleteId: a.id, athleteName: a.name });
+    }
+  }, [initialAthleteId, athletes.length]);
   const utils = trpc.useUtils();
 
   const deleteMutation = trpc.playerReports.delete.useMutation({

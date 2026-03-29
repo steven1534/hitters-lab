@@ -242,7 +242,7 @@
   }
 
   .glass-subtle {
-    background: color-mix(in oklch, var(--card) 70%, transparent);
+    background: var(--card);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
