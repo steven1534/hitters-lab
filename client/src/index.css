@@ -224,24 +224,25 @@
     }
   }
   
-  /* ===== CARD / SURFACE EFFECTS (light theme) ===== */
+  /* ===== CARD / SURFACE EFFECTS — uses CSS variables so .coach-dark overrides work ===== */
   .glass {
-    background: oklch(1 0 0 / 0.85);
+    background: var(--card);
     backdrop-filter: blur(12px) saturate(1.2);
     -webkit-backdrop-filter: blur(12px) saturate(1.2);
-    border: 1px solid oklch(0.88 0.004 250);
+    border: 1px solid var(--border);
   }
 
   .glass-card {
-    background: oklch(1 0 0);
-    border: 1px solid oklch(0.88 0.004 250);
+    background: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
     box-shadow:
-      0 1px 3px oklch(0 0 0 / 0.06),
-      0 4px 16px oklch(0 0 0 / 0.04);
+      0 1px 3px oklch(0 0 0 / 0.08),
+      0 4px 16px oklch(0 0 0 / 0.06);
   }
 
   .glass-subtle {
-    background: oklch(0.97 0.002 250 / 0.7);
+    background: color-mix(in oklch, var(--card) 70%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
