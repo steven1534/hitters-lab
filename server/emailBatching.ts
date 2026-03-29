@@ -8,8 +8,8 @@ import { Resend } from "resend";
 let _resendBatch: any = null;
 function getResend() { if (!_resendBatch) { _resendBatch = new Resend(ENV.resendApiKey || "placeholder_not_configured"); } return _resendBatch; }
 
-// Batch window in milliseconds (5 minutes)
-const BATCH_WINDOW_MS = 5 * 60 * 1000;
+// Batch window in milliseconds (1 minute — near-instant delivery)
+const BATCH_WINDOW_MS = 1 * 60 * 1000;
 
 /**
  * Queue an activity alert for batched sending

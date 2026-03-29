@@ -12,7 +12,7 @@ import {
   Sparkles, Video, Upload, MessageSquare, BarChart3, Activity, Users, 
   LayoutTemplate, Edit3, ArrowLeftRight, FileText, ChevronRight,
   Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
-  BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail,
+  BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail, Bell,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useMemo } from "react";
@@ -34,6 +34,7 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { InlineEdit } from "@/components/InlineEdit";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AddNewDrill } from "@/components/AddNewDrill";
+import { NotificationSettings } from "@/components/NotificationSettings";
 
 interface Drill {
   id: string;
@@ -43,7 +44,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -76,6 +77,12 @@ const NAV_GROUPS = [
       { key: "video-analysis" as ActiveTab, label: "Video Analysis", icon: Sparkles },
     ],
   },
+  {
+    label: "Settings",
+    items: [
+      { key: "notifications" as ActiveTab, label: "Notifications", icon: Bell },
+    ],
+  },
 ];
 
 const TAB_LABELS: Record<ActiveTab, string> = {
@@ -90,6 +97,7 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "player-reports": "Player Reports",
   "video-analysis": "Video Analysis",
   "blast-metrics": "Blast Metrics",
+  notifications: "Notification Settings",
 };
 
 // ── Invite User Dialog ────────────────────────────────────────
@@ -204,6 +212,8 @@ export default function CoachDashboard() {
   const [searchDrill, setSearchDrill] = useState("");
   const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
+  // Cross-tab navigation: pre-select an athlete when switching tabs from Blast Metrics
+  const [crossNavAthleteId, setCrossNavAthleteId] = useState<number | undefined>(undefined);
   const [editingLayoutDrill, setEditingLayoutDrill] = useState<{ id: string; name: string } | null>(null);
   const [layoutSearchQuery, setLayoutSearchQuery] = useState("");
   const [isBulkGoalOpen, setIsBulkGoalOpen] = useState(false);
@@ -318,6 +328,7 @@ export default function CoachDashboard() {
 
   const navigate = (tab: ActiveTab) => {
     setActiveTab(tab);
+    setCrossNavAthleteId(undefined); // clear pre-selection when manually switching tabs
     setSidebarOpen(false);
   };
 
@@ -509,13 +520,36 @@ export default function CoachDashboard() {
 
             {activeTab === "planner" && <PracticePlanner />}
 
-            {activeTab === "session-notes" && <SessionNotesTab />}
+            {activeTab === "session-notes" && (
+              <SessionNotesTab
+                key={crossNavAthleteId ?? "default"}
+                initialAthleteId={crossNavAthleteId}
+              />
+            )}
 
-            {activeTab === "player-reports" && <PlayerReportsTab />}
+            {activeTab === "player-reports" && (
+              <PlayerReportsTab
+                key={crossNavAthleteId ?? "default"}
+                initialAthleteId={crossNavAthleteId}
+              />
+            )}
 
             {activeTab === "video-analysis" && <VideoAnalysisTab />}
 
-            {activeTab === "blast-metrics" && <BlastMetricsTab />}
+            {activeTab === "blast-metrics" && (
+              <BlastMetricsTab
+                onNavigateToNotes={(userId) => {
+                  setCrossNavAthleteId(userId);
+                  setActiveTab("session-notes");
+                }}
+                onNavigateToReports={(userId) => {
+                  setCrossNavAthleteId(userId);
+                  setActiveTab("player-reports");
+                }}
+              />
+            )}
+
+            {activeTab === "notifications" && <NotificationSettings />}
 
             {activeTab === "page-layouts" && (
               <div className="space-y-6">
