@@ -11,6 +11,7 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 // ── YouTube URL normalizer (server-side) ──────────────────────────────────────
 const YT_ID_RE = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/|e\/|watch\/|attribution_link\?(?:.*&)?u=(?:.*%3Fv%3D|.*\/watch%3Fv%3D)))([a-zA-Z0-9_-]{11})/i;
@@ -67,8 +68,7 @@ export async function createUser(user: {
   const isOwner = normalizedEmail === ENV.ownerEmail.toLowerCase();
 
   // Default password is player123 if none provided
-  const { hashPassword } = await import("./_core/auth");
-  const passwordHash = user.passwordHash || await hashPassword("player123");
+  const passwordHash = user.passwordHash || await bcrypt.hash("player123", 12);
 
   const result = await db.insert(users).values({
     email: normalizedEmail,
