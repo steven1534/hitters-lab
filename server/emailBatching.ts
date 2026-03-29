@@ -127,7 +127,7 @@ export async function processPendingBatches(): Promise<number> {
       if (alerts.length === 1) {
         // Single activity - send regular email
         const alert = alerts[0];
-        const baseUrl = process.env.VITE_APP_URL || "https://coachstevemobilecoach.com";
+        const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
         
         await sendActivityAlertEmail({
           coachEmail,
@@ -205,7 +205,7 @@ async function sendBatchedActivityEmail(
       `;
     }).join('');
 
-    const baseUrl = process.env.VITE_APP_URL || "https://coachstevemobilecoach.com";
+    const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
     
     const emailHtml = `
 <!DOCTYPE html>
@@ -263,7 +263,7 @@ async function sendBatchedActivityEmail(
     `;
 
     const result = await getResend().emails.send({
-      from: "coach@coachstevemobilecoach.com",
+      from: "coach@coachstevebaseball.com",
       to: coachEmail,
       subject: `📊 ${athleteName} - ${activityCount} new activities`,
       html: emailHtml,

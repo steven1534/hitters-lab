@@ -108,7 +108,7 @@ export async function logActivity(
       
       // Queue email alert for batched sending (prevents inbox overload)
       if (shouldNotifyEmail && coach.email) {
-        const baseUrl = process.env.VITE_APP_URL || "https://coachstevemobilecoach.com";
+        const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
         await queueActivityAlert(
           coach.id,
           athleteId,

@@ -40,7 +40,7 @@ describe('Invite System', () => {
     });
 
     it('should send email with correct sender address', async () => {
-      // Test that emails are sent from coach@coachstevemobilecoach.com
+      // Test that emails are sent from coach@coachstevebaseball.com
       expect(true).toBe(true);
     });
   });
