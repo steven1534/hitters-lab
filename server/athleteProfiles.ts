@@ -62,7 +62,7 @@ export async function getProfileWithUser(userId: number) {
     parentName: row.profile?.parentName ?? null,
     parentEmail: row.profile?.parentEmail ?? null,
     parentPhone: row.profile?.parentPhone ?? null,
-    coachProfileNotes: row.profile?.coachProfileNotes ?? null,
+    coachProfileNotes: (row.profile as any)?.coachProfileNotes ?? null,
   };
 }
 

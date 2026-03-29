@@ -303,7 +303,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
               type="date"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
-              className="bg-white/[0.04] border-white/[0.08]"
+              className="bg-muted/40 border-border"
             />
             {age !== null && (
               <p className="text-xs text-muted-foreground mt-1">{age} years old</p>
@@ -316,7 +316,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               placeholder="e.g., Westside Tigers"
-              className="bg-white/[0.04] border-white/[0.08]"
+              className="bg-muted/40 border-border"
             />
           </div>
         </div>
@@ -325,7 +325,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Position</label>
             <Select value={position} onValueChange={setPosition}>
-              <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+              <SelectTrigger className="bg-muted/40 border-border">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -340,7 +340,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">2nd Position</label>
             <Select value={secondaryPosition} onValueChange={setSecondaryPosition}>
-              <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+              <SelectTrigger className="bg-muted/40 border-border">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -355,7 +355,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Bats</label>
             <Select value={bats} onValueChange={(v) => setBats(v as "L" | "R" | "S")}>
-              <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+              <SelectTrigger className="bg-muted/40 border-border">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -370,7 +370,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Throws</label>
             <Select value={throws_} onValueChange={(v) => setThrows(v as "L" | "R")}>
-              <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+              <SelectTrigger className="bg-muted/40 border-border">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -397,7 +397,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
                 focusAreas.includes(area)
                   ? "bg-[#DC143C]/20 text-[#DC143C] border-[#DC143C]/40"
-                  : "bg-white/[0.04] text-muted-foreground border-white/[0.08] hover:bg-white/[0.08]"
+                  : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"
               }`}
             >
               {area}
@@ -419,7 +419,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
             value={parentName}
             onChange={(e) => setParentName(e.target.value)}
             placeholder="e.g., John Smith"
-            className="bg-white/[0.04] border-white/[0.08]"
+            className="bg-muted/40 border-border"
           />
         </div>
 
@@ -431,7 +431,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
               value={parentEmail}
               onChange={(e) => setParentEmail(e.target.value)}
               placeholder="parent@email.com"
-              className="bg-white/[0.04] border-white/[0.08]"
+              className="bg-muted/40 border-border"
             />
           </div>
           <div>
@@ -441,7 +441,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
               value={parentPhone}
               onChange={(e) => setParentPhone(e.target.value)}
               placeholder="(555) 123-4567"
-              className="bg-white/[0.04] border-white/[0.08]"
+              className="bg-muted/40 border-border"
             />
           </div>
         </div>
@@ -457,7 +457,7 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
           onChange={(e) => setCoachNotes(e.target.value)}
           placeholder="Private notes about this player (not shared with parents or athletes)..."
           rows={3}
-          className="bg-white/[0.04] border-white/[0.08] resize-none"
+          className="bg-muted/40 border-border resize-none"
         />
       </fieldset>
 

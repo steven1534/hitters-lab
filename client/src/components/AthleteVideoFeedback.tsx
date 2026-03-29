@@ -142,10 +142,7 @@ export function AthleteVideoFeedback() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [showAll, setShowAll] = useState(false);
 
-  const selectedAnalysis = analyses.find((a: any) => a.id === selectedId);
-  const parsedAiFeedback = selectedAnalysis?.aiAnalysis
-    ? (() => { try { return JSON.parse(selectedAnalysis.aiAnalysis as string); } catch { return null; } })()
-    : null;
+  const selectedAnalysis = analyses.find((a: any) => a.id === selectedId) as any;
 
   // Categorize
   const feedbackReady = analyses.filter((a: any) => a.status === "approved" || a.status === "sent");
@@ -220,7 +217,7 @@ export function AthleteVideoFeedback() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   isFeedbackReady
                     ? "bg-gradient-to-br from-purple-500/30 to-electric/20 border border-purple-500/30"
-                    : "bg-white/5 border border-white/10"
+                    : "bg-muted/50 border border-border"
                 }`}>
                   {isFeedbackReady ? (
                     <Sparkles className="w-5 h-5 text-purple-400" />
@@ -255,7 +252,7 @@ export function AthleteVideoFeedback() {
                     {statusConfig.label}
                   </Badge>
                   {isFeedbackReady && (
-                    <ChevronRight className="h-4 w-4 text-white/30" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
                   )}
                 </div>
               </button>
@@ -280,9 +277,9 @@ export function AthleteVideoFeedback() {
 
       {/* ── Full Feedback Detail Dialog ──────────────────────────── */}
       <Dialog open={!!selectedAnalysis} onOpenChange={(open) => !open && setSelectedId(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0 glass-card border-white/10 overflow-hidden">
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0 glass-card border-border overflow-hidden">
           {/* Header */}
-          <DialogHeader className="p-5 pb-4 border-b border-white/10 bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] flex-shrink-0">
+          <DialogHeader className="p-5 pb-4 border-b border-border bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] flex-shrink-0">
             <div className="flex items-center justify-between">
               <DialogTitle className="flex items-center gap-2 text-foreground pr-8">
                 <Sparkles className="h-5 w-5 text-purple-400" />
@@ -323,7 +320,7 @@ export function AthleteVideoFeedback() {
               <>
                 {/* Video Player */}
                 {selectedAnalysis.videoUrl ? (
-                  <div className="rounded-xl overflow-hidden bg-black/50 border border-white/10">
+                  <div className="rounded-xl overflow-hidden bg-black/50 border border-border">
                     <video
                       src={selectedAnalysis.videoUrl}
                       controls
@@ -333,14 +330,14 @@ export function AthleteVideoFeedback() {
                     />
                   </div>
                 ) : (
-                  <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] h-28 flex items-center justify-center">
-                    <p className="text-white/40 text-sm">Video not available</p>
+                  <div className="rounded-xl bg-muted/40 border border-border h-28 flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">Video not available</p>
                   </div>
                 )}
 
                 {/* Athlete's original notes */}
                 {selectedAnalysis.athleteNotes && (
-                  <div className="bg-white/[0.03] rounded-xl p-3 border border-white/[0.06]">
+                  <div className="bg-muted/30 rounded-xl p-3 border border-border/60">
                     <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Your Notes</p>
                     <p className="text-sm text-foreground/80">{selectedAnalysis.athleteNotes}</p>
                   </div>
@@ -373,8 +370,8 @@ export function AthleteVideoFeedback() {
                           <h4 className="font-bold text-foreground text-sm">Mechanics Breakdown</h4>
                         </div>
                         <div className="grid gap-2">
-                          {(parsedAiFeedback as any).mechanicsBreakdown.map((phase: any, i: number) => (
-                            <div key={i} className="bg-white/[0.04] rounded-xl p-3.5 border border-white/[0.06]">
+                          {(selectedAnalysis.aiFeedback as any).mechanicsBreakdown.map((phase: any, i: number) => (
+                            <div key={i} className="bg-muted/40 rounded-xl p-3.5 border border-border/60">
                               <div className="flex items-center justify-between mb-1.5">
                                 <span className="font-semibold text-foreground text-sm">{phase.phase}</span>
                                 <div className="flex gap-0.5">
@@ -474,8 +471,8 @@ export function AthleteVideoFeedback() {
                 )}
 
                 {/* Coach edited feedback (markdown) — fallback when no structured AI feedback */}
-                {selectedAnalysis.coachFeedbackText && !parsedAiFeedback && (
-                  <div className="bg-white/[0.04] rounded-xl p-4 border border-white/[0.08]">
+                {selectedAnalysis.coachEditedFeedback && !selectedAnalysis.aiFeedback && (
+                  <div className="bg-muted/40 rounded-xl p-4 border border-border">
                     <div className="flex items-center gap-2 mb-3">
                       <Sparkles className="w-4 h-4 text-purple-400" />
                       <h4 className="font-bold text-foreground text-sm">Coach Feedback</h4>

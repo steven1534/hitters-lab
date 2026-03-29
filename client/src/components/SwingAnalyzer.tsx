@@ -149,7 +149,7 @@ export function SwingAnalyzer() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-electric rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
-                  <Zap className="w-5 h-5 text-white" />
+                  <Zap className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground">Swing Analyzer</h3>
@@ -188,7 +188,7 @@ export function SwingAnalyzer() {
                 <Button
                   variant="outline"
                   onClick={() => setShowHistory(!showHistory)}
-                  className="glass border-white/10 hover:bg-white/5"
+                  className="glass border-border hover:bg-muted/50"
                 >
                   {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   <span className="ml-1 text-sm">{swingCount}</span>
@@ -200,16 +200,16 @@ export function SwingAnalyzer() {
 
         {/* Submission History (collapsible) */}
         {showHistory && mySwings.data && mySwings.data.length > 0 && (
-          <div className="border-t border-white/10 divide-y divide-white/5">
+          <div className="border-t border-border divide-y divide-white/5">
             {mySwings.data.map((swing) => {
               const statusConfig = getStatusConfig(swing.status);
               const StatusIcon = statusConfig.icon;
               const date = new Date(swing.createdAt);
 
               return (
-                <div key={swing.id} className="px-5 py-3 flex items-center justify-between hover:bg-white/5 transition-colors">
+                <div key={swing.id} className="px-5 py-3 flex items-center justify-between hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 bg-muted/50 rounded-lg flex items-center justify-center flex-shrink-0">
                       <FileVideo className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div className="min-w-0">
@@ -242,8 +242,8 @@ export function SwingAnalyzer() {
           setShowUploadModal(false);
         }
       }}>
-        <DialogContent className="max-w-md mx-auto glass-card border-white/10 p-0 gap-0">
-          <DialogHeader className="p-5 pb-4 border-b border-white/10">
+        <DialogContent className="max-w-md mx-auto glass-card border-border p-0 gap-0">
+          <DialogHeader className="p-5 pb-4 border-b border-border">
             <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
               <Zap className="w-5 h-5 text-purple-400" />
               Upload Your Swing
@@ -275,7 +275,7 @@ export function SwingAnalyzer() {
                   />
 
                   {selectedFile ? (
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <div className="bg-muted/50 border border-border rounded-xl p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -302,7 +302,7 @@ export function SwingAnalyzer() {
                   ) : (
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-purple-500/50 hover:bg-purple-500/5 transition-all group"
+                      className="w-full border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-purple-500/50 hover:bg-purple-500/5 transition-all group"
                     >
                       <div className="w-14 h-14 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-500/20 transition-colors">
                         <Upload className="w-7 h-7 text-purple-400" />
@@ -319,7 +319,7 @@ export function SwingAnalyzer() {
                     What type of swing? <span className="text-muted-foreground font-normal">(optional)</span>
                   </label>
                   <Select value={swingType} onValueChange={setSwingType}>
-                    <SelectTrigger className="bg-white/5 border-white/10 text-foreground">
+                    <SelectTrigger className="bg-muted/50 border-border text-foreground">
                       <SelectValue placeholder="Select swing type..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -341,21 +341,21 @@ export function SwingAnalyzer() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="e.g., Working on keeping hands inside the ball, felt good contact on the 3rd swing..."
-                    className="bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground resize-none"
+                    className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground resize-none"
                     rows={3}
                   />
                 </div>
 
                 {/* Upload Progress */}
                 {uploadProgress && (
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="bg-muted/50 border border-border rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-foreground">
                         {uploadProgress.phase === "compressing" ? "Compressing..." : "Uploading..."}
                       </span>
                       <span className="text-sm text-muted-foreground">{uploadProgress.percent}%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-2 rounded-full transition-all duration-300 ${
                           uploadProgress.phase === "compressing"

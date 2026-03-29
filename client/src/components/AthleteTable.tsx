@@ -239,10 +239,10 @@ export function AthleteTable() {
     return (
       <div className="space-y-4">
         <div className="glass-card rounded-xl p-6 animate-pulse">
-          <div className="h-6 bg-white/[0.06] rounded w-48 mb-4" />
+          <div className="h-6 bg-muted/60 rounded w-48 mb-4" />
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-12 bg-white/[0.04] rounded" />
+              <div key={i} className="h-12 bg-muted/40 rounded" />
             ))}
           </div>
         </div>
@@ -275,7 +275,7 @@ export function AthleteTable() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-10 bg-white/[0.04] border-white/[0.08]"
+              className="pl-10 bg-muted/40 border-border"
             />
           </div>
         </div>
@@ -296,13 +296,13 @@ export function AthleteTable() {
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                 statusFilter === f.key
-                  ? "bg-white/[0.12] text-white border border-white/[0.15]"
-                  : "bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] border border-transparent"
+                  ? "bg-muted text-foreground border border-border"
+                  : "bg-muted/40 text-muted-foreground hover:bg-muted border border-transparent"
               }`}
             >
               <f.icon className={`h-3 w-3 ${statusFilter === f.key ? (f.color || "text-[#DC143C]") : ""}`} />
               {f.label}
-              <span className="bg-white/[0.08] px-1.5 py-0.5 rounded text-[10px]">{f.count}</span>
+              <span className="bg-muted px-1.5 py-0.5 rounded text-[10px]">{f.count}</span>
             </button>
           ))}
         </div>
@@ -313,7 +313,7 @@ export function AthleteTable() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/[0.08] bg-white/[0.03]">
+              <tr className="border-b border-border bg-muted/30">
                 {[
                   { field: "id" as SortField, label: "ID", icon: Hash, width: "w-16" },
                   { field: "name" as SortField, label: "Name", icon: Users, width: "min-w-[140px]" },
@@ -327,7 +327,7 @@ export function AthleteTable() {
                 ].map((col) => (
                   <th
                     key={col.field}
-                    className={`${col.width} px-3 py-3 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-white/80 transition-colors select-none`}
+                    className={`${col.width} px-3 py-3 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground transition-colors select-none`}
                     onClick={() => handleSort(col.field)}
                   >
                     <div className="flex items-center gap-1.5">
@@ -353,9 +353,9 @@ export function AthleteTable() {
                 paginatedAthletes.map((athlete, idx) => (
                   <Fragment key={athlete.id}>
                     <tr
-                      className={`border-b border-white/[0.04] hover:bg-white/[0.04] transition-colors cursor-pointer ${
-                        expandedRow === athlete.id ? "bg-white/[0.06]" : ""
-                      } ${idx % 2 === 0 ? "" : "bg-white/[0.015]"}`}
+                      className={`border-b border-border/40 hover:bg-muted/40 transition-colors cursor-pointer ${
+                        expandedRow === athlete.id ? "bg-muted/60" : ""
+                      } ${idx % 2 === 0 ? "" : "bg-muted/[0.015]"}`}
                       onClick={() => setExpandedRow(expandedRow === athlete.id ? null : athlete.id)}
                     >
                       {/* ID */}
@@ -371,7 +371,7 @@ export function AthleteTable() {
                               ? "bg-gradient-to-br from-[#DC143C]/30 to-[#DC143C]/30 text-[#DC143C]"
                               : athlete.type === "invite"
                               ? "bg-gradient-to-br from-amber-500/30 to-orange-500/30 text-amber-400"
-                              : "bg-white/[0.08] text-muted-foreground"
+                              : "bg-muted text-muted-foreground"
                           }`}>
                             {athlete.name.charAt(0).toUpperCase()}
                           </div>
@@ -402,7 +402,7 @@ export function AthleteTable() {
                             Active
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[10px] bg-white/[0.06] text-muted-foreground border-white/[0.1]">
+                          <Badge variant="outline" className="text-[10px] bg-muted/60 text-muted-foreground border-border">
                             <AlertCircle className="h-2.5 w-2.5 mr-1" />
                             Inactive
                           </Badge>
@@ -414,7 +414,7 @@ export function AthleteTable() {
                         <div className="flex items-center gap-1">
                           <span className="font-semibold text-sm">{athlete.totalDrills}</span>
                           {athlete.totalDrills > 0 && (
-                            <div className="w-12 h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+                            <div className="w-12 h-1.5 rounded-full bg-muted overflow-hidden">
                               <div
                                 className="h-full rounded-full bg-gradient-to-r from-[#DC143C] to-[#E8425A]"
                                 style={{ width: `${athlete.totalDrills > 0 ? (athlete.completedDrills / athlete.totalDrills) * 100 : 0}%` }}
@@ -454,56 +454,56 @@ export function AthleteTable() {
 
                     {/* Expanded Detail Row */}
                     {expandedRow === athlete.id && (
-                      <tr className="bg-white/[0.03]">
+                      <tr className="bg-muted/30">
                         <td colSpan={10} className="px-4 py-4">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">User ID</p>
                               <p className="font-mono text-sm font-medium">{athlete.numericId}</p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Role</p>
                               <p className="text-sm font-medium capitalize">{athlete.role}</p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Account Type</p>
                               <p className="text-sm font-medium capitalize">{athlete.type}</p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Active Client</p>
                               <p className={`text-sm font-medium ${athlete.isActiveClient ? "text-green-400" : "text-muted-foreground"}`}>
                                 {athlete.isActiveClient ? "Yes" : "No"}
                               </p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Assigned Drills</p>
                               <p className="text-sm font-medium">{athlete.assignedDrills}</p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">In Progress</p>
                               <p className={`text-sm font-medium ${athlete.inProgressDrills > 0 ? "text-amber-400" : "text-muted-foreground"}`}>
                                 {athlete.inProgressDrills}
                               </p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Last Activity</p>
                               <p className="text-sm font-medium">{formatDateTime(athlete.lastActivity)}</p>
                             </div>
-                            <div className="bg-white/[0.04] rounded-lg p-3">
+                            <div className="bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Last Sign In</p>
                               <p className="text-sm font-medium">{formatDateTime(athlete.lastSignedIn)}</p>
                             </div>
                           </div>
                           <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                            <div className="flex-1 bg-white/[0.04] rounded-lg p-3">
+                            <div className="flex-1 bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Full Email</p>
                               <p className="text-sm font-medium break-all">{athlete.email || "No email on file"}</p>
                             </div>
-                            <div className="flex-1 bg-white/[0.04] rounded-lg p-3">
+                            <div className="flex-1 bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Joined Date</p>
                               <p className="text-sm font-medium">{formatDateTime(athlete.createdAt)}</p>
                             </div>
-                            <div className="flex-1 bg-white/[0.04] rounded-lg p-3">
+                            <div className="flex-1 bg-muted/40 rounded-lg p-3">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Completion Rate</p>
                               <p className="text-sm font-medium">
                                 {athlete.totalDrills > 0
@@ -570,7 +570,7 @@ export function AthleteTable() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border/60">
             <p className="text-xs text-muted-foreground">
               Showing {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, sortedAthletes.length)} of {sortedAthletes.length}
             </p>
@@ -580,7 +580,7 @@ export function AthleteTable() {
                 size="sm"
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-white"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
               >
                 <ChevronsLeft className="h-3.5 w-3.5" />
               </Button>
@@ -589,7 +589,7 @@ export function AthleteTable() {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-white"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
@@ -601,7 +601,7 @@ export function AthleteTable() {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-white"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
               </Button>
@@ -610,7 +610,7 @@ export function AthleteTable() {
                 size="sm"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-white"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
               >
                 <ChevronsRight className="h-3.5 w-3.5" />
               </Button>

@@ -64,8 +64,8 @@ export function BulkImportDrills() {
 
       setProgress(100);
 
-      const totalSuccess = descResult.success + goalResult.success;
-      const totalFailed = descResult.failed + goalResult.failed;
+      const totalSuccess = descResult.imported + goalResult.imported;
+      const totalFailed = descResult.skipped + goalResult.skipped;
       const allErrors = [...(descResult.errors || []), ...(goalResult.errors || [])];
 
       setResults({

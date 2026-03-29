@@ -438,7 +438,8 @@ export function VideoAnalysisTab() {
               )}
             </CardContent>
           </Card>
-        )}
+          );
+        })()}
 
         {/* Editable Feedback */}
         {(selectedAnalysis.status === "complete") && (
@@ -641,7 +642,7 @@ export function VideoAnalysisTab() {
                         <div className="h-full w-full bg-muted" />
                       )}
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                        <Play className="h-6 w-6 text-white" />
+                        <Play className="h-6 w-6 text-foreground" />
                       </div>
                     </div>
 

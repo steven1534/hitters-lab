@@ -191,7 +191,7 @@ export function InlineEdit({
                 "div",
                 {
                   ref: resetRef,
-                  className: "absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card/95 backdrop-blur-xl border border-white/[0.15] rounded-lg shadow-2xl p-3 min-w-[180px] animate-in fade-in slide-in-from-bottom-2 duration-200",
+                  className: "absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card/95 backdrop-blur-xl border border-border rounded-lg shadow-2xl p-3 min-w-[180px] animate-in fade-in slide-in-from-bottom-2 duration-200",
                   onClick: (e: React.MouseEvent) => e.stopPropagation(),
                 },
                 createElement(
@@ -223,7 +223,7 @@ export function InlineEdit({
                     "button",
                     {
                       type: "button",
-                      className: "flex-1 text-xs font-medium py-1.5 rounded text-muted-foreground hover:bg-white/[0.06] transition-colors",
+                      className: "flex-1 text-xs font-medium py-1.5 rounded text-muted-foreground hover:bg-muted/60 transition-colors",
                       onClick: (e: React.MouseEvent) => {
                         e.stopPropagation();
                         setShowResetConfirm(false);

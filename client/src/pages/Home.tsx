@@ -1,7 +1,10 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, LogIn, LogOut, Shield, Users, Activity, ChevronRight, Sparkles, Settings, Clock, Zap, Target, TrendingUp } from "lucide-react";
+import {
+  Search, LogIn, LogOut, Shield, Users, Activity,
+  ChevronRight, Sparkles, Settings, Clock, Target, TrendingUp, Zap
+} from "lucide-react";
 import { HomePageSkeleton } from "@/components/Skeleton";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
@@ -24,64 +27,45 @@ interface Drill {
   isCustom?: boolean;
 }
 
-// Difficulty config
-const DIFFICULTY_CONFIG: Record<string, { label: string; class: string; dotClass: string }> = {
-  Easy: { label: "Easy", class: "badge-easy", dotClass: "bg-emerald-400" },
-  Medium: { label: "Medium", class: "badge-medium", dotClass: "bg-amber-400" },
-  Hard: { label: "Hard", class: "badge-hard", dotClass: "bg-rose-400" },
-};
-
-// Category config with icons
 const CATEGORIES = ["All", "Hitting", "Bunting", "Pitching", "Infield", "Outfield"];
 
-/**
- * Save scroll position to sessionStorage keyed by the current query string.
- */
 function saveScrollPosition(queryKey: string) {
   sessionStorage.setItem(`drill-scroll-${queryKey}`, String(window.scrollY));
 }
-
-/**
- * Restore scroll position from sessionStorage for the given query key.
- */
 function restoreScrollPosition(queryKey: string) {
   const saved = sessionStorage.getItem(`drill-scroll-${queryKey}`);
-  if (saved) {
-    window.scrollTo(0, parseInt(saved, 10));
-  }
+  if (saved) window.scrollTo(0, parseInt(saved, 10));
+}
+
+function DifficultyBadge({ difficulty }: { difficulty: string }) {
+  const d = difficulty?.toLowerCase();
+  const styles =
+    d === "easy"   ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
+    d === "hard"   ? "bg-red-50    text-red-700    border border-red-200" :
+                     "bg-amber-50  text-amber-700  border border-amber-200";
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${styles}`}>
+      {difficulty}
+    </span>
+  );
 }
 
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
 
-  // URL-synced filter/pagination state
   const {
-    page: currentPage,
-    category: categoryFilter,
-    difficulty: difficultyFilter,
-    search: searchQuery,
-    sort,
-    setPage: setCurrentPage,
-    setCategory: setCategoryFilter,
-    setDifficulty: setDifficultyFilter,
-    setSearch: setSearchQuery,
-    setSort,
-    resetAll,
-    currentQuery,
+    page: currentPage, category: categoryFilter, difficulty: difficultyFilter,
+    search: searchQuery, setPage: setCurrentPage, setCategory: setCategoryFilter,
+    setDifficulty: setDifficultyFilter, setSearch: setSearchQuery,
+    resetAll, currentQuery,
   } = useDrillListParams();
 
-  const [scrollY, setScrollY] = useState(0);
-  const heroRef = useRef<HTMLDivElement>(null);
   const DRILLS_PER_PAGE = 21;
   const hasRestoredScroll = useRef(false);
-
-  // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingDrill, setEditingDrill] = useState<Drill | null>(null);
 
-  // Fetch drill customizations
   const { data: drillCustomizations = [], refetch: refetchCustomizations } = trpc.drillCustomizations.getAll.useQuery();
-
   const customizationsMap = useMemo(() => {
     const map = new Map<string, typeof drillCustomizations[0]>();
     drillCustomizations.forEach((c) => map.set(c.drillId, c));
@@ -93,33 +77,17 @@ export default function Home() {
   const videosMap = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v: any) => {
-      // Extract YouTube thumbnail from any URL format
       const thumb = v.videoUrl ? getYouTubeThumbnail(v.videoUrl) : null;
       if (thumb) map.set(v.drillId, thumb);
     });
     return map;
   }, [allVideos]);
 
-  // Set SEO-friendly document title (30-60 characters)
   useEffect(() => {
-    document.title = "Baseball Training Drills | Coach Steve's Library";
+    document.title = "Baseball Training Drills | Coach Steve's Hitters Lab";
   }, []);
 
-  // Parallax scroll effect
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Merge static + custom drills, sorted alphabetically
   const allDrills = useAllDrills();
-
-  const allCategories = useMemo(() => {
-    const categories = new Set<string>();
-    allDrills.forEach(drill => drill.categories.forEach(cat => categories.add(cat)));
-    return ["All", ...Array.from(categories).sort()];
-  }, [allDrills]);
 
   const filteredDrills = useMemo(() => {
     return allDrills.filter(drill => {
@@ -134,76 +102,40 @@ export default function Home() {
   const startIndex = (currentPage - 1) * DRILLS_PER_PAGE;
   const paginatedDrills = filteredDrills.slice(startIndex, startIndex + DRILLS_PER_PAGE);
 
-  // Restore scroll position after drills render (on back navigation)
   useEffect(() => {
-    if (hasRestoredScroll.current) return;
-    if (paginatedDrills.length === 0) return;
+    if (hasRestoredScroll.current || paginatedDrills.length === 0) return;
     hasRestoredScroll.current = true;
-    // Small delay to ensure DOM is painted
-    const timer = setTimeout(() => {
-      restoreScrollPosition(currentQuery || '__default__');
-    }, 80);
+    const timer = setTimeout(() => restoreScrollPosition(currentQuery || '__default__'), 80);
     return () => clearTimeout(timer);
   }, [paginatedDrills.length, currentQuery]);
 
   if (loading) return <HomePageSkeleton />;
 
-  // Unauthenticated view
+  // ── Unauthenticated splash ────────────────────────────────────────────────
   if (!loading && !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 relative overflow-hidden">
-        <div className="absolute inset-0 gradient-mesh" />
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-[100px] animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-electric/8 rounded-full blur-[80px] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
-        
-        <div className="text-center max-w-lg relative z-10 animate-fade-in-up">
-          <div className="glass-card p-10 rounded-2xl">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-secondary to-electric flex items-center justify-center shadow-lg">
-              <Zap className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4 text-gradient">Access Restricted</h1>
-            <h2 className="text-lg text-muted-foreground mb-8 leading-relaxed font-normal">
-              Exclusive baseball training drills for invited athletes. Log in to access the full drill library.
-            </h2>
-            <Button 
-              onClick={() => window.location.href = getLoginUrl()} 
-              size="lg"
-              className="btn-premium text-white font-semibold px-8 py-3 text-base"
-            >
-              <LogIn className="h-5 w-5 mr-2" />
-              Log In to Continue
-            </Button>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm max-w-md w-full p-10 text-center">
+          <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-600/20">
+            <Target className="h-7 w-7 text-foreground" />
           </div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Coach Steve's<br/>Hitters Lab</h1>
+          <p className="text-slate-500 text-sm leading-relaxed mb-8">
+            Professional baseball training drills for serious athletes. Log in to access the full library.
+          </p>
+          <Button
+            onClick={() => window.location.href = getLoginUrl()}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold h-11 rounded-xl gap-2"
+          >
+            <LogIn className="h-4 w-4" />
+            Log In to Continue
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Inactive athlete view
-  if (!loading && isAuthenticated && user?.role === 'athlete' && !user?.isActiveClient) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 relative overflow-hidden">
-        <div className="absolute top-1/3 left-1/3 w-80 h-80 bg-destructive/10 rounded-full blur-[80px]" />
-        <div className="text-center max-w-md relative z-10 animate-fade-in-up">
-          <div className="glass-card p-10 rounded-2xl">
-            <h1 className="text-4xl font-heading font-bold mb-4">Account Inactive</h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Your account has been deactivated. Please contact your coach for more information.
-            </p>
-            <Button onClick={() => logout()} variant="outline" size="lg" className="hover-lift">
-              <LogOut className="h-5 w-5 mr-2" />
-              Log Out
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /** Handle drill card click: save scroll position, then navigate */
-  const handleDrillClick = (drillId: string) => {
-    saveScrollPosition(currentQuery || '__default__');
-  };
+  const handleDrillClick = () => saveScrollPosition(currentQuery || '__default__');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -239,31 +171,22 @@ export default function Home() {
               </div>
               <span className="font-heading font-bold text-lg text-foreground hidden sm:block">Coach Steve</span>
             </div>
-            
-            <div className="flex items-center gap-2 flex-wrap">
-              {user ? (
-                <>
-                  {user.role === 'admin' && (
-                    <>
-                      <Link href="/coach-dashboard">
-                        <Button variant="outline" size="sm" className="gap-1.5 text-xs glass border-white/10 hover:border-electric/30 hover:bg-electric/10 transition-all duration-300">
-                          <Users className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">Dashboard</span>
-                        </Button>
-                      </Link>
-                      <Link href="/admin">
-                        <Button variant="outline" size="sm" className="gap-1.5 text-xs glass border-white/10 hover:border-electric/30 hover:bg-electric/10 transition-all duration-300">
-                          <Shield className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">Admin</span>
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                  {user.role === 'athlete' && (
-                    <Link href="/athlete-portal">
-                      <Button size="sm" className="gap-1.5 text-xs btn-premium text-white">
-                        <Activity className="h-3.5 w-3.5" />
-                        My Drills
+            <div className="hidden sm:block">
+              <span className="font-bold text-slate-900 text-sm tracking-tight">Coach Steve's Hitters Lab</span>
+            </div>
+            <span className="sm:hidden font-bold text-slate-900 text-sm">Hitters Lab</span>
+          </div>
+
+          {/* Nav actions */}
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                {user.role === 'admin' && (
+                  <>
+                    <Link href="/coach-dashboard">
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-600 hover:text-slate-900">
+                        <Users className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Dashboard</span>
                       </Button>
                     </Link>
                   )}
@@ -320,25 +243,19 @@ export default function Home() {
             {/* Stats row */}
             <div className="flex justify-center gap-8 md:gap-12 animate-fade-in-up stagger-4">
               {[
-                { value: `${allDrills.length}+`, label: "Drills", icon: Target },
-                { value: "8", label: "Categories", icon: Sparkles },
-                { value: "3", label: "Levels", icon: TrendingUp },
-              ].map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <stat.icon className="h-4 w-4 text-electric" />
-                    <span className="text-2xl md:text-3xl font-heading font-bold text-foreground">{stat.value}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+                { value: `${allDrills.length}+`, label: "Drills" },
+                { value: "8", label: "Categories" },
+                { value: "3", label: "Skill Levels" },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div className="text-2xl font-black text-slate-900">{s.value}</div>
+                  <div className="text-xs text-slate-400 font-medium">{s.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
-      </header>
+      </div>
 
       {/* ===== STICKY SEARCH + FILTER BAR ===== */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm shadow-black/20">
@@ -418,7 +335,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* ===== DRILL CARDS GRID ===== */}
+        {/* ── Drill Cards Grid ── */}
         {paginatedDrills.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 max-w-5xl mx-auto">
             {paginatedDrills.map((drill, index) => {
@@ -444,10 +361,8 @@ export default function Home() {
                   {user?.role === 'admin' && (
                     <button
                       onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setEditingDrill(drill);
-                        setEditModalOpen(true);
+                        e.preventDefault(); e.stopPropagation();
+                        setEditingDrill(drill); setEditModalOpen(true);
                       }}
                       className="absolute top-2.5 left-2.5 z-20 p-2 rounded-lg bg-black/60 hover:bg-electric/80 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm"
                       title="Edit drill card"
@@ -565,23 +480,18 @@ export default function Home() {
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                 let page: number;
-                if (totalPages <= 5) {
-                  page = i + 1;
-                } else if (currentPage <= 3) {
-                  page = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  page = totalPages - 4 + i;
-                } else {
-                  page = currentPage - 2 + i;
-                }
+                if (totalPages <= 5) page = i + 1;
+                else if (currentPage <= 3) page = i + 1;
+                else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
+                else page = currentPage - 2 + i;
                 return (
                   <button
                     key={page}
                     onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 ${
                       currentPage === page
-                        ? "bg-electric text-white shadow-lg shadow-electric/25"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                        ? "bg-red-600 text-white"
+                        : "text-slate-500 hover:bg-slate-100"
                     }`}
                   >
                     {page}
@@ -603,36 +513,24 @@ export default function Home() {
         )}
       </main>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="relative py-8 mt-auto border-t border-border/20">
-        <div className="absolute inset-0 bg-gradient-to-t from-card/30 to-transparent" />
-        <div className="container relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-gradient-to-br from-secondary to-electric rounded-lg flex items-center justify-center font-heading font-bold text-sm text-white">
-                CS
-              </div>
-              <div>
-                <h3 className="font-heading font-bold text-sm text-foreground">USA Baseball Drills Directory</h3>
-                <p className="text-xs text-muted-foreground">Coach Steve Baseball — Player Drill Library</p>
-              </div>
+      {/* ── Footer ── */}
+      <footer className="bg-white border-t border-slate-200 mt-auto">
+        <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center">
+              <Target className="h-3.5 w-3.5 text-foreground" />
             </div>
-            <div className="text-xs text-muted-foreground text-center md:text-right">
-              <p>Data sourced from USA Baseball Mobile Coach.</p>
-              <p className="mt-0.5">&copy; {new Date().getFullYear()} All rights reserved.</p>
-            </div>
+            <span className="font-bold text-slate-900 text-sm">Coach Steve's Hitters Lab</span>
           </div>
+          <p className="text-xs text-slate-400">&copy; {new Date().getFullYear()} Coach Steve Baseball. All rights reserved.</p>
         </div>
       </footer>
 
-      {/* Drill Edit Modal */}
+      {/* Edit modal */}
       {editingDrill && (
         <DrillEditModal
           isOpen={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setEditingDrill(null);
-          }}
+          onClose={() => { setEditModalOpen(false); setEditingDrill(null); }}
           drill={editingDrill}
           customization={customizationsMap.get(editingDrill.id)}
           onSaved={() => refetchCustomizations()}

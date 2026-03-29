@@ -47,9 +47,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     ? trpc.siteContent.update.useMutation()
     : null;
 
-  const resetSiteContentMutation = trpc.siteContent?.reset
-    ? trpc.siteContent.reset.useMutation()
-    : null;
+  const resetSiteContentMutation = trpc.siteContent.reset.useMutation();
 
   const get = useCallback(
     (key: string, defaultValue = "") => {

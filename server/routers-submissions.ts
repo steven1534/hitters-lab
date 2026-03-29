@@ -44,7 +44,7 @@ export const submissionsRouter = router({
                   drillId: input.drillId,
                   videoUrl: input.videoUrl,
                   status: "pending",
-                });
+                } as any);
                 console.log(`[VideoAnalysis] Auto-created pending analysis for submission ${latestSubmission.id}`);
               }
             }

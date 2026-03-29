@@ -139,8 +139,8 @@ export function BulkImportCustomDrills() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-heading font-bold text-white">Bulk Import Drills</h2>
-          <p className="text-white/40 text-sm mt-1">Import custom drills via CSV. First 5 fields required; videoUrl is optional.</p>
+          <h2 className="text-2xl font-heading font-bold text-foreground">Bulk Import Drills</h2>
+          <p className="text-muted-foreground text-sm mt-1">Import custom drills via CSV. First 5 fields required; videoUrl is optional.</p>
         </div>
         <Button variant="outline" size="sm" onClick={downloadTemplate} className="gap-2">
           <Download className="h-4 w-4" /> Download Template
@@ -148,8 +148,8 @@ export function BulkImportCustomDrills() {
       </div>
 
       {/* Field reference card */}
-      <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+      <div className="bg-muted/40 border border-border rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
           <FileText className="h-4 w-4 text-[#DC143C]" /> Required CSV Columns (in order)
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -161,11 +161,11 @@ export function BulkImportCustomDrills() {
             { col: "duration", desc: "Time", example: "10m", note: "5m · 10m · 15m · 20m · 30m" },
             { col: "videoUrl", desc: "Video (optional)", example: "https://youtube.com/...", note: "YouTube or any video URL" },
           ].map(f => (
-            <div key={f.col} className="bg-white/[0.04] rounded-lg p-3 border border-white/[0.06]">
+            <div key={f.col} className="bg-muted/40 rounded-lg p-3 border border-border/60">
               <div className="font-mono text-[#DC143C] text-xs font-bold mb-1">{f.col}</div>
-              <div className="text-white/70 text-xs mb-1">{f.desc}</div>
-              <div className="font-mono text-white/50 text-[10px] bg-black/20 rounded px-1.5 py-0.5 mb-1">{f.example}</div>
-              <div className="text-white/30 text-[10px]">{f.note}</div>
+              <div className="text-foreground/80 text-xs mb-1">{f.desc}</div>
+              <div className="font-mono text-muted-foreground text-[10px] bg-black/20 rounded px-1.5 py-0.5 mb-1">{f.example}</div>
+              <div className="text-muted-foreground/60 text-[10px]">{f.note}</div>
             </div>
           ))}
         </div>
@@ -175,27 +175,27 @@ export function BulkImportCustomDrills() {
       {!result && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* CSV paste */}
-          <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-5 space-y-3">
-            <h3 className="text-sm font-semibold text-white">Paste CSV</h3>
+          <div className="bg-muted/40 border border-border rounded-xl p-5 space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">Paste CSV</h3>
             <textarea
-              className="w-full h-48 bg-black/30 border border-white/[0.08] rounded-lg p-3 text-white/70 text-xs font-mono resize-none focus:outline-none focus:border-[#DC143C]/40"
+              className="w-full h-48 bg-black/30 border border-border rounded-lg p-3 text-foreground/80 text-xs font-mono resize-none focus:outline-none focus:border-[#DC143C]/40"
               placeholder={`drillId,name,difficulty,category,duration,videoUrl\nstep-back-drill,Step-back Drill,Medium,Hitting,10m,https://youtube.com/watch?v=abc\nbounce-drill,Bounce Drill,Medium,Hitting,10m,`}
               onPaste={handlePaste}
               onChange={handleTextarea}
             />
-            <p className="text-white/30 text-xs">Include or omit the header row — both work.</p>
+            <p className="text-muted-foreground/60 text-xs">Include or omit the header row — both work.</p>
           </div>
 
           {/* File upload */}
-          <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-5 space-y-3">
-            <h3 className="text-sm font-semibold text-white">Upload CSV File</h3>
+          <div className="bg-muted/40 border border-border rounded-xl p-5 space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">Upload CSV File</h3>
             <label
               htmlFor="csv-file-input"
-              className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-white/[0.12] rounded-lg cursor-pointer hover:border-[#DC143C]/40 hover:bg-white/[0.02] transition-colors"
+              className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-[#DC143C]/40 hover:bg-muted/20 transition-colors"
             >
-              <Upload className="h-8 w-8 text-white/30 mb-3" />
-              <p className="text-white/50 text-sm font-medium">Click to upload CSV</p>
-              <p className="text-white/25 text-xs mt-1">or drag and drop</p>
+              <Upload className="h-8 w-8 text-muted-foreground/60 mb-3" />
+              <p className="text-muted-foreground text-sm font-medium">Click to upload CSV</p>
+              <p className="text-muted-foreground/50 text-xs mt-1">or drag and drop</p>
               {rows.length > 0 && <p className="text-[#DC143C] text-xs mt-2">{rows.length} rows loaded</p>}
             </label>
             <input id="csv-file-input" ref={fileRef} type="file" accept=".csv,.txt" className="hidden" onChange={handleFile} />
@@ -205,10 +205,10 @@ export function BulkImportCustomDrills() {
 
       {/* Preview table */}
       {rows.length > 0 && !result && (
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="bg-muted/40 border border-border rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-border/60 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <h3 className="text-sm font-semibold text-white">Preview</h3>
+              <h3 className="text-sm font-semibold text-foreground">Preview</h3>
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">{validRows.length} valid</Badge>
               {errorRows.length > 0 && <Badge className="bg-red-500/20 text-red-400 border-red-500/30">{errorRows.length} errors</Badge>}
             </div>
@@ -224,18 +224,18 @@ export function BulkImportCustomDrills() {
           </div>
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full text-xs">
-              <thead className="bg-white/[0.04] sticky top-0">
+              <thead className="bg-muted/40 sticky top-0">
                 <tr>
                   {["drillId", "name", "difficulty", "category", "duration", "videoUrl", "status", ""].map(h => (
-                    <th key={h} className="text-left text-white/40 font-semibold uppercase tracking-wider px-4 py-2.5">{h}</th>
+                    <th key={h} className="text-left text-muted-foreground font-semibold uppercase tracking-wider px-4 py-2.5">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, i) => (
-                  <tr key={i} className={`border-t border-white/[0.04] ${row._error ? "bg-red-500/5" : "hover:bg-white/[0.02]"}`}>
-                    <td className="px-4 py-2.5 font-mono text-white/50">{row.drillId || <span className="text-red-400">—</span>}</td>
-                    <td className="px-4 py-2.5 text-white/80">{row.name || <span className="text-red-400">—</span>}</td>
+                  <tr key={i} className={`border-t border-border/40 ${row._error ? "bg-red-500/5" : "hover:bg-muted/20"}`}>
+                    <td className="px-4 py-2.5 font-mono text-muted-foreground">{row.drillId || <span className="text-red-400">—</span>}</td>
+                    <td className="px-4 py-2.5 text-foreground">{row.name || <span className="text-red-400">—</span>}</td>
                     <td className="px-4 py-2.5">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
                         row.difficulty === "Easy" ? "bg-green-500/20 text-green-400" :
@@ -243,12 +243,12 @@ export function BulkImportCustomDrills() {
                         "bg-amber-500/20 text-amber-400"
                       }`}>{row.difficulty}</span>
                     </td>
-                    <td className="px-4 py-2.5 text-white/60">{row.category}</td>
-                    <td className="px-4 py-2.5 text-white/60">{row.duration}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{row.category}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{row.duration}</td>
                     <td className="px-4 py-2.5 max-w-[160px] truncate">
                       {row.videoUrl
                         ? <a href={row.videoUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline text-[10px] truncate block">{row.videoUrl}</a>
-                        : <span className="text-white/20">—</span>
+                        : <span className="text-muted-foreground/40">—</span>
                       }
                     </td>
                     <td className="px-4 py-2.5">
@@ -258,7 +258,7 @@ export function BulkImportCustomDrills() {
                       }
                     </td>
                     <td className="px-4 py-2.5">
-                      <button onClick={() => removeRow(i)} className="text-white/20 hover:text-red-400 transition-colors">
+                      <button onClick={() => removeRow(i)} className="text-muted-foreground/40 hover:text-red-400 transition-colors">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </td>
@@ -272,23 +272,23 @@ export function BulkImportCustomDrills() {
 
       {/* Result */}
       {result && (
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-6 space-y-4">
+        <div className="bg-muted/40 border border-border rounded-xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <CheckCircle className="h-6 w-6 text-green-400" />
-            <h3 className="text-lg font-semibold text-white">Import Complete</h3>
+            <h3 className="text-lg font-semibold text-foreground">Import Complete</h3>
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center">
               <div className="text-3xl font-bold text-green-400">{result.imported}</div>
-              <div className="text-white/40 text-xs mt-1">Imported</div>
+              <div className="text-muted-foreground text-xs mt-1">Imported</div>
             </div>
-            <div className={`${result.skipped > 0 ? "bg-red-500/10 border-red-500/20" : "bg-white/[0.04] border-white/[0.08]"} border rounded-lg p-4 text-center`}>
-              <div className={`text-3xl font-bold ${result.skipped > 0 ? "text-red-400" : "text-white/40"}`}>{result.skipped}</div>
-              <div className="text-white/40 text-xs mt-1">Skipped</div>
+            <div className={`${result.skipped > 0 ? "bg-red-500/10 border-red-500/20" : "bg-muted/40 border-border"} border rounded-lg p-4 text-center`}>
+              <div className={`text-3xl font-bold ${result.skipped > 0 ? "text-red-400" : "text-muted-foreground"}`}>{result.skipped}</div>
+              <div className="text-muted-foreground text-xs mt-1">Skipped</div>
             </div>
-            <div className="bg-white/[0.04] border border-white/[0.08] rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-white/60">{result.imported + result.skipped}</div>
-              <div className="text-white/40 text-xs mt-1">Total</div>
+            <div className="bg-muted/40 border border-border rounded-lg p-4 text-center">
+              <div className="text-3xl font-bold text-muted-foreground">{result.imported + result.skipped}</div>
+              <div className="text-muted-foreground text-xs mt-1">Total</div>
             </div>
           </div>
           {result.errors.length > 0 && (

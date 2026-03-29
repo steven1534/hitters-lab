@@ -124,7 +124,7 @@ export function AthleteSessionNotes() {
                         <span
                           key={skill}
                           className={`px-2 py-0.5 rounded-md text-[10px] font-medium border ${
-                            SKILL_COLORS[skill] || "bg-white/10 text-white/60 border-white/20"
+                            SKILL_COLORS[skill] || "bg-muted text-muted-foreground border-border"
                           }`}
                         >
                           {skill}
@@ -140,7 +140,7 @@ export function AthleteSessionNotes() {
                         <Zap className="h-3.5 w-3.5 text-[#DC143C]" />
                         <span className="text-xs font-semibold text-[#DC143C]"><InlineEdit contentKey="sessionHistory.heading.blastMetrics" defaultValue="Session Blast Metrics" /></span>
                       </div>
-                      <p className="text-xs text-white/70 leading-relaxed">{note.whatImproved}</p>
+                      <p className="text-xs text-foreground/80 leading-relaxed">{note.whatImproved}</p>
                     </div>
                   ) : (
                     <>
@@ -151,7 +151,7 @@ export function AthleteSessionNotes() {
                             <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
                             <span className="text-xs font-semibold text-emerald-400"><InlineEdit contentKey="sessionHistory.heading.whatImproved" defaultValue="What Improved" /></span>
                           </div>
-                          <p className="text-xs text-white/70 leading-relaxed">{note.whatImproved}</p>
+                          <p className="text-xs text-foreground/80 leading-relaxed">{note.whatImproved}</p>
                         </div>
                       )}
 
@@ -162,7 +162,7 @@ export function AthleteSessionNotes() {
                             <TrendingDown className="h-3.5 w-3.5 text-amber-400" />
                             <span className="text-xs font-semibold text-amber-400"><InlineEdit contentKey="sessionHistory.heading.whatNeedsWork" defaultValue="What to Work On" /></span>
                           </div>
-                          <p className="text-xs text-white/70 leading-relaxed">{note.whatNeedsWork}</p>
+                          <p className="text-xs text-foreground/80 leading-relaxed">{note.whatNeedsWork}</p>
                         </div>
                       )}
                     </>
@@ -170,7 +170,7 @@ export function AthleteSessionNotes() {
 
                   {/* Homework drills */}
                   {homework.length > 0 && (
-                    <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
+                    <div className="bg-muted/30 border border-border/60 rounded-lg p-3">
                       <div className="flex items-center gap-1.5 mb-2">
                         <Dumbbell className="h-3.5 w-3.5 text-electric" />
                         <span className="text-xs font-semibold text-electric"><InlineEdit contentKey="sessionHistory.heading.homeworkDrills" defaultValue="Homework Drills" /></span>
@@ -179,7 +179,7 @@ export function AthleteSessionNotes() {
                         {homework.map((drill, i) => (
                           <div
                             key={i}
-                            className="flex items-center gap-2 text-xs text-white/60"
+                            className="flex items-center gap-2 text-xs text-muted-foreground"
                           >
                             <div className="w-1 h-1 rounded-full bg-electric/60" />
                             {drill.drillName}

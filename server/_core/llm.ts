@@ -319,11 +319,23 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `LLM invoke failed: ${response.status} ${response.statusText} – ${errorText}`
-    );
+    const errorText = await response.text().catch(() => response.statusText);
+    if (response.status === 401) {
+      throw new Error("OpenAI API key is invalid or expired. Please update OPENAI_API_KEY in Railway variables.");
+    }
+    if (response.status === 429) {
+      throw new Error("OpenAI rate limit or quota exceeded. Check your OpenAI account billing at platform.openai.com.");
+    }
+    if (response.status === 503 || response.status === 502) {
+      throw new Error("OpenAI service temporarily unavailable. Please try again in a moment.");
+    }
+    throw new Error(`LLM API error (${response.status}): ${errorText.substring(0, 200)}`);
   }
 
-  return (await response.json()) as InvokeResult;
+  const responseText = await response.text();
+  try {
+    return JSON.parse(responseText) as InvokeResult;
+  } catch {
+    throw new Error(`Invalid JSON from LLM API: ${responseText.substring(0, 200)}`);
+  }
 }

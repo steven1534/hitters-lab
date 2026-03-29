@@ -122,118 +122,106 @@ export default function DrillsDirectory() {
   // Anonymous visitors can browse freely but get a login prompt after 2 drill views.
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Hero Section */}
-      <header className="relative bg-primary text-primary-foreground overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/hero-bg.jpg"
-            alt="Baseball Field"
-            className="w-full h-full object-cover opacity-40 mix-blend-overlay"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-primary/95" />
-        </div>
-
-        <div className="container relative z-10 py-8 md:py-20">
-          {/* Auth & Admin Controls */}
-          <div className="flex justify-end gap-2 mb-6 flex-wrap">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="container py-3 flex items-center justify-between">
+          <Link href="/">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center">
+                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><circle cx="12" cy="12" r="9" stroke="white" strokeWidth="2"/><path d="M12 3v18M3 12h18" stroke="white" strokeWidth="1.5"/></svg>
+              </div>
+              <span className="font-bold text-slate-900 text-sm hidden sm:block">Hitters Lab</span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-2">
             {user ? (
               <>
                 {user.role === 'admin' && (
                   <>
-                    <Link href="/coach">
-                      <Button variant="secondary" size="sm" className="gap-2 text-xs md:text-sm">
-                        <Users className="h-4 w-4" />
-                        Coach Dashboard
+                    <Link href="/coach-dashboard">
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-600">
+                        <Users className="h-3.5 w-3.5" /><span className="hidden sm:inline">Dashboard</span>
                       </Button>
                     </Link>
                     <Link href="/admin">
-                      <Button variant="secondary" size="sm" className="gap-2 text-xs md:text-sm">
-                        <Shield className="h-4 w-4" />
-                        <span className="hidden sm:inline">Admin Dashboard</span>
-                        <span className="sm:hidden">Admin</span>
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-600">
+                        <Shield className="h-3.5 w-3.5" /><span className="hidden sm:inline">Admin</span>
                       </Button>
                     </Link>
                   </>
                 )}
                 {user.role === 'athlete' && (
                   <Link href="/athlete-portal">
-                    <Button variant="secondary" size="sm" className="gap-2 text-xs md:text-sm">
-                      <Activity className="h-4 w-4" />
-                      <span className="hidden sm:inline">My Drills</span>
-                      <span className="sm:hidden">Drills</span>
+                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white gap-1.5 text-xs">
+                      <Activity className="h-3.5 w-3.5" />My Portal
                     </Button>
                   </Link>
                 )}
-                <Button variant="outline" size="sm" onClick={logout} className="gap-2 bg-background/20 hover:bg-background/30 text-xs md:text-sm">
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Logout</span>
-                  <span className="sm:hidden">Exit</span>
+                <Button variant="outline" size="sm" onClick={logout} className="gap-1.5 text-xs border-slate-200 text-slate-600">
+                  <LogOut className="h-3.5 w-3.5" /><span className="hidden sm:inline">Logout</span>
                 </Button>
               </>
             ) : (
               <a href={getLoginUrl()}>
-                <Button variant="secondary" size="sm" className="gap-2 text-xs md:text-sm">
-                  <LogIn className="h-4 w-4" />
-                  Login
+                <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white gap-1.5 text-xs">
+                  <LogIn className="h-3.5 w-3.5" />Log In
                 </Button>
               </a>
             )}
           </div>
-
-          <div className="max-w-4xl">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-1 w-12 bg-secondary rounded-full" />
-              <span className="text-secondary font-bold tracking-wider uppercase text-xs">Coach Steve's Mobile Coach</span>
-            </div>
-            <h1 className="text-4xl md:text-7xl font-heading font-black mb-3 md:mb-4 leading-tight">
-              Drills Directory
-            </h1>
-            <p className="text-base md:text-lg text-primary-foreground/90 mb-6 md:mb-10 max-w-3xl leading-relaxed font-medium">
-              {allDrills.length} professional baseball drills. Filter by skill set, difficulty, age level, drill type, and more.
-            </p>
-
-            {/* Search Bar in Hero */}
-            <div className="relative w-full md:max-w-2xl">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <Input
-                type="text"
-                placeholder="Search drills..."
-                className="pl-11 py-5 md:py-7 text-sm md:text-base bg-background/95 text-foreground border-0 shadow-2xl rounded-xl md:rounded-2xl focus-visible:ring-2 focus-visible:ring-secondary font-medium"
-                value={searchQuery}
-                onChange={(e) => handleFilterChange(setSearchQuery, e.target.value)}
-              />
-            </div>
-          </div>
         </div>
       </header>
 
+      {/* Hero banner */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="container py-8 md:py-12">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-red-500" />
+            <span className="text-xs font-semibold text-red-600 uppercase tracking-widest">Coach Steve's Hitters Lab</span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight mb-2">
+            Drills Directory
+          </h1>
+          <p className="text-slate-500 text-sm md:text-base mb-6 max-w-xl">
+            {allDrills.length} professional baseball drills. Filter by skill set, difficulty, age level, and more.
+          </p>
+          <div className="relative w-full md:max-w-xl">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+            <Input
+              type="text"
+              placeholder="Search drills by name..."
+              className="pl-10 h-11 bg-white border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus-visible:ring-red-500/30 focus-visible:border-red-300"
+              value={searchQuery}
+              onChange={(e) => handleFilterChange(setSearchQuery, e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
-      <main className="flex-1 container py-6 md:py-12">
+      <main className="flex-1 container py-6 md:py-8">
 
         {/* Filter Controls Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
             <Filter className="h-4 w-4" />
             Filters
             {activeFilterCount > 0 && (
-              <Badge className="bg-secondary text-secondary-foreground h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+              <span className="bg-red-600 text-white h-5 w-5 flex items-center justify-center text-xs rounded-full font-bold">
                 {activeFilterCount}
-              </Badge>
+              </span>
             )}
           </div>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="gap-1 text-muted-foreground hover:text-foreground">
-              <X className="h-3.5 w-3.5" />
-              Clear all
-            </Button>
+            <button onClick={clearAllFilters} className="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1">
+              <X className="h-3 w-3" />Clear all
+            </button>
           )}
         </div>
 
-        {/* Filters Panel - always visible */}
-        <div className="bg-card border rounded-xl p-5 md:p-6 shadow-sm mb-8 space-y-5">
+        {/* Filters Panel */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 shadow-sm mb-6 space-y-4">
 
             {/* Row 1: Difficulty, Skill Set, Age Level */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -421,10 +409,10 @@ export default function DrillsDirectory() {
                   href={`/drill/${drill.id}`}
                   className="group block h-full"
                 >
-                  <div className="bg-card border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col hover:border-secondary">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-slate-300 transition-all duration-200 h-full flex flex-col">
                     <div className="p-4 md:p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start gap-2 mb-3">
-                        <Badge className={`${getDifficultyColor(drill.difficulty)} text-white font-semibold text-xs`}>
+                        <Badge className={`${getDifficultyColor(drill.difficulty)} text-foreground font-semibold text-xs`}>
                           {drill.difficulty}
                         </Badge>
                         {drill.duration && (
@@ -433,14 +421,14 @@ export default function DrillsDirectory() {
                           </span>
                         )}
                       </div>
-                      <h3 className="text-base md:text-lg font-heading font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                      <h3 className="text-base md:text-lg font-bold mb-3 group-hover:text-red-600 transition-colors line-clamp-2 text-slate-900">
                         {drill.name}
                       </h3>
 
                       {/* Drill Type badge */}
                       {drill.drillType && (
                         <div className="mb-3">
-                          <Badge className={`${getDrillTypeColor(drill.drillType)} text-white text-xs font-medium`}>
+                          <Badge className={`${getDrillTypeColor(drill.drillType)} text-foreground text-xs font-medium`}>
                             {drill.drillType}
                           </Badge>
                         </div>
@@ -512,7 +500,7 @@ export default function DrillsDirectory() {
             )}
           </>
         ) : (
-          <div className="text-center py-20 bg-muted/30 rounded-xl border border-dashed">
+          <div className="text-center py-20 bg-white rounded-xl border border-dashed border-slate-200">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-2">No drills found</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">

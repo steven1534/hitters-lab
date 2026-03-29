@@ -158,9 +158,9 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
   }
 
   return (
-    <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl overflow-hidden">
+    <div className="bg-muted/40 border border-border rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/[0.06] bg-white/[0.02] flex items-center gap-2">
+      <div className="px-4 py-3 border-b border-border/60 bg-white/[0.02] flex items-center gap-2">
         <Video className="w-4 h-4 text-[#E8425A]" />
         <h4 className="font-semibold text-foreground text-sm">Submit Your Work</h4>
       </div>
@@ -175,7 +175,7 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
 
         {/* Progress Panel — shown during compression and upload */}
         {progress.phase !== "idle" && progress.phase !== "error" && isSubmitting && (
-          <div className="space-y-3 bg-white/[0.04] border border-white/[0.08] rounded-xl p-4">
+          <div className="space-y-3 bg-muted/40 border border-border rounded-xl p-4">
             {/* Phase indicator */}
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentPhaseConfig.bgColor}/20`}>
@@ -201,7 +201,7 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
             </div>
 
             {/* Progress bar */}
-            <div className="w-full bg-white/[0.06] rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-muted/60 rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ease-out ${currentPhaseConfig.bgColor} ${currentPhaseConfig.glowColor} shadow-lg`}
                 style={{ width: `${progress.percent}%` }}
@@ -245,7 +245,7 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
             {!videoFile ? (
               <label
                 htmlFor={`video-input-${assignmentId}`}
-                className="flex flex-col items-center justify-center gap-2 w-full px-4 py-6 border-2 border-dashed border-white/[0.12] rounded-xl cursor-pointer hover:bg-white/[0.04] hover:border-[#DC143C]/40 transition-all duration-200 active:scale-[0.98]"
+                className="flex flex-col items-center justify-center gap-2 w-full px-4 py-6 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/40 hover:border-[#DC143C]/40 transition-all duration-200 active:scale-[0.98]"
               >
                 <div className="w-12 h-12 bg-[#DC143C]/20 rounded-full flex items-center justify-center">
                   <Upload className="h-5 w-5 text-[#E8425A]" />
@@ -276,7 +276,7 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
                 )}
 
                 {/* File info + remove */}
-                <div className="flex items-center justify-between bg-white/[0.04] rounded-lg px-3 py-2">
+                <div className="flex items-center justify-between bg-muted/40 rounded-lg px-3 py-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <Video className="h-4 w-4 text-[#E8425A] shrink-0" />
                     <span className="text-xs text-foreground truncate">{videoFile.name}</span>
@@ -313,13 +313,13 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
         {(!isSubmitting || progress.phase === "idle") && (
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">
-              Notes <span className="text-white/30">(optional)</span>
+              Notes <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="How did it feel? Any questions for Coach?"
-              className="w-full h-16 bg-white/[0.04] border border-white/[0.08] rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-[#DC143C]/50 focus:border-[#DC143C]/30"
+              className="w-full h-16 bg-muted/40 border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-[#DC143C]/50 focus:border-[#DC143C]/30"
               disabled={isSubmitting}
               maxLength={500}
             />

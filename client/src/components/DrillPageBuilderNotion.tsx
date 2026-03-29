@@ -493,7 +493,7 @@ export function DrillPageBuilderNotion({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3 md:gap-4 min-w-0">
             <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-gradient-to-br from-[#DC143C] to-purple-500 flex items-center justify-center shrink-0">
-              <Edit3 className="h-5 w-5 md:h-6 md:w-6 text-white" />
+              <Edit3 className="h-5 w-5 md:h-6 md:w-6 text-foreground" />
             </div>
             <div className="min-w-0">
               <h1 className="text-lg md:text-2xl font-bold text-foreground flex items-center gap-2">
@@ -514,7 +514,7 @@ export function DrillPageBuilderNotion({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="hover:bg-white/10"
+              className="hover:bg-muted"
               aria-label="Close page builder"
             >
               <X className="h-5 w-5" />
@@ -536,7 +536,7 @@ export function DrillPageBuilderNotion({
                 }}
               >
                 <SelectTrigger
-                  className="w-[160px] md:w-[180px] bg-white/5 border-white/10 text-sm"
+                  className="w-[160px] md:w-[180px] bg-muted/50 border-border text-sm"
                   aria-label="Load a template"
                 >
                   <SelectValue placeholder="Load Template" />
@@ -577,13 +577,13 @@ export function DrillPageBuilderNotion({
             <div className="flex-1" />
 
             {/* Undo / Redo */}
-            <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={undo}
                 disabled={!canUndo}
-                className="h-8 w-8 p-0 hover:bg-white/10 disabled:opacity-30"
+                className="h-8 w-8 p-0 hover:bg-muted disabled:opacity-30"
                 aria-label="Undo"
                 title="Undo (Ctrl+Z)"
               >
@@ -594,7 +594,7 @@ export function DrillPageBuilderNotion({
                 size="sm"
                 onClick={redo}
                 disabled={!canRedo}
-                className="h-8 w-8 p-0 hover:bg-white/10 disabled:opacity-30"
+                className="h-8 w-8 p-0 hover:bg-muted disabled:opacity-30"
                 aria-label="Redo"
                 title="Redo (Ctrl+Shift+Z)"
               >
@@ -614,7 +614,7 @@ export function DrillPageBuilderNotion({
               className={
                 previewMode
                   ? "bg-[#DC143C]/20 border-[#DC143C] text-[#DC143C]"
-                  : "bg-white/5 border-white/10 hover:bg-white/10"
+                  : "bg-muted/50 border-border hover:bg-muted"
               }
               aria-label={previewMode ? "Switch to editing mode" : "Switch to preview mode"}
             >
@@ -630,7 +630,7 @@ export function DrillPageBuilderNotion({
               size="sm"
               onClick={() => setShowTemplateDialog(true)}
               disabled={blocks.length === 0}
-              className="bg-white/5 border-white/10 hover:bg-white/10 text-xs md:text-sm"
+              className="bg-muted/50 border-border hover:bg-muted text-xs md:text-sm"
             >
               <FileText className="h-3.5 w-3.5 mr-1.5" />
               Save Template
@@ -695,37 +695,37 @@ export function DrillPageBuilderNotion({
                 </p>
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-[10px]">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">
                       /
                     </kbd>{" "}
                     Block menu
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-[10px]">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">
                       #
                     </kbd>{" "}
                     Heading
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-[10px]">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">
                       -
                     </kbd>{" "}
                     Bullet list
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-[10px]">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">
                       1.
                     </kbd>{" "}
                     Numbered list
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-[10px]">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">
                       Ctrl+Z
                     </kbd>{" "}
                     Undo
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-[10px]">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">
                       Ctrl+S
                     </kbd>{" "}
                     Force save
@@ -745,31 +745,31 @@ export function DrillPageBuilderNotion({
 
         {/* Editor hints (shown when editing with content) */}
         {blocks.length > 0 && !previewMode && (
-          <div className="px-4 py-2.5 mb-4 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+          <div className="px-4 py-2.5 mb-4 rounded-lg bg-muted/30 border border-border/60">
             <p className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
               <Sparkles className="h-3.5 w-3.5 text-[#DC143C] shrink-0" />
               <span>
                 Type{" "}
-                <kbd className="px-1 py-0.5 bg-white/10 rounded text-[10px]">
+                <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
                   /
                 </kbd>{" "}
                 for commands
               </span>
-              <span className="text-white/20">|</span>
+              <span className="text-muted-foreground/40">|</span>
               <span>
-                <kbd className="px-1 py-0.5 bg-white/10 rounded text-[10px]">
+                <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
                   Ctrl+Z
                 </kbd>{" "}
                 Undo
               </span>
-              <span className="text-white/20">|</span>
+              <span className="text-muted-foreground/40">|</span>
               <span>
-                <kbd className="px-1 py-0.5 bg-white/10 rounded text-[10px]">
+                <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
                   Ctrl+S
                 </kbd>{" "}
                 Save
               </span>
-              <span className="text-white/20">|</span>
+              <span className="text-muted-foreground/40">|</span>
               <span className="text-[#DC143C]/70">
                 Autosave is on
               </span>
@@ -788,7 +788,7 @@ export function DrillPageBuilderNotion({
 
         {/* Template Save Dialog */}
         <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-          <DialogContent className="glass-card border-white/10">
+          <DialogContent className="glass-card border-border">
             <DialogHeader>
               <DialogTitle>Save as Template</DialogTitle>
               <DialogDescription>
@@ -804,7 +804,7 @@ export function DrillPageBuilderNotion({
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   placeholder="e.g., Video + Steps Layout"
-                  className="bg-white/5 border-white/10"
+                  className="bg-muted/50 border-border"
                 />
               </div>
               <div>
@@ -817,7 +817,7 @@ export function DrillPageBuilderNotion({
                   onChange={(e) => setTemplateDescription(e.target.value)}
                   placeholder="Describe when to use this template..."
                   rows={3}
-                  className="bg-white/5 border-white/10"
+                  className="bg-muted/50 border-border"
                 />
               </div>
             </div>

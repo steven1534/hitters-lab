@@ -99,13 +99,13 @@ function TBtn({ active, onClick, title, children }: { active?: boolean; onClick:
       type="button"
       onMouseDown={(e) => { e.preventDefault(); onClick(); }}
       title={title}
-      className={`flex items-center justify-center w-7 h-7 rounded transition-colors ${active ? "bg-electric/90 text-black" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+      className={`flex items-center justify-center w-7 h-7 rounded transition-colors ${active ? "bg-electric/90 text-black" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
     >
       {children}
     </button>
   );
 }
-function Sep() { return <div className="w-px h-5 bg-white/10 mx-0.5" />; }
+function Sep() { return <div className="w-px h-5 bg-muted mx-0.5" />; }
 
 function Toolbar({ editor }: { editor: any }) {
   if (!editor) return null;
@@ -114,7 +114,7 @@ function Toolbar({ editor }: { editor: any }) {
     if (url) editor.chain().focus().setLink({ href: url, target: "_blank" }).run();
   };
   return (
-    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-white/[0.08] bg-[#111111] rounded-t-xl sticky top-0 z-10">
+    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-border bg-[#111111] rounded-t-xl sticky top-0 z-10">
       <TBtn active={editor.isActive("heading",{level:1})} onClick={()=>editor.chain().focus().toggleHeading({level:1}).run()} title="H1"><Heading1 className="w-3.5 h-3.5"/></TBtn>
       <TBtn active={editor.isActive("heading",{level:2})} onClick={()=>editor.chain().focus().toggleHeading({level:2}).run()} title="H2"><Heading2 className="w-3.5 h-3.5"/></TBtn>
       <TBtn active={editor.isActive("heading",{level:3})} onClick={()=>editor.chain().focus().toggleHeading({level:3}).run()} title="H3"><Heading3 className="w-3.5 h-3.5"/></TBtn>
@@ -192,15 +192,15 @@ function NoteEditor({
       <style>{EDITOR_STYLES}</style>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
-          <button onClick={onCancel} className="text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/[0.06]">
+          <button onClick={onCancel} className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted/60">
             <ChevronLeft className="w-5 h-5"/>
           </button>
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-white">{isEdit ? "Edit Session Note" : "New Session Note"}</h2>
-            <p className="text-white/40 text-xs">{athleteName}</p>
+            <h2 className="text-lg font-bold text-foreground">{isEdit ? "Edit Session Note" : "New Session Note"}</h2>
+            <p className="text-muted-foreground text-xs">{athleteName}</p>
           </div>
           <div className="flex gap-2">
-            <button onClick={onCancel} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors text-sm">
+            <button onClick={onCancel} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors text-sm">
               <X className="w-3.5 h-3.5"/> Cancel
             </button>
             <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-electric text-black font-semibold text-sm hover:bg-electric/90 transition-colors disabled:opacity-50">
@@ -214,15 +214,15 @@ function NoteEditor({
           <input
             type="text" value={title} onChange={e => setTitle(e.target.value)}
             placeholder="Session note title…"
-            className="flex-1 bg-white/[0.04] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/25 text-sm focus:outline-none focus:border-electric/40 transition-colors"
+            className="flex-1 bg-muted/40 border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none focus:border-electric/40 transition-colors"
           />
-          <div className="flex items-center gap-2 bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2.5">
-            <Calendar className="w-4 h-4 text-white/30 shrink-0"/>
-            <input type="date" value={noteDate} onChange={e => setNoteDate(e.target.value)} className="bg-transparent text-white/80 text-sm focus:outline-none"/>
+          <div className="flex items-center gap-2 bg-muted/40 border border-border rounded-lg px-3 py-2.5">
+            <Calendar className="w-4 h-4 text-muted-foreground/60 shrink-0"/>
+            <input type="date" value={noteDate} onChange={e => setNoteDate(e.target.value)} className="bg-transparent text-foreground text-sm focus:outline-none"/>
           </div>
         </div>
 
-        <div className="sn-editor rounded-xl border border-white/[0.08] bg-[#0e0e0e] overflow-hidden shadow-xl">
+        <div className="sn-editor rounded-xl border border-border bg-[#0e0e0e] overflow-hidden shadow-xl">
           <Toolbar editor={editor}/>
           <EditorContent editor={editor}/>
         </div>
@@ -284,13 +284,13 @@ function NoteViewer({
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
-            <button onClick={onBack} className="text-white/40 hover:text-white transition-colors mt-0.5 p-1 rounded-lg hover:bg-white/[0.06]">
+            <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors mt-0.5 p-1 rounded-lg hover:bg-muted/60">
               <ChevronLeft className="w-5 h-5"/>
             </button>
             <div>
-              <h2 className="text-lg font-bold text-white leading-snug">{note.title}</h2>
+              <h2 className="text-lg font-bold text-foreground leading-snug">{note.title}</h2>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-white/35 text-xs">{athleteName} ·</span>
+                <span className="text-muted-foreground/70 text-xs">{athleteName} ·</span>
                 {editingDate ? (
                   <div className="flex items-center gap-1">
                     <input
@@ -299,7 +299,7 @@ function NoteViewer({
                       onChange={e => setDateValue(e.target.value)}
                       onKeyDown={e => { if (e.key === "Enter") handleSaveDate(dateValue); if (e.key === "Escape") setEditingDate(false); }}
                       autoFocus
-                      className="bg-white/[0.08] border border-electric/40 rounded px-2 py-0.5 text-white text-xs focus:outline-none focus:border-electric"
+                      className="bg-muted border border-electric/40 rounded px-2 py-0.5 text-foreground text-xs focus:outline-none focus:border-electric"
                     />
                     <button
                       onClick={() => handleSaveDate(dateValue)}
@@ -308,14 +308,14 @@ function NoteViewer({
                     >
                       <Check className="w-3 h-3" />
                     </button>
-                    <button onClick={() => setEditingDate(false)} className="p-1 rounded text-white/30 hover:text-white/60">
+                    <button onClick={() => setEditingDate(false)} className="p-1 rounded text-muted-foreground/60 hover:text-muted-foreground">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
                 ) : (
                   <button
                     onClick={() => setEditingDate(true)}
-                    className="flex items-center gap-1 text-white/35 text-xs hover:text-white/70 hover:bg-white/[0.05] px-1.5 py-0.5 rounded transition-colors group"
+                    className="flex items-center gap-1 text-muted-foreground/70 text-xs hover:text-foreground/80 hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors group"
                     title="Click to edit date"
                   >
                     <Calendar className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -326,17 +326,17 @@ function NoteViewer({
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
-            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
+            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground text-sm transition-colors">
               <Download className="w-3.5 h-3.5"/> Export PDF
             </button>
-            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
+            <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground text-sm transition-colors">
               <Edit3 className="w-3.5 h-3.5"/> Edit
             </button>
             {confirmDelete ? (
               <div className="flex gap-2 items-center">
-                <span className="text-white/40 text-sm">Delete?</span>
+                <span className="text-muted-foreground text-sm">Delete?</span>
                 <button onClick={onDelete} className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm transition-colors">Yes</button>
-                <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 rounded-lg bg-white/[0.05] text-white/40 text-sm transition-colors">No</button>
+                <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 rounded-lg bg-muted/50 text-muted-foreground text-sm transition-colors">No</button>
               </div>
             ) : (
               <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm transition-colors">
@@ -345,7 +345,7 @@ function NoteViewer({
             )}
           </div>
         </div>
-        <div className="sn-view rounded-xl border border-white/[0.08] bg-[#0e0e0e] px-12 py-10 shadow-xl"
+        <div className="sn-view rounded-xl border border-border bg-[#0e0e0e] px-12 py-10 shadow-xl"
           dangerouslySetInnerHTML={{ __html: note.content }}
         />
       </div>
@@ -366,8 +366,8 @@ function NoteList({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-bold text-white">{athleteName}</h3>
-          <p className="text-white/35 text-xs mt-0.5">{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
+          <h3 className="text-base font-bold text-foreground">{athleteName}</h3>
+          <p className="text-muted-foreground/70 text-xs mt-0.5">{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
         </div>
         <button onClick={onNew} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-electric text-black font-semibold text-sm hover:bg-electric/90 transition-colors">
           <Plus className="w-4 h-4"/> New Note
@@ -375,12 +375,12 @@ function NoteList({
       </div>
 
       {isLoading ? (
-        <div className="text-white/30 text-sm py-12 text-center">Loading…</div>
+        <div className="text-muted-foreground/60 text-sm py-12 text-center">Loading…</div>
       ) : notes.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-white/[0.08] rounded-xl">
-          <StickyNote className="w-10 h-10 text-white/15 mx-auto mb-3"/>
-          <p className="text-white/35 text-sm">No session notes yet for {athleteName}</p>
-          <button onClick={onNew} className="mt-4 px-4 py-2 rounded-lg bg-white/[0.05] hover:bg-white/10 text-white/60 text-sm transition-colors">
+        <div className="text-center py-16 border border-dashed border-border rounded-xl">
+          <StickyNote className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3"/>
+          <p className="text-muted-foreground/70 text-sm">No session notes yet for {athleteName}</p>
+          <button onClick={onNew} className="mt-4 px-4 py-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground text-sm transition-colors">
             Create First Note
           </button>
         </div>
@@ -388,7 +388,7 @@ function NoteList({
         <div className="flex flex-col gap-2">
           {(notes as any[]).map((n: any) => (
             <button key={n.id} onClick={() => onSelect(n)}
-              className="w-full text-left p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] hover:border-electric/25 hover:bg-white/[0.05] transition-all group"
+              className="w-full text-left p-4 rounded-xl bg-muted/20 border border-border/70 hover:border-electric/25 hover:bg-muted/50 transition-all group"
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -396,13 +396,13 @@ function NoteList({
                     <StickyNote className="w-4 h-4 text-electric"/>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-white/90 font-medium text-sm truncate">{n.title}</p>
-                    <p className="text-white/35 text-xs mt-0.5">
+                    <p className="text-foreground font-medium text-sm truncate">{n.title}</p>
+                    <p className="text-muted-foreground/70 text-xs mt-0.5">
                       {new Date(n.reportDate).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
                     </p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/40 shrink-0 transition-colors"/>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 transition-colors"/>
               </div>
             </button>
           ))}
@@ -452,13 +452,13 @@ export function SessionNotesTab() {
     <div className="flex gap-5 min-h-[600px]">
       {/* Sidebar */}
       <div className="w-52 shrink-0 flex flex-col gap-2">
-        <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-1 flex items-center gap-1.5 px-1">
+        <p className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-widest mb-1 flex items-center gap-1.5 px-1">
           <User className="w-3 h-3"/> Athletes
         </p>
         <input
           type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search…"
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-white placeholder:text-white/25 text-xs focus:outline-none focus:border-electric/30 transition-colors"
+          className="w-full bg-muted/40 border border-border rounded-lg px-3 py-1.5 text-foreground placeholder:text-muted-foreground/50 text-xs focus:outline-none focus:border-electric/30 transition-colors"
         />
         <div className="flex flex-col gap-0.5">
           {filtered.map((a: any) => {
@@ -468,7 +468,7 @@ export function SessionNotesTab() {
                 key={a.id}
                 onClick={() => setView({ type: "list", athleteId: a.id, athleteName: a.name })}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate ${
-                  isActive ? "bg-electric/15 text-electric border border-electric/20" : "text-white/55 hover:text-white/90 hover:bg-white/[0.05]"
+                  isActive ? "bg-electric/15 text-electric border border-electric/20" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 {a.name}
@@ -482,10 +482,10 @@ export function SessionNotesTab() {
       <div className="flex-1 min-w-0">
         {view.type === "select-athlete" && (
           <div className="flex flex-col items-center justify-center h-full py-24 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-4">
-              <StickyNote className="w-6 h-6 text-white/20"/>
+            <div className="w-14 h-14 rounded-2xl bg-muted/40 border border-border flex items-center justify-center mb-4">
+              <StickyNote className="w-6 h-6 text-muted-foreground/40"/>
             </div>
-            <p className="text-white/30 text-sm">Select an athlete to view or create session notes</p>
+            <p className="text-muted-foreground/60 text-sm">Select an athlete to view or create session notes</p>
           </div>
         )}
 

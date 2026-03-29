@@ -1411,7 +1411,7 @@ export default function DrillDetail() {
               <Lock className="h-8 w-8 text-[#DC143C]" />
             </div>
             <div>
-              <h2 className="text-2xl font-heading font-bold text-white mb-2">Free Preview Limit Reached</h2>
+              <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Free Preview Limit Reached</h2>
               <p className="text-white/50 text-sm leading-relaxed">
                 You've viewed your 2 free drills. Log in to access all 200+ professional training drills.
               </p>
