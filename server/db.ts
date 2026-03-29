@@ -52,7 +52,7 @@ export async function getDb() {
 
 export async function createUser(user: {
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   name: string;
   role?: string;
   isActiveClient?: number;
@@ -66,9 +66,13 @@ export async function createUser(user: {
   const normalizedEmail = user.email.toLowerCase().trim();
   const isOwner = normalizedEmail === ENV.ownerEmail.toLowerCase();
 
+  // Default password is player123 if none provided
+  const { hashPassword } = await import("./_core/auth");
+  const passwordHash = user.passwordHash || await hashPassword("player123");
+
   const result = await db.insert(users).values({
     email: normalizedEmail,
-    passwordHash: user.passwordHash,
+    passwordHash,
     name: user.name,
     role: (isOwner ? "admin" : (user.role as any)) ?? "athlete",
     isActiveClient: isOwner ? 1 : (user.isActiveClient ?? 1),
