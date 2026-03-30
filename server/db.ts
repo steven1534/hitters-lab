@@ -12,6 +12,7 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 // ── YouTube URL normalizer (server-side) ──────────────────────────────────────
 const YT_ID_RE = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/|e\/|watch\/|attribution_link\?(?:.*&)?u=(?:.*%3Fv%3D|.*\/watch%3Fv%3D)))([a-zA-Z0-9_-]{11})/i;
@@ -39,7 +40,12 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      const client = postgres(process.env.DATABASE_URL, { prepare: false });
+      const client = postgres(process.env.DATABASE_URL, {
+        prepare: false,
+        max: 3,              // hard cap — Supabase pooler has limited slots
+        idle_timeout: 20,    // release idle connections after 20s
+        connect_timeout: 10, // fail fast if can't connect
+      });
       _db = drizzle(client);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
@@ -53,7 +59,7 @@ export async function getDb() {
 
 export async function createUser(user: {
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   name: string;
   role?: string;
   isActiveClient?: number;
@@ -67,9 +73,12 @@ export async function createUser(user: {
   const normalizedEmail = user.email.toLowerCase().trim();
   const isOwner = normalizedEmail === ENV.ownerEmail.toLowerCase();
 
+  // Default password is player123 if none provided
+  const passwordHash = user.passwordHash || await bcrypt.hash("player123", 12);
+
   const result = await db.insert(users).values({
     email: normalizedEmail,
-    passwordHash: user.passwordHash,
+    passwordHash,
     name: user.name,
     role: (isOwner ? "admin" : (user.role as any)) ?? "athlete",
     isActiveClient: isOwner ? 1 : (user.isActiveClient ?? 1),

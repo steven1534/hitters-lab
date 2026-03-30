@@ -8,8 +8,8 @@ import { Resend } from "resend";
 let _resendBatch: any = null;
 function getResend() { if (!_resendBatch) { _resendBatch = new Resend(ENV.resendApiKey || "placeholder_not_configured"); } return _resendBatch; }
 
-// Batch window in milliseconds (5 minutes)
-const BATCH_WINDOW_MS = 5 * 60 * 1000;
+// Batch window in milliseconds (1 minute — near-instant delivery)
+const BATCH_WINDOW_MS = 1 * 60 * 1000;
 
 /**
  * Queue an activity alert for batched sending
@@ -127,7 +127,7 @@ export async function processPendingBatches(): Promise<number> {
       if (alerts.length === 1) {
         // Single activity - send regular email
         const alert = alerts[0];
-        const baseUrl = process.env.VITE_APP_URL || "https://coachstevemobilecoach.com";
+        const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
         
         await sendActivityAlertEmail({
           coachEmail,
@@ -205,7 +205,7 @@ async function sendBatchedActivityEmail(
       `;
     }).join('');
 
-    const baseUrl = process.env.VITE_APP_URL || "https://coachstevemobilecoach.com";
+    const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
     
     const emailHtml = `
 <!DOCTYPE html>
@@ -263,7 +263,7 @@ async function sendBatchedActivityEmail(
     `;
 
     const result = await getResend().emails.send({
-      from: "coach@coachstevemobilecoach.com",
+      from: "coach@coachstevebaseball.com",
       to: coachEmail,
       subject: `📊 ${athleteName} - ${activityCount} new activities`,
       html: emailHtml,

@@ -51,7 +51,7 @@ export async function assignDrill(
 
   // Send email notification
   if (email) {
-    const portalUrl = `https://coachstevemobilecoach.com/athlete-portal`;
+    const portalUrl = `https://app.coachstevebaseball.com/athlete-portal`;
     await sendDrillAssignmentEmail({
       athleteEmail: email,
       athleteName: name || "Athlete",

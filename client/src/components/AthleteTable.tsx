@@ -250,6 +250,25 @@ export function AthleteTable() {
     );
   }
 
+  const sendReminderMutation = trpc.drillAssignments.sendFollowUpReminder.useMutation();
+  const utils = trpc.useUtils();
+
+  // Active status toggle
+  const toggleActiveMutation = trpc.admin.toggleClientAccess.useMutation({
+    onSuccess: () => {
+      utils.admin.getAllUsers.invalidate();
+    },
+  });
+
+  const impersonateMutation = trpc.auth.impersonate.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+      await utils.auth.isImpersonating.invalidate();
+      window.location.href = "/athlete-portal";
+    },
+    onError: (err) => alert("Could not switch view: " + err.message),
+  });
+
   return (
     <div className="space-y-4">
       {/* Header with search and filters */}
@@ -389,23 +408,40 @@ export function AthleteTable() {
                         <span className="text-xs text-muted-foreground truncate block max-w-[200px]">{athlete.email || "—"}</span>
                       </td>
 
-                      {/* Status */}
+                      {/* Status — toggle for real users, badge for invites */}
                       <td className="px-3 py-3">
                         {athlete.type === "invite" ? (
                           <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-400 border-amber-500/20">
                             <UserPlus className="h-2.5 w-2.5 mr-1" />
                             Pending
                           </Badge>
-                        ) : athlete.isActiveClient ? (
-                          <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-400 border-green-500/20">
-                            <CheckCircle className="h-2.5 w-2.5 mr-1" />
-                            Active
-                          </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[10px] bg-muted/60 text-muted-foreground border-border">
-                            <AlertCircle className="h-2.5 w-2.5 mr-1" />
-                            Inactive
-                          </Badge>
+                          <button
+                            onClick={() => toggleActiveMutation.mutate({
+                              userId: athlete.numericId,
+                              isActive: !athlete.isActiveClient,
+                            })}
+                            disabled={toggleActiveMutation.isPending}
+                            className="flex items-center gap-2 group"
+                            title={athlete.isActiveClient ? "Click to deactivate" : "Click to activate"}
+                          >
+                            {/* Track */}
+                            <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${
+                              athlete.isActiveClient
+                                ? "bg-green-500"
+                                : "bg-white/[0.12]"
+                            } ${toggleActiveMutation.isPending ? "opacity-50" : ""}`}>
+                              {/* Thumb */}
+                              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                                athlete.isActiveClient ? "translate-x-4" : "translate-x-0.5"
+                              }`} />
+                            </div>
+                            <span className={`text-[10px] font-semibold ${
+                              athlete.isActiveClient ? "text-green-400" : "text-muted-foreground"
+                            }`}>
+                              {athlete.isActiveClient ? "Active" : "Inactive"}
+                            </span>
+                          </button>
                         )}
                       </td>
 

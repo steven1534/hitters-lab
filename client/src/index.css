@@ -139,6 +139,44 @@
   --input: oklch(0.90 0.005 0);
 }
 
+/* Coach Dashboard + Athlete Portal dark scope
+   Exact original Charcoal + Crimson palette — restored from pre-redesign.
+   Applied to .coach-dark wrapper so all sub-components get correct colors. */
+.coach-dark {
+  --primary:             oklch(0.14 0.005 0);
+  --primary-foreground:  oklch(0.98 0.005 0);
+  --secondary:           oklch(0.50 0.20 25);
+  --secondary-foreground:oklch(1 0 0);
+  --background:          oklch(0.13 0.005 0);
+  --foreground:          oklch(0.95 0.005 0);
+  --card:                oklch(0.19 0.005 0);
+  --card-foreground:     oklch(0.95 0.005 0);
+  --popover:             oklch(0.21 0.005 0);
+  --popover-foreground:  oklch(0.95 0.005 0);
+  --muted:               oklch(0.22 0.005 0);
+  --muted-foreground:    oklch(0.65 0.005 0);
+  --accent:              oklch(0.24 0.005 0);
+  --accent-foreground:   oklch(0.95 0.005 0);
+  --destructive:         oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border:              oklch(0.28 0.005 0);
+  --input:               oklch(0.22 0.005 0);
+  --ring:                oklch(0.50 0.20 25);
+  --electric:            oklch(0.50 0.20 25);
+  --electric-glow:       oklch(0.55 0.22 25);
+  --sidebar:             oklch(0.11 0.005 0);
+  --sidebar-foreground:  oklch(0.95 0.005 0);
+  --sidebar-primary:     oklch(0.50 0.20 25);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent:      oklch(0.19 0.005 0);
+  --sidebar-accent-foreground: oklch(0.95 0.005 0);
+  --sidebar-border:      oklch(0.25 0.005 0);
+  --sidebar-ring:        oklch(0.50 0.20 25);
+  color-scheme: dark;
+  color: oklch(0.95 0.005 0);
+  background: oklch(0.13 0.005 0);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -187,24 +225,25 @@
     }
   }
   
-  /* ===== CARD / SURFACE EFFECTS (light theme) ===== */
+  /* ===== CARD / SURFACE EFFECTS — uses CSS variables so .coach-dark overrides work ===== */
   .glass {
-    background: oklch(1 0 0 / 0.85);
+    background: var(--card);
     backdrop-filter: blur(12px) saturate(1.2);
     -webkit-backdrop-filter: blur(12px) saturate(1.2);
-    border: 1px solid oklch(0.88 0.004 250);
+    border: 1px solid var(--border);
   }
 
   .glass-card {
-    background: oklch(1 0 0);
-    border: 1px solid oklch(0.88 0.004 250);
+    background: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
     box-shadow:
-      0 1px 3px oklch(0 0 0 / 0.06),
-      0 4px 16px oklch(0 0 0 / 0.04);
+      0 1px 3px oklch(0 0 0 / 0.08),
+      0 4px 16px oklch(0 0 0 / 0.06);
   }
 
   .glass-subtle {
-    background: oklch(0.97 0.002 250 / 0.7);
+    background: var(--card);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }

@@ -137,7 +137,7 @@ export const appRouter = router({
             const emailResult = await sendEmail({
               athleteEmail: user.email,
               athleteName: user.name || 'Athlete',
-              portalUrl: 'https://coachstevemobilecoach.com/athlete-portal',
+              portalUrl: 'https://app.coachstevebaseball.com/athlete-portal',
             });
             if (emailResult.success) {
               await db.markWelcomeEmailSent(input.userId);
@@ -182,7 +182,7 @@ export const appRouter = router({
         const result = await sendEmail({
           athleteEmail: user.email,
           athleteName: user.name || 'Athlete',
-          portalUrl: 'https://coachstevemobilecoach.com/athlete-portal',
+          portalUrl: 'https://app.coachstevebaseball.com/athlete-portal',
         });
         if (result.success) {
           await db.markWelcomeEmailSent(input.userId);

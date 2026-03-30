@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
 
 interface SiteContentContextValue {
   get: (key: string, defaultValue?: string) => string;
@@ -19,16 +18,13 @@ const SiteContentContext = createContext<SiteContentContextValue>({
 });
 
 export function SiteContentProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
   const canEdit = false; // Inline editing disabled
 
   // Local cache: key → overridden value
   const [overrides, setOverrides] = useState<Record<string, string>>({});
 
-  // Load all site content on mount
-  const { data: siteContentList } = trpc.siteContent?.getAll
-    ? trpc.siteContent.getAll.useQuery(undefined, { staleTime: 60_000 })
-    : { data: undefined };
+  // Load all site content on mount — hooks must always be called unconditionally
+  const { data: siteContentList } = trpc.siteContent.getAll.useQuery(undefined, { staleTime: 60_000 });
 
   // Merge server data into overrides on load
   React.useEffect(() => {
@@ -43,9 +39,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     }
   }, [siteContentList]);
 
-  const setSiteContentMutation = trpc.siteContent?.update
-    ? trpc.siteContent.update.useMutation()
-    : null;
+  const setSiteContentMutation = trpc.siteContent.update.useMutation();
 
   const resetSiteContentMutation = trpc.siteContent.reset.useMutation();
 
@@ -60,7 +54,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     async (key: string, value: string) => {
       setOverrides((prev) => ({ ...prev, [key]: value }));
       try {
-        await setSiteContentMutation?.mutateAsync({ contentKey: key, value });
+        await setSiteContentMutation.mutateAsync({ contentKey: key, value });
       } catch (e) {
         console.error("Failed to persist site content:", e);
       }
@@ -76,7 +70,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
         return next;
       });
       try {
-        await resetSiteContentMutation?.mutateAsync({ contentKey: key });
+        await resetSiteContentMutation.mutateAsync({ contentKey: key });
       } catch (e) {
         console.error("Failed to reset site content:", e);
       }

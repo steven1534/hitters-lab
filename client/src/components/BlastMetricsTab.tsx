@@ -57,7 +57,13 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-export function BlastMetricsTab() {
+export function BlastMetricsTab({
+  onNavigateToNotes,
+  onNavigateToReports,
+}: {
+  onNavigateToNotes?: (userId: number) => void;
+  onNavigateToReports?: (userId: number) => void;
+} = {}) {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [sessionTypeFilter, setSessionTypeFilter] = useState("All");
   const [chartMetric1, setChartMetric1] = useState<MetricKey>("batSpeed");
@@ -78,7 +84,9 @@ export function BlastMetricsTab() {
   const [retroNotesOpen, setRetroNotesOpen] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
 
-  const { data: players = [], isLoading: playersLoading } = trpc.blastMetrics.listPlayers.useQuery();
+  const { data: players = [], isLoading: playersLoading } = trpc.blastMetrics.listPlayers.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000, // 5 min — avoid re-fetching the heavy GROUP BY JOIN on every tab visit
+  });
 
   const { data: player } = trpc.blastMetrics.getPlayer.useQuery(
     { playerId: selectedPlayerId! },
@@ -287,16 +295,19 @@ export function BlastMetricsTab() {
                       {p.fullName.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground group-hover:text-violet-600 transition-colors">
-                        {p.fullName}
+                      <h3 className="font-semibold text-white group-hover:text-violet-300 transition-colors">
+                        {p.portalName || p.fullName}
                       </h3>
-                      <p className="text-xs text-muted-foreground">
+                      {p.portalName && p.portalName !== p.fullName && (
+                        <p className="text-[10px] text-white/30">Blast: {p.fullName}</p>
+                      )}
+                      <p className="text-xs text-white/40">
                         {p.sessionCount} session{p.sessionCount !== 1 ? "s" : ""}
                       </p>
-                      {p.portalName && (
-                        <p className="text-xs text-green-400/70 mt-0.5 flex items-center gap-1">
+                      {p.userId && (
+                        <p className="text-[10px] text-green-400/70 mt-0.5 flex items-center gap-1">
                           <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400"></span>
-                          Linked: {p.portalEmail}
+                          ID: {p.userId} · {p.portalEmail || "Portal linked"}
                         </p>
                       )}
                     </div>
@@ -377,6 +388,28 @@ export function BlastMetricsTab() {
             >
               <FileText className="h-3.5 w-3.5 mr-1" />
               Sync Notes
+            </Button>
+          )}
+          {player?.userId && onNavigateToNotes && (
+            <Button
+              onClick={() => onNavigateToNotes(player.userId!)}
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
+            >
+              <FileText className="h-3.5 w-3.5 mr-1" />
+              Session Notes
+            </Button>
+          )}
+          {player?.userId && onNavigateToReports && (
+            <Button
+              onClick={() => onNavigateToReports(player.userId!)}
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs text-purple-400 border-purple-500/30 hover:bg-purple-500/10"
+            >
+              <FileText className="h-3.5 w-3.5 mr-1" />
+              Player Reports
             </Button>
           )}
           <Button

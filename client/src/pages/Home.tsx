@@ -65,15 +65,18 @@ export default function Home() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingDrill, setEditingDrill] = useState<Drill | null>(null);
 
-  const { data: drillCustomizations = [], refetch: refetchCustomizations } = trpc.drillCustomizations.getAll.useQuery();
+  const { data: drillCustomizations = [], refetch: refetchCustomizations } = trpc.drillCustomizations.getAll.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000, // 5 minutes — don't refetch on every page visit
+  });
   const customizationsMap = useMemo(() => {
     const map = new Map<string, typeof drillCustomizations[0]>();
     drillCustomizations.forEach((c) => map.set(c.drillId, c));
     return map;
   }, [drillCustomizations]);
 
-  // Fetch all drill videos to use YouTube thumbnails on first load
-  const { data: allVideos = [] } = trpc.videos.getAllVideos.useQuery();
+  const { data: allVideos = [] } = trpc.drillVideos.getAllVideos.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
   const videosMap = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v: any) => {

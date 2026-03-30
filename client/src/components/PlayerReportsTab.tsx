@@ -564,12 +564,20 @@ type View =
   | { type: "view"; athleteId: number; athleteName: string; report: any }
   | { type: "edit"; athleteId: number; athleteName: string; report: any };
 
-export function PlayerReportsTab() {
+export function PlayerReportsTab({ initialAthleteId, blastUserIds: blastUserIdsProp }: { initialAthleteId?: number; blastUserIds?: Set<number> } = {}) {
+  const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
+  const athletes = (allUsers as any[]).filter((u: any) => u.role === "athlete");
+
   const [view, setView] = useState<View>({ type: "select-athlete" });
   const [athleteSearch, setAthleteSearch] = useState("");
 
-  const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
-  const athletes = (allUsers as any[]).filter((u: any) => u.role === "athlete");
+  // Auto-select athlete once data loads (navigated from Blast Metrics)
+  useEffect(() => {
+    if (initialAthleteId && athletes.length > 0) {
+      const a = athletes.find((u: any) => u.id === initialAthleteId);
+      if (a) setView({ type: "list", athleteId: a.id, athleteName: a.name });
+    }
+  }, [initialAthleteId, athletes.length]);
   const utils = trpc.useUtils();
 
   const deleteMutation = trpc.playerReports.delete.useMutation({
@@ -580,6 +588,9 @@ export function PlayerReportsTab() {
       }
     },
   });
+
+  // Blast badge — use prop if provided (from CoachDashboard), else empty set
+  const blastUserIds = blastUserIdsProp ?? new Set<number>();
 
   const filteredAthletes = athletes.filter((a: any) =>
     a.name?.toLowerCase().includes(athleteSearch.toLowerCase())
@@ -612,17 +623,21 @@ export function PlayerReportsTab() {
         <div className="flex flex-col gap-0.5">
           {filteredAthletes.map((a: any) => {
             const isActive = activeAthleteId === a.id;
+            const hasBlast = blastUserIds.has(a.id);
             return (
               <button
                 key={a.id}
                 onClick={() => setView({ type: "list", athleteId: a.id, athleteName: a.name })}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate ${
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between gap-1 ${
                   isActive
                     ? "bg-electric/15 text-electric border border-electric/20"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
-                {a.name}
+                <span className="truncate">{a.name}</span>
+                {hasBlast && (
+                  <span title="Has Blast Motion data" className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
+                )}
               </button>
             );
           })}
