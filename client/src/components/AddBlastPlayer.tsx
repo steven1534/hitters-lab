@@ -70,20 +70,20 @@ export function AddBlastPlayer({ open, onOpenChange }: AddBlastPlayerProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-violet-400" />
             Add Blast Player
           </DialogTitle>
-          <DialogDescription className="text-white/50">
+          <DialogDescription className="text-muted-foreground">
             Add a new player to track their Blast Motion swing metrics.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label className="text-white/70 text-sm">Player Full Name *</Label>
+            <Label className="text-foreground/80 text-sm">Player Full Name *</Label>
             <Input
               placeholder="e.g., Sean Jaeger"
               value={fullName}
@@ -91,19 +91,19 @@ export function AddBlastPlayer({ open, onOpenChange }: AddBlastPlayerProps) {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && fullName.trim()) handleSubmit();
               }}
-              className="bg-white/[0.06] border-white/[0.1] text-white"
+              className="bg-muted/60 border-border text-foreground"
               autoFocus
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white/70 text-sm flex items-center gap-1.5">
+            <Label className="text-foreground/80 text-sm flex items-center gap-1.5">
               <Link2 className="h-3.5 w-3.5 text-[#DC143C]" />
               Link to Portal Account
-              <span className="text-white/30 font-normal">(optional)</span>
+              <span className="text-muted-foreground/60 font-normal">(optional)</span>
             </Label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-              <SelectTrigger className="bg-white/[0.06] border-white/[0.1] text-white">
+              <SelectTrigger className="bg-muted/60 border-border text-foreground">
                 <SelectValue placeholder="No portal link" />
               </SelectTrigger>
               <SelectContent>
@@ -115,7 +115,7 @@ export function AddBlastPlayer({ open, onOpenChange }: AddBlastPlayerProps) {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-white/30 italic">
+            <p className="text-xs text-muted-foreground/60 italic">
               Linking to a portal account enables auto-creating session notes when adding Blast sessions.
             </p>
           </div>
@@ -125,7 +125,7 @@ export function AddBlastPlayer({ open, onOpenChange }: AddBlastPlayerProps) {
           <Button
             variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
           >
             Cancel
           </Button>

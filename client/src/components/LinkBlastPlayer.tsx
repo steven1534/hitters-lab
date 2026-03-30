@@ -97,14 +97,14 @@ export function LinkBlastPlayer({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-border text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Link2 className="h-5 w-5 text-[#DC143C]" />
             Link Player Account
           </DialogTitle>
-          <DialogDescription className="text-white/50">
-            Link <span className="text-white/80 font-medium">{playerName}</span> to a portal user account to enable session note integration.
+          <DialogDescription className="text-muted-foreground">
+            Link <span className="text-foreground font-medium">{playerName}</span> to a portal user account to enable session note integration.
           </DialogDescription>
         </DialogHeader>
 
@@ -117,7 +117,7 @@ export function LinkBlastPlayer({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-green-300">Currently linked</p>
-                <p className="text-xs text-white/50">
+                <p className="text-xs text-muted-foreground">
                   {currentPortalName || "Unknown"}{currentPortalEmail ? ` (${currentPortalEmail})` : ""}
                 </p>
               </div>
@@ -134,11 +134,11 @@ export function LinkBlastPlayer({
           )}
 
           <div className="space-y-2">
-            <label className="text-white/70 text-sm font-medium block">
+            <label className="text-foreground/80 text-sm font-medium block">
               {currentUserId ? "Change linked account" : "Select portal user"}
             </label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-              <SelectTrigger className="bg-white/[0.06] border-white/[0.1] text-white">
+              <SelectTrigger className="bg-muted/60 border-border text-foreground">
                 <SelectValue placeholder="Select a portal user..." />
               </SelectTrigger>
               <SelectContent>
@@ -151,7 +151,7 @@ export function LinkBlastPlayer({
             </Select>
           </div>
 
-          <p className="text-xs text-white/30 italic">
+          <p className="text-xs text-muted-foreground/60 italic">
             When linked, adding a Blast session will automatically create a session note for this athlete.
           </p>
         </div>
@@ -160,7 +160,7 @@ export function LinkBlastPlayer({
           <Button
             variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
           >
             Cancel
           </Button>

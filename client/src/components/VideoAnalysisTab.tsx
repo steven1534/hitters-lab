@@ -90,7 +90,7 @@ export function VideoAnalysisTab() {
   const [statusFilter, setStatusFilter] = useState<AnalysisStatus | "all">("all");
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisRecord | null>(null);
   const [editedFeedback, setEditedFeedback] = useState("");
-  const [ setCoachNotes] = useState("");
+  const [, setCoachNotes] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState("");
 
@@ -205,6 +205,7 @@ export function VideoAnalysisTab() {
   if (selectedAnalysis) {
     const statusCfg = STATUS_CONFIG[selectedAnalysis.status];
     const StatusIcon = statusCfg.icon;
+    const aiFeedback = parseAiFeedback(selectedAnalysis);
 
     return (
       <div className="space-y-6">
@@ -335,15 +336,15 @@ export function VideoAnalysisTab() {
         )}
 
         {/* AI Feedback (structured view) */}
-        {parseAiFeedback(selectedAnalysis) && (
+        {aiFeedback && (
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Sparkles className="h-5 w-5 text-purple-400" />
                 AI Analysis
-                {parseAiFeedback(selectedAnalysis).confidenceScore > 0 && (
+                {aiFeedback.confidenceScore > 0 && (
                   <Badge variant="outline" className="ml-auto text-xs">
-                    Confidence: {parseAiFeedback(selectedAnalysis).confidenceScore}%
+                    Confidence: {aiFeedback.confidenceScore}%
                   </Badge>
                 )}
               </CardTitle>
@@ -352,14 +353,14 @@ export function VideoAnalysisTab() {
               {/* Overall Assessment */}
               <div>
                 <h4 className="font-semibold text-foreground mb-2">Overall Assessment</h4>
-                <p className="text-muted-foreground leading-relaxed">{parseAiFeedback(selectedAnalysis).overallAssessment}</p>
+                <p className="text-muted-foreground leading-relaxed">{aiFeedback.overallAssessment}</p>
               </div>
 
               {/* Mechanics Breakdown */}
               <div>
                 <h4 className="font-semibold text-foreground mb-3">Mechanics Breakdown</h4>
                 <div className="grid gap-3">
-                  {parseAiFeedback(selectedAnalysis).mechanicsBreakdown.map((phase, i) => (
+                  {aiFeedback.mechanicsBreakdown.map((phase, i) => (
                     <div key={i} className="bg-muted/30 rounded-lg p-4 border border-border/50">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-foreground">{phase.phase}</span>
@@ -379,11 +380,11 @@ export function VideoAnalysisTab() {
               </div>
 
               {/* Strengths */}
-              {parseAiFeedback(selectedAnalysis).strengths.length > 0 && (
+              {aiFeedback.strengths.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-green-400 mb-2">Strengths</h4>
                   <ul className="space-y-1.5">
-                    {parseAiFeedback(selectedAnalysis).strengths.map((s, i) => (
+                    {aiFeedback.strengths.map((s, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <CheckCircle className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
                         {s}
@@ -394,11 +395,11 @@ export function VideoAnalysisTab() {
               )}
 
               {/* Areas for Improvement */}
-              {parseAiFeedback(selectedAnalysis).areasForImprovement.length > 0 && (
+              {aiFeedback.areasForImprovement.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-amber-400 mb-2">Areas for Improvement</h4>
                   <ul className="space-y-1.5">
-                    {parseAiFeedback(selectedAnalysis).areasForImprovement.map((a, i) => (
+                    {aiFeedback.areasForImprovement.map((a, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <ArrowRight className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                         {a}
@@ -409,11 +410,11 @@ export function VideoAnalysisTab() {
               )}
 
               {/* Drill Recommendations */}
-              {parseAiFeedback(selectedAnalysis).drillRecommendations.length > 0 && (
+              {aiFeedback.drillRecommendations.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-[#E8425A] mb-2">Recommended Drills</h4>
                   <div className="flex flex-wrap gap-2">
-                    {parseAiFeedback(selectedAnalysis).drillRecommendations.map((d, i) => (
+                    {aiFeedback.drillRecommendations.map((d, i) => (
                       <Badge key={i} variant="secondary" className="bg-[#DC143C]/10 text-[#E8425A] border-[#DC143C]/20">
                         {d}
                       </Badge>
@@ -423,11 +424,11 @@ export function VideoAnalysisTab() {
               )}
 
               {/* Coaching Cues */}
-              {parseAiFeedback(selectedAnalysis).coachingCues.length > 0 && (
+              {aiFeedback.coachingCues.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-purple-400 mb-2">Coaching Cues</h4>
                   <div className="flex flex-wrap gap-2">
-                    {parseAiFeedback(selectedAnalysis).coachingCues.map((c, i) => (
+                    {aiFeedback.coachingCues.map((c, i) => (
                       <Badge key={i} variant="outline" className="border-purple-500/30 text-purple-400">
                         &ldquo;{c}&rdquo;
                       </Badge>
@@ -437,7 +438,8 @@ export function VideoAnalysisTab() {
               )}
             </CardContent>
           </Card>
-        )}
+          );
+        })()}
 
         {/* Editable Feedback */}
         {(selectedAnalysis.status === "complete") && (
@@ -640,7 +642,7 @@ export function VideoAnalysisTab() {
                         <div className="h-full w-full bg-muted" />
                       )}
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                        <Play className="h-6 w-6 text-white" />
+                        <Play className="h-6 w-6 text-foreground" />
                       </div>
                     </div>
 

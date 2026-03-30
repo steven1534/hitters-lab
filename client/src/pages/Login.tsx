@@ -53,15 +53,15 @@ export default function Login() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-red-600 to-red-800 flex-col justify-between p-12">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-            <Target className="w-5 h-5 text-white" />
+            <Target className="w-5 h-5 text-foreground" />
           </div>
-          <span className="font-bold text-white text-lg">Hitters Lab</span>
+          <span className="font-bold text-foreground text-lg">Hitters Lab</span>
         </div>
         <div>
           <blockquote className="text-white/90 text-2xl font-bold leading-snug mb-4">
             "Elite mechanics start with<br />deliberate practice."
           </blockquote>
-          <p className="text-white/60 text-sm">Coach Steve Baseball — Player Development Platform</p>
+          <p className="text-muted-foreground text-sm">Coach Steve Baseball — Player Development Platform</p>
         </div>
         <div className="grid grid-cols-3 gap-4">
           {[
@@ -69,9 +69,9 @@ export default function Login() {
             { n: "8",    l: "Categories" },
             { n: "3",    l: "Skill Levels" },
           ].map(s => (
-            <div key={s.l} className="bg-white/10 rounded-xl p-4 text-center">
-              <div className="text-2xl font-black text-white">{s.n}</div>
-              <div className="text-xs text-white/60 mt-0.5">{s.l}</div>
+            <div key={s.l} className="bg-muted rounded-xl p-4 text-center">
+              <div className="text-2xl font-black text-foreground">{s.n}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{s.l}</div>
             </div>
           ))}
         </div>
@@ -83,7 +83,7 @@ export default function Login() {
           {/* Mobile logo */}
           <div className="flex items-center gap-2.5 mb-8 lg:hidden">
             <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-              <Target className="w-4 h-4 text-white" />
+              <Target className="w-4 h-4 text-foreground" />
             </div>
             <span className="font-bold text-slate-900">Coach Steve's Hitters Lab</span>
           </div>

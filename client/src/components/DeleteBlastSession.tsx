@@ -54,25 +54,25 @@ export function DeleteBlastSession({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-white/10 text-white">
+      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-border text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-400" />
             Delete Session
           </DialogTitle>
-          <DialogDescription className="text-white/50">
+          <DialogDescription className="text-muted-foreground">
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-            <p className="text-white/80 text-sm">
-              Are you sure you want to delete the <span className="font-semibold text-white">{sessionType}</span> session
-              from <span className="font-semibold text-white">{sessionDate}</span> for{" "}
-              <span className="font-semibold text-white">{playerName}</span>?
+            <p className="text-foreground text-sm">
+              Are you sure you want to delete the <span className="font-semibold text-foreground">{sessionType}</span> session
+              from <span className="font-semibold text-foreground">{sessionDate}</span> for{" "}
+              <span className="font-semibold text-foreground">{playerName}</span>?
             </p>
-            <p className="text-white/50 text-xs mt-2">
+            <p className="text-muted-foreground text-xs mt-2">
               All metrics data for this session will be permanently removed.
             </p>
           </div>
@@ -82,7 +82,7 @@ export function DeleteBlastSession({
           <Button
             variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
           >
             Cancel
           </Button>

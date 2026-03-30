@@ -40,12 +40,11 @@ export const submissionsRouter = router({
 
               if (latestSubmission) {
                 await database.insert(videoAnalysis).values({
-                  submissionId: latestSubmission.id,
                   athleteId: ctx.user.id,
                   drillId: input.drillId,
                   videoUrl: input.videoUrl,
                   status: "pending",
-                });
+                } as any);
                 console.log(`[VideoAnalysis] Auto-created pending analysis for submission ${latestSubmission.id}`);
               }
             }

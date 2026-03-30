@@ -8,6 +8,7 @@ import {
   InsertUser, users, notifications, notificationPreferences,
   InsertNotificationPreference, invites, drillVideos, drillDetails,
   drillSubmissions, coachFeedback, customDrills,
+  drillQuestions, drillAnswers, parentChildren,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc } from "drizzle-orm";
@@ -94,6 +95,40 @@ export async function getUserByEmail(email: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
   return result[0] ?? undefined;
+}
+
+export async function getUserByOpenId(openId: string) {
+  // This app uses email-based auth; treat openId as email for SDK compatibility
+  return getUserByEmail(openId);
+}
+
+export async function upsertUser(user: {
+  openId: string;
+  name: string | null;
+  email: string | null;
+  loginMethod: string | null;
+  lastSignedIn: Date;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  const emailKey = (user.email || user.openId).toLowerCase();
+  const existing = await db.select().from(users).where(eq(users.email, emailKey)).limit(1);
+  if (existing[0]) {
+    await db.update(users).set({
+      name: user.name ?? existing[0].name,
+      loginMethod: user.loginMethod ?? existing[0].loginMethod,
+      lastSignedIn: user.lastSignedIn,
+    }).where(eq(users.email, emailKey));
+  } else {
+    await db.insert(users).values({
+      email: emailKey,
+      name: user.name ?? "",
+      passwordHash: "",
+      loginMethod: user.loginMethod ?? "oauth",
+      lastSignedIn: user.lastSignedIn,
+      role: "athlete",
+    });
+  }
 }
 
 export async function getUserById(userId: number) {
@@ -619,6 +654,223 @@ export async function getCustomDrills() {
   }
 }
 
+export async function deleteNotification(notificationId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(notifications).where(eq(notifications.id, notificationId));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export async function createOrUpdateNotificationPreferences(userId: number, prefs: Partial<InsertNotificationPreference>) {
+  return upsertNotificationPreferences(userId, prefs);
+}
+
+export async function updateDrillSubmission(submissionId: number, data: { notes?: string; videoUrl?: string }) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    const updateData: Record<string, any> = {};
+    if (data.notes !== undefined) updateData.notes = data.notes;
+    if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
+    await db.update(drillSubmissions).set(updateData).where(eq(drillSubmissions.id, submissionId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update drill submission:", error);
+    return false;
+  }
+}
+
+export async function deleteDrillSubmission(submissionId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(drillSubmissions).where(eq(drillSubmissions.id, submissionId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete drill submission:", error);
+    return false;
+  }
+}
+
+export async function updateCoachFeedback(feedbackId: number, feedbackText: string) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.update(coachFeedback).set({ feedback: feedbackText }).where(eq(coachFeedback.id, feedbackId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update coach feedback:", error);
+    return false;
+  }
+}
+
+export async function deleteCoachFeedback(feedbackId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(coachFeedback).where(eq(coachFeedback.id, feedbackId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete coach feedback:", error);
+    return false;
+  }
+}
+
+export async function bulkImportDrillDescriptions(drillsData: { drillName: string; description: string }[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  let imported = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+  for (const item of drillsData) {
+    try {
+      const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, item.drillName));
+      if (existing.length > 0) {
+        await db.update(drillDetails).set({ description: [item.description], updatedAt: new Date() }).where(eq(drillDetails.drillId, item.drillName));
+      } else {
+        await db.insert(drillDetails).values({
+          drillId: item.drillName,
+          description: [item.description],
+          skillSet: "Custom", difficulty: "Medium", athletes: "Varies",
+          time: "Varies", equipment: "Varies", goal: "",
+          createdBy: 0,
+        });
+      }
+      imported++;
+    } catch (e: any) {
+      skipped++;
+      errors.push(`${item.drillName}: ${e.message}`);
+    }
+  }
+  return { imported, skipped, errors };
+}
+
+export async function bulkImportDrillGoals(goalsData: { drillName: string; goal: string }[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  let imported = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+  for (const item of goalsData) {
+    try {
+      const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, item.drillName));
+      if (existing.length > 0) {
+        await db.update(drillDetails).set({ goal: item.goal, updatedAt: new Date() }).where(eq(drillDetails.drillId, item.drillName));
+      } else {
+        await db.insert(drillDetails).values({
+          drillId: item.drillName,
+          goal: item.goal,
+          description: [],
+          skillSet: "Custom", difficulty: "Medium", athletes: "Varies",
+          time: "Varies", equipment: "Varies",
+          createdBy: 0,
+        });
+      }
+      imported++;
+    } catch (e: any) {
+      skipped++;
+      errors.push(`${item.drillName}: ${e.message}`);
+    }
+  }
+  return { imported, skipped, errors };
+}
+
+export async function updateDrillGoal(drillId: string, goal: string, userId: number = 0): Promise<boolean> {
+  return saveDrillGoal(drillId, goal, userId);
+}
+
+export async function updateDrillInstructions(drillId: string, instructions: string, userId: number = 0): Promise<boolean> {
+  return saveDrillInstructions(drillId, instructions, userId);
+}
+
+export async function linkChildToParent(childUserId: number, parentUserId: number): Promise<boolean> {
+  // Stub: parent-child linking not yet implemented in schema
+  console.warn("[Database] linkChildToParent not yet implemented");
+  return false;
+}
+
+export async function getChildrenByParent(parentUserId: number): Promise<any[]> {
+  // Stub: parent-child lookup not yet implemented in schema
+  console.warn("[Database] getChildrenByParent not yet implemented");
+  return [];
+}
+
+export async function isParentOf(parentUserId: number, childUserId: number): Promise<boolean> {
+  // Stub: parent-child relationship not yet implemented in schema
+  console.warn("[Database] isParentOf not yet implemented");
+  return false;
+}
+
+// ── Q&A ──────────────────────────────────────────────────────
+
+export async function createDrillQuestion(data: { athleteId: number; drillId: string; question: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.insert(drillQuestions).values(data).returning({ id: drillQuestions.id });
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to create drill question:", error);
+    throw error;
+  }
+}
+
+export async function getDrillQuestions(drillId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillQuestions).where(eq(drillQuestions.drillId, drillId));
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function getAthleteQuestions(athleteId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillQuestions).where(eq(drillQuestions.athleteId, athleteId));
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function getAllQuestions() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillQuestions);
+  } catch (error) {
+    return [];
+  }
+}
+
+export async function createDrillAnswer(data: { questionId: number; coachId: number; answer: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.insert(drillAnswers).values(data).returning({ id: drillAnswers.id });
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to create drill answer:", error);
+    throw error;
+  }
+}
+
+export async function getAnswersByQuestion(questionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillAnswers).where(eq(drillAnswers.questionId, questionId));
+  } catch (error) {
+    return [];
+  }
+}
+
 export async function bulkImportCustomDrills(
   drills: { drillId: string; name: string; difficulty: string; category: string; duration: string; videoUrl?: string }[],
   createdBy: number
@@ -662,4 +914,234 @@ export async function bulkImportCustomDrills(
   }
 
   return { imported, skipped, errors };
+}
+
+// ── Notification aliases ──────────────────────────────────────────────────────
+
+export async function getUnreadNotifications(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(notifications)
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, 0)))
+      .orderBy(desc(notifications.createdAt));
+  } catch {
+    return [];
+  }
+}
+
+export async function markNotificationAsRead(notificationId: number) {
+  return markNotificationRead(notificationId);
+}
+
+export async function deleteNotification(notificationId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(notifications).where(eq(notifications.id, notificationId));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function createOrUpdateNotificationPreferences(
+  userId: number,
+  prefs: Partial<InsertNotificationPreference>
+) {
+  return upsertNotificationPreferences(userId, prefs);
+}
+
+// ── Q&A functions ─────────────────────────────────────────────────────────────
+
+export async function createDrillQuestion(data: { athleteId: number; drillId: string; question: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(drillQuestions).values(data).returning();
+  return result;
+}
+
+export async function getDrillQuestions(drillId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drillQuestions).where(eq(drillQuestions.drillId, drillId)).orderBy(desc(drillQuestions.createdAt));
+}
+
+export async function getAnswersByQuestion(questionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drillAnswers).where(eq(drillAnswers.questionId, questionId)).orderBy(desc(drillAnswers.createdAt));
+}
+
+export async function getAthleteQuestions(athleteId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drillQuestions).where(eq(drillQuestions.athleteId, athleteId)).orderBy(desc(drillQuestions.createdAt));
+}
+
+export async function getAllQuestions() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(drillQuestions).orderBy(desc(drillQuestions.createdAt));
+}
+
+export async function createDrillAnswer(data: { questionId: number; coachId: number; answer: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(drillAnswers).values(data).returning();
+  return result;
+}
+
+// ── Submission & feedback update/delete ──────────────────────────────────────
+
+export async function updateDrillSubmission(submissionId: number, data: { notes?: string; videoUrl?: string }) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.update(drillSubmissions).set({ ...data }).where(eq(drillSubmissions.id, submissionId));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function deleteDrillSubmission(submissionId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(drillSubmissions).where(eq(drillSubmissions.id, submissionId));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function updateCoachFeedback(feedbackId: number, feedback: string) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.update(coachFeedback).set({ feedback }).where(eq(coachFeedback.id, feedbackId));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function deleteCoachFeedback(feedbackId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.delete(coachFeedback).where(eq(coachFeedback.id, feedbackId));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ── Drill bulk import helpers ─────────────────────────────────────────────────
+
+export async function bulkImportDrillDescriptions(drillsData: { drillName: string; description: string }[]) {
+  const db = await getDb();
+  if (!db) return { success: 0, failed: 0, errors: [] as string[] };
+  let success = 0;
+  let failed = 0;
+  const errors: string[] = [];
+  for (const { drillName, description } of drillsData) {
+    try {
+      const descArray = [description];
+      const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, drillName)).limit(1);
+      if (existing.length > 0) {
+        await db.update(drillDetails).set({ description: descArray }).where(eq(drillDetails.drillId, drillName));
+      }
+      // Skip insert — drillDetails requires many required fields; only update existing
+      success++;
+    } catch (e: any) {
+      failed++;
+      errors.push(`${drillName}: ${e.message}`);
+    }
+  }
+  return { success, failed, errors };
+}
+
+export async function bulkImportDrillGoals(goalsData: { drillName: string; goal: string }[]) {
+  const db = await getDb();
+  if (!db) return { success: 0, failed: 0, errors: [] as string[] };
+  let success = 0;
+  let failed = 0;
+  const errors: string[] = [];
+  for (const { drillName, goal } of goalsData) {
+    try {
+      await saveDrillGoal(drillName, goal, 0);
+      success++;
+    } catch (e: any) {
+      failed++;
+      errors.push(`${drillName}: ${e.message}`);
+    }
+  }
+  return { success, failed, errors };
+}
+
+export async function updateDrillGoal(drillName: string, goal: string) {
+  return saveDrillGoal(drillName, goal, 0);
+}
+
+export async function updateDrillInstructions(drillName: string, instructions: string) {
+  return saveDrillInstructions(drillName, instructions, 0);
+}
+
+// ── Parent-Child Management ───────────────────────────────────────────────────
+
+export async function linkChildToParent(childId: number, parentId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.insert(parentChildren).values({ parentId, childId })
+      .onConflictDoNothing();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function getChildrenByParent(parentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db.select().from(parentChildren).where(eq(parentChildren.parentId, parentId));
+  if (rows.length === 0) return [];
+  const childIds = rows.map(r => r.childId);
+  const children = await db.select().from(users).where(eq(users.id, childIds[0]));
+  // Fetch all children
+  const result = [];
+  for (const childId of childIds) {
+    const [child] = await db.select().from(users).where(eq(users.id, childId)).limit(1);
+    if (child) result.push(child);
+  }
+  return result;
+}
+
+export async function isParentOf(parentId: number, childId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  const rows = await db.select().from(parentChildren)
+    .where(and(eq(parentChildren.parentId, parentId), eq(parentChildren.childId, childId)))
+    .limit(1);
+  return rows.length > 0;
+}
+
+// ── OAuth stubs (legacy — app uses email/password auth) ───────────────────────
+
+export async function getUserByOpenId(_openId: string): Promise<typeof users.$inferSelect | undefined> {
+  // Not used — app uses email/password auth, not OAuth
+  return undefined;
+}
+
+export async function upsertUser(data: {
+  openId?: string;
+  name?: string | null;
+  email?: string | null;
+  loginMethod?: string | null;
+  lastSignedIn?: Date;
+}) {
+  // Not used — app uses email/password auth, not OAuth
+  return undefined;
 }

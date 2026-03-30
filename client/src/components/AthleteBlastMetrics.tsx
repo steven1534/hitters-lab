@@ -111,7 +111,7 @@ export function AthleteBlastMetrics() {
               return (
                 <div
                   key={config.key}
-                  className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-2.5 text-center"
+                  className="bg-muted/30 border border-border/60 rounded-lg p-2.5 text-center"
                 >
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <Icon className={`h-3 w-3 ${config.color}`} />
@@ -123,7 +123,7 @@ export function AthleteBlastMetrics() {
                   </p>
                   <p className="text-[9px] text-muted-foreground uppercase tracking-wider mt-0.5">
                     {config.label}
-                    {config.unit && <span className="ml-0.5 text-white/20">{config.unit}</span>}
+                    {config.unit && <span className="ml-0.5 text-muted-foreground/40">{config.unit}</span>}
                   </p>
                 </div>
               );
@@ -193,7 +193,7 @@ export function AthleteBlastMetrics() {
                             <p className={`text-sm font-semibold ${config.color}`}>
                               {config.isScore ? val : parseFloat(val).toFixed(1)}
                               {config.unit && (
-                                <span className="text-[10px] text-white/30 ml-0.5">{config.unit}</span>
+                                <span className="text-[10px] text-muted-foreground/60 ml-0.5">{config.unit}</span>
                               )}
                             </p>
                           </div>

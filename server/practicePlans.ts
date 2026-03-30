@@ -88,7 +88,7 @@ export async function createPlan(input: CreatePlanInput) {
     status: input.status ?? "draft",
     isShared: input.isShared ? 1 : 0,
     isTemplate: input.isTemplate ? 1 : 0,
-  }).$returningId();
+  }).returning({ id: practicePlans.id });
 
   if (input.blocks.length > 0) {
     await db.insert(practicePlanBlocks).values(

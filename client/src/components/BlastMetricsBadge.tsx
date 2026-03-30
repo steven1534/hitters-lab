@@ -42,9 +42,9 @@ export function BlastMetricsBadge({ blastSessionId }: BlastMetricsBadgeProps) {
           return (
             <span key={m.label} className="flex items-center gap-1 text-xs">
               <Icon className={`h-3 w-3 ${m.color}`} />
-              <span className="text-white/50">{m.label}:</span>
+              <span className="text-muted-foreground">{m.label}:</span>
               <span className={`font-medium ${m.color}`}>
-                {displayVal}{m.unit && <span className="text-white/30 ml-0.5">{m.unit}</span>}
+                {displayVal}{m.unit && <span className="text-muted-foreground/60 ml-0.5">{m.unit}</span>}
               </span>
             </span>
           );

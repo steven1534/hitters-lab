@@ -57,11 +57,12 @@
 }
 
 :root {
-  /* Coach Steve Baseball — Clean Light Theme */
-  --primary: oklch(0.13 0.005 0);          /* near-black text */
-  --primary-foreground: oklch(1 0 0);       /* white */
-
-  --secondary: oklch(0.48 0.20 25);         /* crimson red */
+  color-scheme: dark;
+  /* Coach Steve Baseball — Charcoal + Crimson Palette */
+  --primary: oklch(0.14 0.005 0);
+  --primary-foreground: oklch(0.98 0.005 0);
+  
+  --secondary: oklch(0.50 0.20 25);
   --secondary-foreground: oklch(1 0 0);
 
   --background: oklch(0.97 0.002 250);      /* off-white slate-50 */

@@ -92,7 +92,7 @@ export default function CoachMessaging() {
 
   // Get unique drills
   const uniqueDrills = useMemo(() => {
-    const drillSet = new Set(allQuestions.map((q: any) => q.drillId));
+    const drillSet = new Set<string>(allQuestions.map((q: any) => q.drillId as string));
     return Array.from(drillSet);
   }, [allQuestions]);
 
@@ -212,7 +212,7 @@ export default function CoachMessaging() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Drills</SelectItem>
-                      {uniqueDrills.map((drillId: string) => (
+                      {(uniqueDrills as string[]).map((drillId) => (
                         <SelectItem key={drillId} value={drillId}>
                           {drillId}
                         </SelectItem>

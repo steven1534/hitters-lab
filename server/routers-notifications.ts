@@ -5,7 +5,8 @@ import * as db from "./db";
 export const notificationsRouter = router({
   getUnread: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user) return [];
-    return await db.getUnreadNotifications(ctx.user.id);
+    const all = await db.getNotificationsByUser(ctx.user.id);
+    return all.filter((n: any) => !n.isRead);
   }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -16,7 +17,7 @@ export const notificationsRouter = router({
   markAsRead: protectedProcedure
     .input(z.object({ notificationId: z.number() }))
     .mutation(async ({ input }) => {
-      const success = await db.markNotificationAsRead(input.notificationId);
+      const success = await db.markNotificationRead(input.notificationId);
       return { success };
     }),
 
@@ -46,7 +47,7 @@ export const notificationsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user) return null;
-      return await db.createOrUpdateNotificationPreferences(ctx.user.id, input);
+      return await db.upsertNotificationPreferences(ctx.user.id, input);
     }),
 
   getUnreadCount: protectedProcedure.query(async ({ ctx }) => {

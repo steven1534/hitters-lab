@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isValidVideoUrl } from '@/lib/youtubeUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +21,7 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
 
   const validateVideoUrl = (url: string): boolean => {
     if (!url) return true; // Empty is valid
-    return isValidVideoUrl(url);
+    return /youtu\.be|youtube\.com|vimeo\.com/i.test(url);
   };
 
   const handleSave = () => {

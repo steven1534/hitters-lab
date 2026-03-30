@@ -120,7 +120,7 @@ export default function Home() {
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm max-w-md w-full p-10 text-center">
           <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-600/20">
-            <Target className="h-7 w-7 text-white" />
+            <Target className="h-7 w-7 text-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Coach Steve's<br/>Hitters Lab</h1>
           <p className="text-slate-500 text-sm leading-relaxed mb-8">
@@ -141,15 +141,38 @@ export default function Home() {
   const handleDrillClick = () => saveScrollPosition(currentQuery || '__default__');
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-
-      {/* ── Header / Nav ── */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center shadow-sm shadow-red-600/30">
-              <Target className="h-4 w-4 text-white" />
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* ===== HERO SECTION ===== */}
+      <header ref={heroRef} className="relative overflow-hidden">
+        {/* Layered background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 gradient-hero" />
+          <div className="absolute inset-0 gradient-mesh opacity-60" />
+          <div className="absolute inset-0 gradient-glow" />
+        </div>
+        
+        {/* Floating ambient orbs */}
+        <div 
+          className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-electric/8 rounded-full blur-[100px] animate-float"
+          style={{ transform: `translateY(${scrollY * -0.08}px)` }}
+        />
+        <div 
+          className="absolute top-40 -left-20 w-[300px] h-[300px] bg-secondary/6 rounded-full blur-[80px] animate-float"
+          style={{ animationDelay: '2s', transform: `translateY(${scrollY * -0.12}px)` }}
+        />
+        <div 
+          className="absolute bottom-0 right-1/3 w-[250px] h-[250px] bg-electric/5 rounded-full blur-[60px] animate-float"
+          style={{ animationDelay: '3.5s' }}
+        />
+        
+        <div className="container relative z-10 pt-4 pb-8 md:pt-8 md:pb-20">
+          {/* Top Navigation Bar */}
+          <nav className="flex justify-between items-center mb-6 md:mb-16 animate-fade-in-down">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-gradient-to-br from-secondary to-electric rounded-lg flex items-center justify-center font-heading font-bold text-lg text-white shadow-lg shadow-secondary/20">
+                CS
+              </div>
+              <span className="font-heading font-bold text-lg text-foreground hidden sm:block">Coach Steve</span>
             </div>
             <div className="hidden sm:block">
               <span className="font-bold text-slate-900 text-sm tracking-tight">Coach Steve's Hitters Lab</span>
@@ -169,58 +192,59 @@ export default function Home() {
                         <span className="hidden sm:inline">Dashboard</span>
                       </Button>
                     </Link>
-                    <Link href="/admin">
-                      <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-600 hover:text-slate-900">
-                        <Shield className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Admin</span>
-                      </Button>
-                    </Link>
-                  </>
-                )}
-                {user.role === 'athlete' && (
-                  <Link href="/athlete-portal">
-                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white gap-1.5 text-xs">
-                      <Activity className="h-3.5 w-3.5" />
-                      My Portal
-                    </Button>
-                  </Link>
-                )}
-                <Button variant="outline" size="sm" onClick={logout} className="gap-1.5 text-xs border-slate-200 text-slate-600">
-                  <LogOut className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Log out</span>
-                </Button>
-              </>
-            ) : (
-              <a href={getLoginUrl()}>
-                <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white gap-1.5 text-xs">
-                  <LogIn className="h-3.5 w-3.5" />
-                  Log In
-                </Button>
-              </a>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* ── Hero ── */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-          <div className="max-w-3xl">
-            {/* Eyebrow */}
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
-              <span className="text-xs font-semibold text-red-600 uppercase tracking-widest">Player Development Platform</span>
+                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={logout} 
+                    className="gap-1.5 text-xs glass border-white/10 hover:border-white/20 hover:bg-white/5 transition-all duration-300"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Logout</span>
+                  </Button>
+                </>
+              ) : (
+                <a href={getLoginUrl()}>
+                  <Button size="sm" className="gap-1.5 text-xs btn-premium text-white">
+                    <LogIn className="h-3.5 w-3.5" />
+                    Login
+                  </Button>
+                </a>
+              )}
             </div>
-            {/* Headline */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-none mb-4">
-              Coach Steve's<br />
-              <span className="text-red-600">Hitters Lab</span>
-            </h1>
-            <p className="text-slate-500 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
-              Professional training drills to build elite mechanics, explosive power, and game-ready confidence.
-            </p>
-            {/* Stats */}
-            <div className="flex items-center gap-8">
+          </nav>
+          
+          {/* Hero Content */}
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Badge */}
+            <div className="flex justify-center mb-6 animate-fade-in-down stagger-1">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-electric/20 bg-electric/5 backdrop-blur-sm">
+                <div className="w-1.5 h-1.5 rounded-full bg-electric animate-pulse-glow" />
+                <span className="text-electric text-xs font-semibold tracking-wider uppercase">Player Development Platform</span>
+              </div>
+            </div>
+            
+            {/* Main heading */}
+            <div className="animate-fade-in-up stagger-2">
+              <h1 className="font-heading font-black tracking-tight leading-none">
+                <span className="block text-foreground text-4xl sm:text-6xl md:text-7xl lg:text-8xl">
+                  COACH STEVE'S
+                </span>
+                <span className="block text-5xl sm:text-7xl md:text-8xl lg:text-9xl mt-1 text-gradient">
+                  HITTERS LAB
+                </span>
+              </h1>
+            </div>
+
+            <h2 className="text-xs md:text-lg text-muted-foreground mt-4 mb-6 max-w-xl mx-auto leading-relaxed animate-fade-in-up stagger-3 font-normal">
+              Professional training drills designed to build{" "}
+              <span className="text-foreground font-semibold">elite mechanics</span>,{" "}
+              <span className="text-foreground font-semibold">explosive power</span>, and{" "}
+              <span className="text-foreground font-semibold">game-ready confidence</span>.
+            </h2>
+            
+            {/* Stats row */}
+            <div className="flex justify-center gap-8 md:gap-12 animate-fade-in-up stagger-4">
               {[
                 { value: `${allDrills.length}+`, label: "Drills" },
                 { value: "8", label: "Categories" },
@@ -236,60 +260,53 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── Main Content ── */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-
-        {/* Search + Filters */}
-        <div className="mb-6 space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+      {/* ===== STICKY SEARCH + FILTER BAR ===== */}
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm shadow-black/20">
+        <div className="container max-w-5xl py-3 md:py-4 space-y-2.5">
+          {/* Search Bar */}
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-electric transition-colors duration-300" />
+            </div>
             <Input
               type="text"
-              placeholder="Search drills by name..."
-              className="pl-10 h-11 bg-white border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus-visible:ring-red-500/30 focus-visible:border-red-300"
+              placeholder="Search drills..."
+              className="pl-10 h-11 text-sm bg-card/60 text-foreground border-border/40 rounded-xl focus-visible:ring-2 focus-visible:ring-electric/50 focus-visible:border-electric/30 font-medium transition-all duration-200 hover:border-electric/20 placeholder:text-muted-foreground/50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          {/* Filter row */}
-          <div className="flex flex-wrap gap-3">
-            {/* Difficulty */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {["All", "Easy", "Medium", "Hard"].map((level) => {
-                const active = difficultyFilter === level;
-                const baseActive =
-                  level === "Easy"   ? "bg-emerald-600 text-white border-emerald-600" :
-                  level === "Medium" ? "bg-amber-500  text-white border-amber-500" :
-                  level === "Hard"   ? "bg-red-600    text-white border-red-600" :
-                                       "bg-slate-900  text-white border-slate-900";
-                return (
-                  <button
-                    key={level}
-                    onClick={() => setDifficultyFilter(level)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
-                      active ? baseActive : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    {level === "All" ? "All Levels" : level}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="w-px h-5 bg-slate-200 self-center hidden sm:block" />
-
-            {/* Category */}
-            <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Difficulty Filter — horizontal scroll */}
+          <div className="-mx-4 px-4 md:mx-0 md:px-0">
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest flex-shrink-0">Level</span>
+              {["All", "Easy", "Medium", "Hard"].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setDifficultyFilter(level)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
+                    difficultyFilter === level
+                      ? level === "Easy" ? "badge-easy shadow-sm"
+                        : level === "Medium" ? "badge-medium shadow-sm"
+                        : level === "Hard" ? "badge-hard shadow-sm"
+                        : "bg-electric text-white shadow-md shadow-electric/30"
+                      : "bg-card/80 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/40"
+                  }`}
+                >
+                  {level === "All" ? "All Levels" : level}
+                </button>
+              ))}
+              <div className="flex-shrink-0 w-px h-5 bg-border/40 mx-0.5" />
+              <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest flex-shrink-0">Skill</span>
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
                     categoryFilter === cat
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                      ? "bg-electric text-white shadow-md shadow-electric/30"
+                      : "bg-card/80 text-muted-foreground hover:bg-accent hover:text-foreground border border-border/40"
                   }`}
                 >
                   {cat === "All" ? "All Skills" : cat}
@@ -298,17 +315,24 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Results count */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <h2 className="font-semibold text-slate-900 text-sm">Training Library</h2>
-            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-              {filteredDrills.length} drills
+      {/* ===== MAIN CONTENT ===== */}
+      <main className="flex-1 container py-5 md:py-8">
+
+        {/* Results Header */}
+        <div className="flex items-center justify-between mb-5 max-w-5xl mx-auto">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-lg font-heading font-bold text-foreground">Training Library</h2>
+            <span className="text-xs font-semibold text-electric bg-electric/10 px-2.5 py-1 rounded-full">
+              {filteredDrills.length}
             </span>
           </div>
           {(searchQuery || difficultyFilter !== "All" || categoryFilter !== "All") && (
-            <button onClick={() => resetAll()} className="text-xs text-red-600 hover:text-red-700 font-medium">
+            <button
+              onClick={() => resetAll()}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors py-1.5 px-3 rounded-lg hover:bg-accent active:scale-95"
+            >
               Clear filters
             </button>
           )}
@@ -316,83 +340,107 @@ export default function Home() {
 
         {/* ── Drill Cards Grid ── */}
         {paginatedDrills.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 max-w-5xl mx-auto">
             {paginatedDrills.map((drill, index) => {
               const customization = customizationsMap.get(drill.id);
               const displayDifficulty = customization?.difficulty || drill.difficulty;
               const displayCategory = customization?.category || drill.categories[0] || "General";
-              const displayDescription = customization?.briefDescription ||
-                `Master your ${displayCategory.toLowerCase()} mechanics with focused repetition.`;
-              const imageSource =
-                customization?.thumbnailUrl ||
-                (customization?.imageBase64 && customization?.imageMimeType
+              const displayDescription = customization?.briefDescription || `Master this drill to improve your ${drill.categories[0]?.toLowerCase() || "baseball"} skills.`;
+              const imageSource = customization?.thumbnailUrl
+                || (customization?.imageBase64 && customization?.imageMimeType
                   ? `data:${customization.imageMimeType};base64,${customization.imageBase64}`
-                  : null) ||
-                videosMap.get(drill.id);
+                  : null)
+                || videosMap.get(drill.id)
+              const diffConfig = DIFFICULTY_CONFIG[displayDifficulty] || DIFFICULTY_CONFIG.Easy;
               const drillDetailHref = `/drill/${drill.id}${currentQuery}`;
 
               return (
-                <div key={drill.id} className="group relative">
-                  {/* Admin edit btn */}
+                <div
+                  key={drill.id}
+                  className="group animate-fade-in-up relative"
+                  style={{ animationDelay: `${Math.min(index * 0.04, 0.4)}s` }}
+                >
+                  {/* Admin Edit Button */}
                   {user?.role === 'admin' && (
                     <button
                       onClick={(e) => {
                         e.preventDefault(); e.stopPropagation();
                         setEditingDrill(drill); setEditModalOpen(true);
                       }}
-                      className="absolute top-3 left-3 z-20 p-1.5 rounded-lg bg-white/90 hover:bg-white border border-slate-200 text-slate-500 hover:text-slate-900 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                      className="absolute top-2.5 left-2.5 z-20 p-2 rounded-lg bg-black/60 hover:bg-electric/80 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm"
+                      title="Edit drill card"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                   )}
 
-                  <Link href={drillDetailHref} className="block h-full" onClick={handleDrillClick}>
-                    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden h-full flex flex-col hover:border-slate-300 hover:shadow-md transition-all duration-200 cursor-pointer">
-                      {/* Image */}
-                      <div className="relative h-40 bg-slate-100 overflow-hidden">
+                  <Link
+                    href={drillDetailHref}
+                    className="block h-full"
+                    onClick={() => handleDrillClick(drill.id)}
+                  >
+                    <div className="glass-card rounded-xl overflow-hidden drill-card-hover cursor-pointer h-full flex flex-col active:scale-[0.98] transition-transform duration-150">
+                      {/* Card Image */}
+                      <div className="relative h-32 sm:h-44 bg-gradient-to-br from-card to-accent overflow-hidden">
                         {imageSource ? (
                           <img
                             src={imageSource}
                             alt={drill.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-out"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-                            <Target className="w-8 h-8 text-slate-300" />
+                          <div className="absolute inset-0 bg-gradient-to-br from-electric/10 via-card to-accent/30 flex items-center justify-center">
+                            <Target className="h-8 w-8 text-electric/20" />
                           </div>
                         )}
-                        {/* Overlay on hover */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
-                        {/* Duration */}
+
+                        {/* Gradient overlays */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-electric/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        {/* Difficulty Badge */}
+                        <div className="absolute top-2 right-2">
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${diffConfig.class}`}>
+                            {displayDifficulty}
+                          </span>
+                        </div>
+
+                        {/* Duration badge */}
                         {drill.duration && drill.duration !== "Unknown" && (
                           <div className="absolute bottom-2 right-2">
-                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-black/50 text-white backdrop-blur-sm">
-                              <Clock className="h-2.5 w-2.5" />{drill.duration}
+                            <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-black/60 text-white/80 backdrop-blur-sm">
+                              <Clock className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                              <span className="hidden sm:inline">{drill.duration}</span>
                             </span>
                           </div>
                         )}
                       </div>
 
-                      {/* Body */}
-                      <div className="p-4 flex-1 flex flex-col">
-                        {/* Category + difficulty row */}
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{displayCategory}</span>
-                          <DifficultyBadge difficulty={displayDifficulty} />
+                      {/* Card Body */}
+                      <div className="p-3 sm:p-4 flex-1 flex flex-col">
+                        {/* Category */}
+                        <div className="flex items-center gap-1 mb-1.5">
+                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${diffConfig.dotClass}`} />
+                          <span className="text-electric text-[9px] sm:text-[10px] font-bold uppercase tracking-wider truncate">
+                            {displayCategory}
+                          </span>
                         </div>
+
                         {/* Title */}
-                        <h3 className="font-bold text-slate-900 text-sm leading-snug mb-1.5 group-hover:text-red-600 transition-colors line-clamp-2">
+                        <h3 className="text-sm sm:text-base font-heading font-bold text-foreground mb-1.5 group-hover:text-electric transition-colors duration-300 leading-tight line-clamp-2">
                           {drill.name}
                         </h3>
-                        {/* Description */}
-                        <p className="text-xs text-slate-400 flex-1 line-clamp-2 leading-relaxed mb-3">
+
+                        {/* Description — hidden on very small screens */}
+                        <p className="hidden sm:block text-xs text-muted-foreground mb-3 flex-1 line-clamp-2 leading-relaxed">
                           {displayDescription}
                         </p>
-                        {/* CTA */}
-                        <div className="flex items-center text-slate-400 group-hover:text-red-600 transition-colors pt-2 border-t border-slate-100">
-                          <span className="text-xs font-semibold">View Drill</span>
-                          <ChevronRight className="h-3.5 w-3.5 ml-auto group-hover:translate-x-0.5 transition-transform" />
+
+                        {/* Footer */}
+                        <div className="flex items-center text-muted-foreground group-hover:text-electric transition-all duration-300 pt-2 border-t border-border/30 mt-auto">
+                          <span className="text-xs font-semibold">View</span>
+                          <ChevronRight className="h-3.5 w-3.5 ml-auto group-hover:translate-x-1 transition-transform duration-300" />
                         </div>
                       </div>
                     </div>
@@ -402,16 +450,19 @@ export default function Home() {
             })}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
-            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Search className="h-5 w-5 text-slate-400" />
+          <div className="text-center py-16 glass-card rounded-2xl border-dashed border border-border/30 max-w-sm mx-auto">
+            <div className="bg-accent/50 h-14 w-14 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <Search className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-slate-900 mb-1">No drills found</h3>
-            <p className="text-sm text-slate-400 max-w-xs mx-auto mb-5">
+            <h3 className="text-lg font-heading font-bold mb-2">No drills found</h3>
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto mb-6">
               Try adjusting your search or filters.
             </p>
-            <Button onClick={() => resetAll()} className="bg-red-600 hover:bg-red-700 text-white h-9 text-sm rounded-lg">
-              Clear Filters
+            <Button
+              onClick={() => resetAll()}
+              className="btn-premium text-white text-sm px-6 py-2.5 active:scale-95"
+            >
+              Clear All Filters
             </Button>
           </div>
         )}
@@ -420,13 +471,15 @@ export default function Home() {
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-10">
             <Button
-              variant="outline" size="sm"
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              variant="outline"
+              size="sm"
+              onClick={() => { setCurrentPage(Math.max(1, currentPage - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage === 1}
-              className="border-slate-200 text-slate-600 disabled:opacity-40"
+              className="glass border-border/40 hover:border-electric/30 hover:bg-electric/5 disabled:opacity-40 transition-all duration-300 h-10 px-4 active:scale-95"
             >
               Previous
             </Button>
+
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                 let page: number;
@@ -437,8 +490,8 @@ export default function Home() {
                 return (
                   <button
                     key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
+                    onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 ${
                       currentPage === page
                         ? "bg-red-600 text-white"
                         : "text-slate-500 hover:bg-slate-100"
@@ -449,11 +502,13 @@ export default function Home() {
                 );
               })}
             </div>
+
             <Button
-              variant="outline" size="sm"
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              variant="outline"
+              size="sm"
+              onClick={() => { setCurrentPage(Math.min(totalPages, currentPage + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage === totalPages}
-              className="border-slate-200 text-slate-600 disabled:opacity-40"
+              className="glass border-border/40 hover:border-electric/30 hover:bg-electric/5 disabled:opacity-40 transition-all duration-300 h-10 px-4 active:scale-95"
             >
               Next
             </Button>
@@ -466,7 +521,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center">
-              <Target className="h-3.5 w-3.5 text-white" />
+              <Target className="h-3.5 w-3.5 text-foreground" />
             </div>
             <span className="font-bold text-slate-900 text-sm">Coach Steve's Hitters Lab</span>
           </div>

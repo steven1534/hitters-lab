@@ -120,7 +120,7 @@ export default function MyProfile() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="glass sticky top-0 z-40 border-b border-white/10">
+      <header className="glass sticky top-0 z-40 border-b border-border">
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
           <Link href="/athlete-portal">
             <button className="flex items-center gap-1 text-muted-foreground hover:text-electric text-sm transition-colors">
@@ -152,17 +152,17 @@ export default function MyProfile() {
                     </Badge>
                   )}
                   {age !== null && (
-                    <Badge className="bg-white/10 text-foreground border border-white/20 text-xs">
+                    <Badge className="bg-muted text-foreground border border-border text-xs">
                       {age}y
                     </Badge>
                   )}
                   {bats && (
-                    <Badge className="bg-white/10 text-foreground border border-white/20 text-xs">
+                    <Badge className="bg-muted text-foreground border border-border text-xs">
                       B: {bats}
                     </Badge>
                   )}
                   {throws_ && (
-                    <Badge className="bg-white/10 text-foreground border border-white/20 text-xs">
+                    <Badge className="bg-muted text-foreground border border-border text-xs">
                       T: {throws_}
                     </Badge>
                   )}
@@ -253,7 +253,7 @@ export default function MyProfile() {
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="bg-white/[0.04] border-white/[0.08]"
+                    className="bg-muted/40 border-border"
                   />
                   {age !== null && (
                     <p className="text-xs text-muted-foreground mt-1">{age} years old</p>
@@ -263,7 +263,7 @@ export default function MyProfile() {
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Position</label>
                   <Select value={position} onValueChange={setPosition}>
-                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+                    <SelectTrigger className="bg-muted/40 border-border">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -278,7 +278,7 @@ export default function MyProfile() {
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">2nd Position</label>
                   <Select value={secondaryPosition} onValueChange={setSecondaryPosition}>
-                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+                    <SelectTrigger className="bg-muted/40 border-border">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -293,7 +293,7 @@ export default function MyProfile() {
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Bats</label>
                   <Select value={bats} onValueChange={(v) => setBats(v as "L" | "R" | "S")}>
-                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+                    <SelectTrigger className="bg-muted/40 border-border">
                       <SelectValue placeholder="—" />
                     </SelectTrigger>
                     <SelectContent>
@@ -308,7 +308,7 @@ export default function MyProfile() {
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Throws</label>
                   <Select value={throws_} onValueChange={(v) => setThrows(v as "L" | "R")}>
-                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08]">
+                    <SelectTrigger className="bg-muted/40 border-border">
                       <SelectValue placeholder="—" />
                     </SelectTrigger>
                     <SelectContent>
@@ -325,7 +325,7 @@ export default function MyProfile() {
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     placeholder="e.g., Westside Tigers"
-                    className="bg-white/[0.04] border-white/[0.08]"
+                    className="bg-muted/40 border-border"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function MyProfile() {
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
                   placeholder="e.g., John Smith"
-                  className="bg-white/[0.04] border-white/[0.08]"
+                  className="bg-muted/40 border-border"
                 />
               </div>
 
@@ -355,7 +355,7 @@ export default function MyProfile() {
                   value={parentEmail}
                   onChange={(e) => setParentEmail(e.target.value)}
                   placeholder="parent@email.com"
-                  className="bg-white/[0.04] border-white/[0.08]"
+                  className="bg-muted/40 border-border"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   Progress reports will be sent to this email.
@@ -369,7 +369,7 @@ export default function MyProfile() {
                   value={parentPhone}
                   onChange={(e) => setParentPhone(e.target.value)}
                   placeholder="(555) 123-4567"
-                  className="bg-white/[0.04] border-white/[0.08]"
+                  className="bg-muted/40 border-border"
                 />
               </div>
             </div>
@@ -378,7 +378,7 @@ export default function MyProfile() {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                className="flex-1 glass hover:bg-white/5"
+                className="flex-1 glass hover:bg-muted/50"
                 onClick={() => setIsEditing(false)}
               >
                 Cancel

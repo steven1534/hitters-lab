@@ -412,7 +412,7 @@ export default function DrillsDirectory() {
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-slate-300 transition-all duration-200 h-full flex flex-col">
                     <div className="p-4 md:p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start gap-2 mb-3">
-                        <Badge className={`${getDifficultyColor(drill.difficulty)} text-white font-semibold text-xs`}>
+                        <Badge className={`${getDifficultyColor(drill.difficulty)} text-foreground font-semibold text-xs`}>
                           {drill.difficulty}
                         </Badge>
                         {drill.duration && (
@@ -428,7 +428,7 @@ export default function DrillsDirectory() {
                       {/* Drill Type badge */}
                       {drill.drillType && (
                         <div className="mb-3">
-                          <Badge className={`${getDrillTypeColor(drill.drillType)} text-white text-xs font-medium`}>
+                          <Badge className={`${getDrillTypeColor(drill.drillType)} text-foreground text-xs font-medium`}>
                             {drill.drillType}
                           </Badge>
                         </div>

@@ -141,7 +141,7 @@ export function SessionHistory({
   if (notes.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="h-16 w-16 rounded-full bg-white/[0.06] flex items-center justify-center mx-auto mb-4">
+        <div className="h-16 w-16 rounded-full bg-muted/60 flex items-center justify-center mx-auto mb-4">
           <FileText className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="font-heading font-bold text-lg mb-2">No Session Notes Yet</h3>
@@ -218,7 +218,7 @@ export function SessionHistory({
       {/* Timeline */}
       <div className="relative">
         {/* Timeline line */}
-        <div className="absolute left-4 top-0 bottom-0 w-px bg-white/[0.08]" />
+        <div className="absolute left-4 top-0 bottom-0 w-px bg-muted" />
 
         {notes.map((note: any, index: number) => {
           const isExpanded = expandedNoteId === note.id;
@@ -233,7 +233,7 @@ export function SessionHistory({
                 className={`absolute left-2.5 top-3 h-3 w-3 rounded-full border-2 transition-colors ${
                   isExpanded
                     ? "bg-[#DC143C] border-[#DC143C]"
-                    : "bg-background border-white/20"
+                    : "bg-background border-border"
                 }`}
               />
 
@@ -283,7 +283,7 @@ export function SessionHistory({
                           key={skill}
                           variant="outline"
                           className={`text-[10px] px-1.5 py-0 ${
-                            SKILL_COLORS[skill] ?? "bg-white/[0.06] text-white/60"
+                            SKILL_COLORS[skill] ?? "bg-muted/60 text-muted-foreground"
                           }`}
                         >
                           {skill}
@@ -292,7 +292,7 @@ export function SessionHistory({
                       {skillsWorked.length > 3 && (
                         <Badge
                           variant="outline"
-                          className="text-[10px] px-1.5 py-0 bg-white/[0.04] text-white/40"
+                          className="text-[10px] px-1.5 py-0 bg-muted/40 text-muted-foreground"
                         >
                           +{skillsWorked.length - 3}
                         </Badge>
@@ -319,7 +319,7 @@ export function SessionHistory({
 
                 {/* Expanded content */}
                 {isExpanded && (
-                  <div className="px-3 md:px-4 pb-3 md:pb-4 space-y-3 border-t border-white/[0.06] pt-3 animate-in slide-in-from-top-2 duration-200">
+                  <div className="px-3 md:px-4 pb-3 md:pb-4 space-y-3 border-t border-border/60 pt-3 animate-in slide-in-from-top-2 duration-200">
                     {/* Blast notes show metrics only; regular notes show improved/needs work */}
                     {note.blastSessionId ? (
                       <div>
@@ -386,7 +386,7 @@ export function SessionHistory({
 
                     {/* Private Notes */}
                     {note.privateNotes && (
-                      <div className="bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]">
+                      <div className="bg-muted/30 rounded-lg p-3 border border-border/60">
                         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                           <InlineEdit contentKey="sessionHistory.heading.privateNotes" defaultValue="Private Notes" />
                         </h4>
@@ -397,7 +397,7 @@ export function SessionHistory({
                     )}
 
                     {/* Sharing Toggle */}
-                    <div className="flex items-center justify-between bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]">
+                    <div className="flex items-center justify-between bg-muted/30 rounded-lg p-3 border border-border/60">
                       <div className="flex items-center gap-2">
                         {note.sharedWithAthlete ? (
                           <Eye className="h-4 w-4 text-green-400" />

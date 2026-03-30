@@ -1162,6 +1162,7 @@ export default function DrillDetail() {
   const { user, loading } = useAuth();
   const [match, params] = useRoute("/drill/:id");
   const id = params?.id;
+  const [headerScrolled, setHeaderScrolled] = useState(false);
 
   // Free preview tracking for unauthenticated visitors
   const { viewCount, isLimitReached, recordView } = usePreviewLimit();
@@ -1266,6 +1267,13 @@ export default function DrillDetail() {
   // Activity logging mutation
   const logActivityMutation = trpc.activity.logActivity.useMutation();
 
+  // Track scroll for sticky header
+  useEffect(() => {
+    const handleScroll = () => setHeaderScrolled(window.scrollY > 80);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Log drill view when athlete views the page
   useEffect(() => {
     if (user?.id && user?.role === 'athlete' && drill && id) {
@@ -1368,7 +1376,32 @@ export default function DrillDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-8 md:pb-12">
+    <div className="min-h-screen bg-background pb-24 md:pb-12">
+
+      {/* Sticky mini-header — appears on mobile scroll */}
+      <div className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 md:hidden ${
+        headerScrolled ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      } bg-background/95 backdrop-blur-md border-b border-border/20`}>
+        <div className="flex items-center gap-3 px-4 py-3">
+          <Link href={backHref}>
+            <button className="p-2 -ml-1 rounded-lg hover:bg-accent active:scale-95 transition-all">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          </Link>
+          <span className="font-heading font-bold text-sm truncate flex-1">{drill?.name || 'Drill'}</span>
+          {user && (
+            <button
+              onClick={handleToggleFavorite}
+              disabled={toggleFavoriteMutation.isPending}
+              className={`p-2 rounded-lg transition-all active:scale-95 ${
+                isFavorited ? 'text-amber-400 bg-amber-500/10' : 'text-muted-foreground hover:bg-accent'
+              }`}
+            >
+              <Star className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Login prompt overlay — shown after 2 free views for anonymous users */}
       {isAnonymous && isLimitReached && (
@@ -1378,7 +1411,7 @@ export default function DrillDetail() {
               <Lock className="h-8 w-8 text-[#DC143C]" />
             </div>
             <div>
-              <h2 className="text-2xl font-heading font-bold text-white mb-2">Free Preview Limit Reached</h2>
+              <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Free Preview Limit Reached</h2>
               <p className="text-white/50 text-sm leading-relaxed">
                 You've viewed your 2 free drills. Log in to access all 200+ professional training drills.
               </p>
@@ -1402,21 +1435,21 @@ export default function DrillDetail() {
 
       {/* Header — always rendered (blurred behind modal when limit reached) */}
       <>
-      <header className="relative overflow-hidden mb-6 md:mb-8">
+      <header className="relative overflow-hidden mb-0 md:mb-8">
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.18_0.01_25)] via-[oklch(0.15_0.005_0)] to-[oklch(0.12_0.01_20)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.45_0.15_250/0.15),transparent_60%)]" />
-        <div className="container relative z-10 py-6 md:py-10">
+        <div className="container relative z-10 pt-4 pb-6 md:py-10">
           <Link href={backHref}>
-            <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10 mb-4 pl-0 gap-2 text-sm">
+            <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10 mb-3 md:mb-4 pl-0 gap-2 text-sm h-9">
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Back to Directory</span>
               <span className="sm:hidden">Back</span>
             </Button>
           </Link>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex-1 w-full">
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <Badge className={`font-bold text-xs px-3 py-1 ${
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
+            <div className="flex-1 w-full min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                <Badge className={`font-bold text-[10px] px-2.5 py-0.5 ${
                   drill.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
                   drill.difficulty === 'Medium' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
                   'bg-red-500/20 text-red-400 border-red-500/30'
@@ -1424,24 +1457,24 @@ export default function DrillDetail() {
                   {drill.difficulty}
                 </Badge>
                 {drill.categories.map(cat => (
-                  <Badge key={cat} variant="outline" className="bg-white/[0.06] text-white/80 border-white/[0.12] font-medium text-xs">
+                  <Badge key={cat} variant="outline" className="bg-white/[0.06] text-white/70 border-white/[0.1] font-medium text-[10px] px-2.5 py-0.5">
                     {cat}
                   </Badge>
                 ))}
               </div>
-              <InlineEdit contentKey={`drill.detail.${id}.title`} defaultValue={drill.name} as="h1" className="text-3xl md:text-5xl font-heading font-black text-white leading-tight tracking-tight" />
+              <InlineEdit contentKey={`drill.detail.${id}.title`} defaultValue={drill.name} as="h1" className="text-2xl sm:text-3xl md:text-5xl font-heading font-black text-white leading-tight tracking-tight" />
             </div>
-            
-            <div className="flex gap-2 w-full md:w-auto">
-              {/* Add to Favorites Button */}
+
+            {/* Desktop action buttons only — mobile uses bottom bar */}
+            <div className="hidden md:flex gap-2">
               {user && (
                 <Button
                   onClick={handleToggleFavorite}
                   disabled={toggleFavoriteMutation.isPending}
                   variant="outline"
-                  className={`flex-1 md:flex-none gap-2 ${
-                    isFavorited 
-                      ? "bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/30" 
+                  className={`gap-2 ${
+                    isFavorited
+                      ? "bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/30"
                       : "bg-white/[0.06] hover:bg-white/[0.12] text-white/80 border-white/[0.12]"
                   }`}
                 >
@@ -1449,13 +1482,11 @@ export default function DrillDetail() {
                   {isFavorited ? "Favorited" : "Favorite"}
                 </Button>
               )}
-              
-              {/* Fallback to external link — only for static drills, not custom drills */}
+
               {!details && !customDrill && (
-                <a href={drill.url} target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-none">
-                  <Button variant="outline" className="w-full bg-white/[0.06] hover:bg-white/[0.12] text-white/80 border-white/[0.12] gap-2">
-                    <span className="hidden sm:inline">View on USA Baseball</span>
-                    <span className="sm:hidden">View</span>
+                <a href={drill.url} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="bg-white/[0.06] hover:bg-white/[0.12] text-white/80 border-white/[0.12] gap-2">
+                    View on USA Baseball
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </a>
@@ -1465,7 +1496,7 @@ export default function DrillDetail() {
         </div>
       </header>
 
-      <div className="container max-w-4xl px-3 md:px-4">
+      <div className="container max-w-4xl px-0 md:px-4">
         {/* Check if custom page layout exists - if so, render ONLY that */}
         {pageLayout?.blocks && Array.isArray(pageLayout.blocks) && pageLayout.blocks.length > 0 ? (
           <div className="grid gap-6 md:gap-8">
@@ -1534,20 +1565,22 @@ export default function DrillDetail() {
           </div>
         ) : details ? (
           <div className="grid gap-6 md:gap-8">
-            {/* Video Section - Moved to Top */}
-            {(savedVideos[drill.id] || (details && 'videoUrl' in details && details.videoUrl)) ? (
-              <VideoPlayer videoUrl={(savedVideos[drill.id] || (details && 'videoUrl' in details && details.videoUrl)) as string} title={`${drill.name} Video`} />
-            ) : (
-              <div className="bg-muted rounded-lg md:rounded-xl aspect-video flex items-center justify-center border-2 border-dashed border-muted-foreground/20 w-full">
-                <div className="text-center p-3 md:p-4">
-                  <p className="text-muted-foreground font-medium text-sm md:text-base">Video / Diagram Placeholder</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">Media content would appear here</p>
+            {/* Video Section - Full bleed on mobile */}
+            <div className="md:rounded-xl overflow-hidden">
+              {(savedVideos[drill.id] || (details && 'videoUrl' in details && details.videoUrl)) ? (
+                <VideoPlayer videoUrl={(savedVideos[drill.id] || (details && 'videoUrl' in details && details.videoUrl)) as string} title={`${drill.name} Video`} />
+              ) : (
+                <div className="bg-muted aspect-video flex items-center justify-center border-y border-dashed border-muted-foreground/20 md:border md:rounded-xl w-full">
+                  <div className="text-center p-4">
+                    <p className="text-muted-foreground font-medium text-sm">No video available</p>
+                    <p className="text-xs text-muted-foreground/50 mt-1">Video will appear here when added</p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Coaching Cues - Above the Fold */}
-            <div className="glass-card rounded-xl border-l-4 border-l-[#DC143C] overflow-hidden">
+            <div className="glass-card rounded-none md:rounded-xl border-l-4 border-l-[#DC143C] overflow-hidden">
               <div className="p-4 md:p-6">
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <h3 className="flex items-center gap-2 text-xl md:text-2xl font-heading font-black">
@@ -1639,7 +1672,7 @@ export default function DrillDetail() {
             />
 
             {/* Custom Instructions */}
-            <section>
+            <section className="px-4 md:px-0">
               <h2 className="text-2xl md:text-3xl font-heading font-black mb-3 md:mb-4 flex items-center gap-2">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
                   <Target className="h-4 w-4 text-green-400" />
@@ -1699,7 +1732,7 @@ export default function DrillDetail() {
 
         {/* ── New Metadata Fields: always shown for static drills ── */}
         {staticDrill && (staticDrill.drillType || (staticDrill.ageLevel?.length ?? 0) > 0 || (staticDrill.tags?.length ?? 0) > 0 || (staticDrill.problem?.length ?? 0) > 0 || (staticDrill.goal?.length ?? 0) > 0) && (
-          <div className="grid gap-4 mt-6">
+          <div className="grid gap-4 mt-6 px-4 md:px-0">
 
             {/* Drill Type + Age Level */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1781,6 +1814,31 @@ export default function DrillDetail() {
 
       </div>
       </>
+
+      {/* Sticky Bottom Action Bar — mobile only */}
+      {user && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-background/95 backdrop-blur-md border-t border-border/20 px-4 py-3 safe-area-bottom">
+          <div className="flex gap-3">
+            <Link href={backHref} className="flex-none">
+              <button className="h-12 w-12 rounded-xl border border-border/40 bg-card/80 flex items-center justify-center hover:bg-accent active:scale-95 transition-all">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+            </Link>
+            <button
+              onClick={handleToggleFavorite}
+              disabled={toggleFavoriteMutation.isPending}
+              className={`flex-1 h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                isFavorited
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  : 'bg-card/80 border border-border/40 text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`}
+            >
+              <Star className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
+              {isFavorited ? 'Favorited' : 'Add to Favorites'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (

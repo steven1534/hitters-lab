@@ -27,7 +27,7 @@ function StatCard({ icon, label, value, subtitle, color }: {
           <p className={`text-2xl font-heading font-bold mt-1 ${color || "text-foreground"}`}>{value}</p>
           {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
-        <div className="p-2 rounded-lg bg-white/[0.05] border border-white/[0.06]">{icon}</div>
+        <div className="p-2 rounded-lg bg-muted/50 border border-border/60">{icon}</div>
       </div>
     </div>
   );
@@ -46,7 +46,7 @@ function ProgressBar({ value, max, label, color }: {
         <span className="text-muted-foreground">{label}</span>
         <span className="font-medium">{value}/{max} ({pct}%)</span>
       </div>
-      <div className="h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
+      <div className="h-2.5 bg-muted/60 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${pct}%` }}
@@ -63,7 +63,7 @@ function WeeklyChart({ data }: { data: Array<{ week: string; completed: number }
       {data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1">
           <span className="text-xs font-medium text-foreground">{d.completed}</span>
-          <div className="w-full bg-white/[0.06] rounded-t-md overflow-hidden" style={{ height: "100%" }}>
+          <div className="w-full bg-muted/60 rounded-t-md overflow-hidden" style={{ height: "100%" }}>
             <div
               className="w-full bg-gradient-to-t from-[#DC143C] to-[#E8425A] rounded-t-md transition-all duration-500"
               style={{
@@ -162,7 +162,7 @@ function AssessmentReport({ athleteId, athleteName }: { athleteId: number; athle
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#DC143C]/20 to-purple-500/20 border border-white/[0.06] flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#DC143C]/20 to-purple-500/20 border border-border/60 flex items-center justify-center">
                 <User className="h-5 w-5 text-[#E8425A]" />
               </div>
               <h2 className="text-2xl font-heading font-bold">{athleteName}</h2>
@@ -343,7 +343,7 @@ function AssessmentReport({ athleteId, athleteName }: { athleteId: number; athle
           <div className="p-4 md:p-6 pt-0">
             <div className="space-y-4">
               {coachNotes.slice(0, 3).map((note: any, i: number) => (
-                <div key={i} className="bg-white/[0.03] rounded-lg p-4 border-l-2 border-l-[#DC143C]/50">
+                <div key={i} className="bg-muted/30 rounded-lg p-4 border-l-2 border-l-[#DC143C]/50">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-muted-foreground">
                       {note.meetingDate ? new Date(note.meetingDate).toLocaleDateString() : "N/A"}
@@ -412,12 +412,12 @@ export default function AthleteAssessment() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.45_0.15_250/0.15),transparent_60%)]" />
         <div className="container relative z-10 py-6">
           <Link href="/coach-dashboard">
-            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 mb-3 gap-2">
+            <Button variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground hover:bg-muted mb-3 gap-2">
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
             </Button>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-heading font-black text-white">Athlete Assessment Reports</h1>
-          <p className="text-white/60 mt-1">Auto-generated progress reports for each athlete</p>
+          <h1 className="text-3xl md:text-4xl font-heading font-black text-foreground">Athlete Assessment Reports</h1>
+          <p className="text-muted-foreground mt-1">Auto-generated progress reports for each athlete</p>
         </div>
       </header>
 
@@ -459,7 +459,7 @@ export default function AthleteAssessment() {
           />
         ) : (
           <div className="text-center py-20">
-            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#DC143C]/10 to-purple-500/10 border border-white/[0.06] flex items-center justify-center mx-auto mb-4">
+            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#DC143C]/10 to-purple-500/10 border border-border/60 flex items-center justify-center mx-auto mb-4">
               <FileText className="h-10 w-10 text-[#E8425A]/60" />
             </div>
             <h3 className="text-xl font-heading font-bold mb-2">Select an Athlete</h3>

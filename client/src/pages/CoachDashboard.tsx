@@ -384,9 +384,9 @@ export default function CoachDashboard() {
       <div className="px-4 mb-6">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-7 h-7 rounded-lg bg-[#DC143C] flex items-center justify-center shrink-0">
-            <Target className="w-3.5 h-3.5 text-white" />
+            <Target className="w-3.5 h-3.5 text-foreground" />
           </div>
-          <span className="text-white font-bold text-sm leading-tight">Coach Dashboard</span>
+          <span className="text-foreground font-bold text-sm leading-tight">Coach Dashboard</span>
         </div>
         <p className="text-white/30 text-[11px] pl-9">Coach Steve Baseball</p>
       </div>
@@ -470,13 +470,13 @@ export default function CoachDashboard() {
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0a0a0a] border-b border-white/[0.06] sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md bg-[#DC143C] flex items-center justify-center">
-            <Target className="w-3 h-3 text-white" />
+            <Target className="w-3 h-3 text-foreground" />
           </div>
-          <span className="text-white font-semibold text-sm">Coach Dashboard</span>
+          <span className="text-foreground font-semibold text-sm">Coach Dashboard</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-white/40 text-xs">{TAB_LABELS[activeTab]}</span>
-          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors">
+          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-lg text-white/50 hover:text-foreground hover:bg-white/[0.06] transition-colors">
             <Menu className="w-5 h-5" />
           </button>
         </div>
@@ -488,7 +488,7 @@ export default function CoachDashboard() {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
           <div className="relative z-10 flex flex-col h-full">
             <div className="absolute top-4 right-4">
-              <button onClick={() => setSidebarOpen(false)} className="p-1.5 rounded-lg text-white/50 hover:text-white bg-white/[0.06] transition-colors">
+              <button onClick={() => setSidebarOpen(false)} className="p-1.5 rounded-lg text-white/50 hover:text-foreground bg-white/[0.06] transition-colors">
                 <XIcon className="w-4 h-4" />
               </button>
             </div>
@@ -506,7 +506,7 @@ export default function CoachDashboard() {
           {/* Page header */}
           <div className="px-6 py-5 border-b border-white/[0.05] bg-[#0d0d0d] flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-white">{TAB_LABELS[activeTab]}</h1>
+              <h1 className="text-xl font-bold text-foreground">{TAB_LABELS[activeTab]}</h1>
               <p className="text-white/35 text-xs mt-0.5">Coach Steve Baseball · {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
             </div>
             <div className="flex items-center gap-2">

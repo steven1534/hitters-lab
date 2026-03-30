@@ -326,7 +326,7 @@ export function ProgressReportReview({
       </p>
 
       {/* Report Preview — All sections are inline-editable */}
-      <div className="rounded-xl overflow-hidden shadow-2xl border border-white/[0.06]">
+      <div className="rounded-xl overflow-hidden shadow-2xl border border-border/60">
         {/* Branded Header */}
         <div className="bg-gradient-to-br from-[#0a1628] via-[#0f1f3d] to-[#1a2744] text-white px-8 py-10 text-center relative">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(96,165,250,0.08),transparent_50%)]" />
@@ -521,7 +521,7 @@ export function ProgressReportReview({
                 value={sendEmail}
                 onChange={(e) => setSendEmail(e.target.value)}
                 placeholder="parent@email.com"
-                className="bg-white/[0.04] border-white/[0.08]"
+                className="bg-muted/40 border-border"
               />
             </div>
             <div>
@@ -532,7 +532,7 @@ export function ProgressReportReview({
                 value={sendName}
                 onChange={(e) => setSendName(e.target.value)}
                 placeholder="e.g., Mr. Johnson"
-                className="bg-white/[0.04] border-white/[0.08]"
+                className="bg-muted/40 border-border"
               />
             </div>
           </div>

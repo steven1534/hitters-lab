@@ -235,13 +235,13 @@ export function BlastMetricsTab({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-heading font-bold text-white flex items-center gap-3">
+            <h2 className="text-2xl font-heading font-bold text-foreground flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#DC143C]/20 to-fuchsia-500/20 flex items-center justify-center border border-violet-500/20">
                 <Zap className="h-5 w-5 text-violet-400" />
               </div>
               <InlineEdit contentKey="coach.blast.title" defaultValue="Blast Motion Metrics" as="span" />
             </h2>
-            <InlineEdit contentKey="coach.blast.desc" defaultValue="Track swing metrics and identify trends across your players" as="p" className="text-white/50 mt-1" />
+            <InlineEdit contentKey="coach.blast.desc" defaultValue="Track swing metrics and identify trends across your players" as="p" className="text-muted-foreground mt-1" />
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -252,7 +252,7 @@ export function BlastMetricsTab({
               <UserPlus className="h-4 w-4 mr-1.5" />
               <InlineEdit contentKey="coach.blast.addPlayer" defaultValue="Add Player" as="span" />
             </Button>
-            <Badge variant="outline" className="text-white/60 border-white/10">
+            <Badge variant="outline" className="text-muted-foreground border-border">
               {players.length} Players
             </Badge>
           </div>
@@ -261,15 +261,15 @@ export function BlastMetricsTab({
         {playersLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-32 rounded-xl bg-white/[0.04] animate-pulse border border-white/[0.06]" />
+              <div key={i} className="h-32 rounded-xl bg-muted/40 animate-pulse border border-border/60" />
             ))}
           </div>
         ) : players.length === 0 ? (
-          <Card className="bg-white/[0.04] border-white/[0.08]">
+          <Card className="bg-muted/40 border-border">
             <CardContent className="py-12 text-center">
-              <Users className="h-12 w-12 text-white/20 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white/80 mb-2">No Players Yet</h3>
-              <p className="text-white/40 max-w-md mx-auto mb-6">
+              <Users className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No Players Yet</h3>
+              <p className="text-muted-foreground max-w-md mx-auto mb-6">
                 Add players and their Blast Motion session data to start tracking swing metrics.
               </p>
               <Button
@@ -287,11 +287,11 @@ export function BlastMetricsTab({
               <button
                 key={p.id}
                 onClick={() => setSelectedPlayerId(p.id)}
-                className="group text-left rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/5"
+                className="group text-left rounded-xl bg-muted/40 hover:bg-muted border border-border hover:border-violet-500/30 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/5"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#DC143C]/20 to-[#DC143C]/20 flex items-center justify-center border border-white/10 text-white font-bold text-sm">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#DC143C]/20 to-[#DC143C]/20 flex items-center justify-center border border-border text-foreground font-bold text-sm">
                       {p.fullName.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                     </div>
                     <div>
@@ -312,10 +312,10 @@ export function BlastMetricsTab({
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-white/20 group-hover:text-violet-400 transition-all group-hover:translate-x-1" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-violet-600 transition-all group-hover:translate-x-1" />
                 </div>
                 {p.latestSession && (
-                  <p className="text-xs text-white/30">
+                  <p className="text-xs text-muted-foreground/60">
                     Last session: {formatDate(p.latestSession)}
                   </p>
                 )}
@@ -346,21 +346,21 @@ export function BlastMetricsTab({
               setSelectedPlayerId(null);
               setSessionTypeFilter("All");
             }}
-            className="text-white/60 hover:text-white hover:bg-white/[0.06]"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/60"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             All Players
           </Button>
-          <div className="h-6 w-px bg-white/10" />
+          <div className="h-6 w-px bg-border" />
           <div>
-            <h2 className="text-xl font-heading font-bold text-white">
+            <h2 className="text-xl font-heading font-bold text-foreground">
               {player?.fullName || "Loading..."}
             </h2>
             {player?.portalEmail && (
               <p className="text-xs text-green-400/60 flex items-center gap-1.5 mt-0.5">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400"></span>
                 Portal: {player.portalEmail}
-                {player.blastEmail && <span className="text-white/30">| Blast: {player.blastEmail}</span>}
+                {player.blastEmail && <span className="text-muted-foreground/60">| Blast: {player.blastEmail}</span>}
               </p>
             )}
           </div>
@@ -455,10 +455,10 @@ export function BlastMetricsTab({
               key={card.key}
               className={`rounded-xl bg-gradient-to-br ${card.color} border ${card.borderColor} p-4 text-center`}
             >
-              <InlineEdit contentKey={`coach.blast.metric.${card.key}`} defaultValue={card.label} as="p" className="text-xs text-white/50 font-medium uppercase tracking-wider mb-1" />
-              <p className="text-2xl font-bold text-white">
+              <InlineEdit contentKey={`coach.blast.metric.${card.key}`} defaultValue={card.label} as="p" className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1" />
+              <p className="text-2xl font-bold text-foreground">
                 {card.value}
-                {card.unit && <span className="text-sm font-normal text-white/40 ml-1">{card.unit}</span>}
+                {card.unit && <span className="text-sm font-normal text-muted-foreground ml-1">{card.unit}</span>}
               </p>
             </div>
           ))}
@@ -469,7 +469,7 @@ export function BlastMetricsTab({
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
         <div className="flex flex-wrap gap-3 items-center">
           <Select value={sessionTypeFilter} onValueChange={setSessionTypeFilter}>
-            <SelectTrigger className="w-[200px] bg-white/[0.06] border-white/[0.1] text-white">
+            <SelectTrigger className="w-[200px] bg-muted/60 border-border text-foreground">
               <SelectValue placeholder="Session Type" />
             </SelectTrigger>
             <SelectContent>
@@ -483,7 +483,7 @@ export function BlastMetricsTab({
 
         <div className="flex gap-2 items-center">
           <Select value={chartMetric1} onValueChange={(v) => setChartMetric1(v as MetricKey)}>
-            <SelectTrigger className="w-[160px] bg-white/[0.06] border-white/[0.1] text-white text-xs">
+            <SelectTrigger className="w-[160px] bg-muted/60 border-border text-foreground text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -492,9 +492,9 @@ export function BlastMetricsTab({
               ))}
             </SelectContent>
           </Select>
-          <span className="text-white/30 text-xs">vs</span>
+          <span className="text-muted-foreground/60 text-xs">vs</span>
           <Select value={chartMetric2} onValueChange={(v) => setChartMetric2(v as MetricKey)}>
-            <SelectTrigger className="w-[160px] bg-white/[0.06] border-white/[0.1] text-white text-xs">
+            <SelectTrigger className="w-[160px] bg-muted/60 border-border text-foreground text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -503,11 +503,11 @@ export function BlastMetricsTab({
               ))}
             </SelectContent>
           </Select>
-          <div className="flex bg-white/[0.06] rounded-lg border border-white/[0.08] p-0.5">
+          <div className="flex bg-muted/60 rounded-lg border border-border p-0.5">
             <button
               onClick={() => setChartView("line")}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                chartView === "line" ? "bg-white/[0.12] text-white" : "text-white/40 hover:text-white/60"
+                chartView === "line" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground/80"
               }`}
             >
               Line
@@ -515,7 +515,7 @@ export function BlastMetricsTab({
             <button
               onClick={() => setChartView("bar")}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                chartView === "bar" ? "bg-white/[0.12] text-white" : "text-white/40 hover:text-white/60"
+                chartView === "bar" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground/80"
               }`}
             >
               Bar
@@ -525,16 +525,16 @@ export function BlastMetricsTab({
       </div>
 
       {/* Trend Chart */}
-      <Card className="bg-white/[0.04] border-white/[0.08]">
+      <Card className="bg-muted/40 border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-white flex items-center gap-2">
+          <CardTitle className="text-lg text-foreground flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-violet-400" />
             Performance Trends
           </CardTitle>
         </CardHeader>
         <CardContent>
           {chartData.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center text-white/30 gap-3">
+            <div className="h-64 flex flex-col items-center justify-center text-muted-foreground/60 gap-3">
               <p>No session data available for the selected filters</p>
               <Button
                 onClick={() => setAddSessionOpen(true)}
@@ -624,9 +624,9 @@ export function BlastMetricsTab({
 
       {/* Averages by Session Type */}
       {averages.length > 0 && (
-        <Card className="bg-white/[0.04] border-white/[0.08]">
+        <Card className="bg-muted/40 border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-[#E8425A]" />
               Averages by Session Type
             </CardTitle>
@@ -635,24 +635,24 @@ export function BlastMetricsTab({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.08]">
-                    <th className="text-left py-3 px-3 text-white/50 font-medium">Session Type</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Sessions</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Bat Speed</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">On-Plane Eff.</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Attack Angle</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Exit Velo</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">Session Type</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Sessions</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Bat Speed</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">On-Plane Eff.</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Attack Angle</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Exit Velo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {averages.map((avg: any, idx: number) => (
-                    <tr key={avg.sessionType || idx} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
+                    <tr key={avg.sessionType || idx} className="border-b border-border/40 hover:bg-muted/20 transition-colors">
                       <td className="py-3 px-3">
-                        <Badge variant="outline" className="text-white/70 border-white/10 font-normal">
+                        <Badge variant="outline" className="text-foreground/80 border-border font-normal">
                           {avg.sessionType}
                         </Badge>
                       </td>
-                      <td className="text-center py-3 px-2 text-white/60">{avg.sessionCount}</td>
+                      <td className="text-center py-3 px-2 text-muted-foreground">{avg.sessionCount}</td>
                       <td className="text-center py-3 px-2 text-[#E8425A] font-medium">{avg.avgBatSpeed} mph</td>
                       <td className="text-center py-3 px-2 text-teal-400 font-medium">{avg.avgOnPlaneEfficiency}%</td>
                       <td className="text-center py-3 px-2 text-lime-400 font-medium">{avg.avgAttackAngle}°</td>
@@ -667,13 +667,13 @@ export function BlastMetricsTab({
       )}
 
       {/* Session History Table */}
-      <Card className="bg-white/[0.04] border-white/[0.08]">
+      <Card className="bg-muted/40 border-border">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg text-white flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-green-400" />
               Session History
-              <Badge variant="outline" className="text-white/40 border-white/10 ml-2 font-normal">
+              <Badge variant="outline" className="text-muted-foreground border-border ml-2 font-normal">
                 {sessions.length} sessions
               </Badge>
             </CardTitle>
@@ -692,11 +692,11 @@ export function BlastMetricsTab({
           {sessionsLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 rounded-lg bg-white/[0.04] animate-pulse" />
+                <div key={i} className="h-16 rounded-lg bg-muted/40 animate-pulse" />
               ))}
             </div>
           ) : sessions.length === 0 ? (
-            <div className="py-8 text-center text-white/30 space-y-3">
+            <div className="py-8 text-center text-muted-foreground/60 space-y-3">
               <p>No sessions found for the selected filters</p>
               <Button
                 onClick={() => setAddSessionOpen(true)}
@@ -712,23 +712,23 @@ export function BlastMetricsTab({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.08]">
-                    <th className="text-left py-3 px-3 text-white/50 font-medium">Date</th>
-                    <th className="text-left py-3 px-2 text-white/50 font-medium">Type</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Bat Speed</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">On-Plane Eff.</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Attack Angle</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Exit Velo</th>
-                    <th className="text-center py-3 px-2 text-white/50 font-medium">Note</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">Date</th>
+                    <th className="text-left py-3 px-2 text-muted-foreground font-medium">Type</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Bat Speed</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">On-Plane Eff.</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Attack Angle</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Exit Velo</th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Note</th>
                     <th className="w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {sessions.map((s: any, idx: number) => (
-                    <tr key={s.id || idx} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group">
-                      <td className="py-3 px-3 text-white/80 whitespace-nowrap">{formatDate(s.sessionDate)}</td>
+                    <tr key={s.id || idx} className="border-b border-border/40 hover:bg-muted/20 transition-colors group">
+                      <td className="py-3 px-3 text-foreground whitespace-nowrap">{formatDate(s.sessionDate)}</td>
                       <td className="py-3 px-2">
-                        <Badge variant="outline" className="text-white/60 border-white/10 font-normal text-xs">
+                        <Badge variant="outline" className="text-muted-foreground border-border font-normal text-xs">
                           {s.sessionType}
                         </Badge>
                       </td>
@@ -750,14 +750,14 @@ export function BlastMetricsTab({
                             <FileText className="h-3 w-3" />
                           </span>
                         ) : (
-                          <span className="text-white/15">—</span>
+                          <span className="text-muted-foreground/30">—</span>
                         )}
                       </td>
                       <td className="py-3 px-1">
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setEditSession(s as SessionData)}
-                            className="p-1.5 rounded-md hover:bg-amber-500/10 text-white/30 hover:text-amber-400"
+                            className="p-1.5 rounded-md hover:bg-amber-500/10 text-muted-foreground/60 hover:text-amber-400"
                             title="Edit session"
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -768,7 +768,7 @@ export function BlastMetricsTab({
                               date: formatDate(s.sessionDate),
                               type: s.sessionType || "Unknown",
                             })}
-                            className="p-1.5 rounded-md hover:bg-red-500/10 text-white/30 hover:text-red-400"
+                            className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground/60 hover:text-red-400"
                             title="Delete session"
                           >
                             <Trash2 className="h-3.5 w-3.5" />

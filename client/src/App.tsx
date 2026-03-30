@@ -175,7 +175,7 @@ function App() {
     <ErrorBoundary resetKey={location}>
       <NotificationProvider>
         <ThemeProvider
-          defaultTheme="light"
+          defaultTheme="dark"
           // switchable
         >
           <TooltipProvider>
