@@ -81,45 +81,52 @@ export async function logActivity(
       userAgent: options?.userAgent || null,
     });
 
-    // Find coach(es) to notify - get all users with admin or coach role
-    const coaches = await db.select().from(users).where(
-      sql`${users.role} IN ('admin', 'coach')`
-    );
-
-    // Create notifications for each coach based on their preferences
-    for (const coach of coaches) {
-      const { shouldNotifyInApp, shouldNotifyEmail } = await shouldNotifyCoach(coach.id, activityType);
-      const message = `${athleteName} ${activityMessages[activityType](options?.metadata)}`;
-      const actionUrl = getActionUrl(activityType, options?.relatedId);
-      
-      // Send in-app notification
-      if (shouldNotifyInApp) {
-        await db.insert(notifications).values({
-          userId: coach.id,
-          type: "system",
-          title: activityTitles[activityType],
-          message,
-          relatedId: athleteId,
-          relatedType: "athlete_activity",
-          isRead: 0,
-          actionUrl,
-        });
-      }
-      
-      // Queue email alert for batched sending (prevents inbox overload)
-      if (shouldNotifyEmail && coach.email) {
-        const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
-        await queueActivityAlert(
-          coach.id,
-          athleteId,
-          athleteName,
-          activityType,
-          message,
-          `${baseUrl}${actionUrl}`,
-          options?.metadata
+    // Notifications are fire-and-forget — never block the caller for them.
+    // Runs in background so the HTTP response returns immediately.
+    setImmediate(async () => {
+      try {
+        const db2 = await getDb();
+        if (!db2) return;
+        // Find coach(es) to notify - get all users with admin or coach role
+        const coaches = await db2.select().from(users).where(
+          sql`${users.role} IN ('admin', 'coach')`
         );
+
+        for (const coach of coaches) {
+          const { shouldNotifyInApp, shouldNotifyEmail } = await shouldNotifyCoach(coach.id, activityType);
+          const message = `${athleteName} ${activityMessages[activityType](options?.metadata)}`;
+          const actionUrl = getActionUrl(activityType, options?.relatedId);
+
+          if (shouldNotifyInApp) {
+            await db2.insert(notifications).values({
+              userId: coach.id,
+              type: "system",
+              title: activityTitles[activityType],
+              message,
+              relatedId: athleteId,
+              relatedType: "athlete_activity",
+              isRead: 0,
+              actionUrl,
+            });
+          }
+
+          if (shouldNotifyEmail && coach.email) {
+            const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
+            await queueActivityAlert(
+              coach.id,
+              athleteId,
+              athleteName,
+              activityType,
+              message,
+              `${baseUrl}${actionUrl}`,
+              options?.metadata
+            );
+          }
+        }
+      } catch (bgErr) {
+        console.error("[Activity] Background notification failed:", bgErr);
       }
-    }
+    });
 
     return true;
   } catch (error) {

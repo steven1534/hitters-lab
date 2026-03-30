@@ -84,7 +84,9 @@ export function BlastMetricsTab({
   const [retroNotesOpen, setRetroNotesOpen] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
 
-  const { data: players = [], isLoading: playersLoading } = trpc.blastMetrics.listPlayers.useQuery();
+  const { data: players = [], isLoading: playersLoading } = trpc.blastMetrics.listPlayers.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000, // 5 min — avoid re-fetching the heavy GROUP BY JOIN on every tab visit
+  });
 
   const { data: player } = trpc.blastMetrics.getPlayer.useQuery(
     { playerId: selectedPlayerId! },

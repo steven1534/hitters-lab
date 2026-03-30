@@ -230,6 +230,17 @@ export default function CoachDashboard() {
     enabled: user?.role === "admin",
   });
 
+  // Fetch blast players ONCE here with stale time so SessionNotes + PlayerReports
+  // don't each fire their own heavy GROUP BY JOIN query on mount.
+  const { data: blastPlayersList = [] } = trpc.blastMetrics.listPlayers.useQuery(undefined, {
+    enabled: user?.role === "admin",
+    staleTime: 5 * 60 * 1000, // 5 minutes — no refetch on every tab switch
+  });
+  const blastUserIds = useMemo(
+    () => new Set((blastPlayersList as any[]).filter((p: any) => p.userId).map((p: any) => Number(p.userId))),
+    [blastPlayersList]
+  );
+
   const athleteOptions = useMemo(() => {
     const options: { id: string; name: string; email: string; type: 'user' | 'invite'; status?: string }[] = [];
     allUsers.forEach((u: any) => {
@@ -524,6 +535,7 @@ export default function CoachDashboard() {
               <SessionNotesTab
                 key={crossNavAthleteId ?? "default"}
                 initialAthleteId={crossNavAthleteId}
+                blastUserIds={blastUserIds}
               />
             )}
 
@@ -531,6 +543,7 @@ export default function CoachDashboard() {
               <PlayerReportsTab
                 key={crossNavAthleteId ?? "default"}
                 initialAthleteId={crossNavAthleteId}
+                blastUserIds={blastUserIds}
               />
             )}
 

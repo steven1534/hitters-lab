@@ -420,7 +420,7 @@ type View =
   | { type: "view"; athleteId: number; athleteName: string; note: any }
   | { type: "edit"; athleteId: number; athleteName: string; note: any };
 
-export function SessionNotesTab({ initialAthleteId }: { initialAthleteId?: number } = {}) {
+export function SessionNotesTab({ initialAthleteId, blastUserIds: blastUserIdsProp }: { initialAthleteId?: number; blastUserIds?: Set<number> } = {}) {
   const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
   const athletes = (allUsers as any[]).filter((u: any) => u.role === "athlete");
 
@@ -445,9 +445,8 @@ export function SessionNotesTab({ initialAthleteId }: { initialAthleteId?: numbe
     },
   });
 
-  // Blast players map: userId -> blastPlayer (for badge display)
-  const { data: blastPlayers = [] } = trpc.blastMetrics.listPlayers.useQuery();
-  const blastUserIds = new Set((blastPlayers as any[]).filter((p: any) => p.userId).map((p: any) => p.userId));
+  // Blast badge — use prop if provided (from CoachDashboard), else empty set
+  const blastUserIds = blastUserIdsProp ?? new Set<number>();
 
   const filtered = athletes.filter((a: any) => a.name?.toLowerCase().includes(search.toLowerCase()));
 
