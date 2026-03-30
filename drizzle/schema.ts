@@ -28,7 +28,7 @@ export const users = pgTable("users", {
   /** Email used as primary auth identifier (replaces Manus openId) */
   email: varchar("email", { length: 320 }).notNull().unique(),
   /** Hashed password */
-  passwordHash: text("password"),
+    passwordHash: text("passwordHash"),
   name: text("name"),
   loginMethod: varchar("loginMethod", { length: 64 }).default("email"),
   role: roleEnum("role").default("user").notNull(),
