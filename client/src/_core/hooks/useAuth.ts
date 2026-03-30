@@ -2,6 +2,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
+import { UNAUTHED_ERR_MSG } from "@shared/const";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -14,7 +15,22 @@ export function useAuth(options?: UseAuthOptions) {
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
-    retry: false,
+    // Don't retry on genuine 401 / "please login" responses — the user is simply
+    // not authenticated.  But DO retry once for transient server errors (503,
+    // network blips, server restarts) so a brief outage doesn't flash the user
+    // to the login screen unexpectedly.
+    retry: (failureCount, error) => {
+      if (error instanceof TRPCClientError) {
+        if (
+          error.message === UNAUTHED_ERR_MSG ||
+          error.data?.httpStatus === 401
+        ) {
+          return false;
+        }
+      }
+      return failureCount < 1;
+    },
+    retryDelay: 1000,
     refetchOnWindowFocus: false,
   });
 

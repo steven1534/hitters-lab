@@ -8,7 +8,7 @@ import {
   MessageCircle, Star, Flame, Target, X, Trophy, FileText, ChevronDown, ChevronUp, Dumbbell, Coffee, Zap, User, Video, Upload
 } from "lucide-react";
 import { Link } from "wouter";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { getCategoryConfig } from "@/lib/categoryColors";
 import { trpc } from "@/lib/trpc";
 import { CompletionModal } from "@/components/CompletionModal";
@@ -142,12 +142,16 @@ export default function AthletePortal() {
 
   // Activity logging mutation
   const logActivityMutation = trpc.activity.logActivity.useMutation();
+  const hasLoggedActivity = useRef(false);
 
-  // Log portal login on mount
+  // Log portal login on mount — fire once when the user id is first known
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && !hasLoggedActivity.current) {
+      hasLoggedActivity.current = true;
       logActivityMutation.mutate({ activityType: "portal_login" });
     }
+    // logActivityMutation.mutate is stable; hasLoggedActivity is a ref
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   // Calculate progress stats

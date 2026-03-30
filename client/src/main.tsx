@@ -13,8 +13,13 @@ import { SiteContentProvider } from "@/contexts/SiteContentContext";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 2,
-      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+      // One retry is enough to survive a momentary server hiccup.
+      // retryDelay: 1 s — fast enough to be invisible, slow enough not to spam.
+      retry: 1,
+      retryDelay: 1000,
+      // 30 s staleTime prevents the same data from being re-fetched every time
+      // a component remounts, eliminating unnecessary loading flickers.
+      staleTime: 30_000,
     },
     mutations: {
       retry: 1,
