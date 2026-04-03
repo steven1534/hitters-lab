@@ -184,10 +184,7 @@ export default function Home() {
               <span className="font-bold text-slate-900 text-sm tracking-tight">Coach Steve's Hitters Lab</span>
             </div>
             <span className="sm:hidden font-bold text-slate-900 text-sm">Hitters Lab</span>
-          </div>
-
-          {/* Nav actions */}
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
             {user ? (
               <>
                 {user.role === 'admin' && (
@@ -198,17 +195,18 @@ export default function Home() {
                         <span className="hidden sm:inline">Dashboard</span>
                       </Button>
                     </Link>
-                  )}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={logout} 
-                    className="gap-1.5 text-xs glass border-white/10 hover:border-white/20 hover:bg-white/5 transition-all duration-300"
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Logout</span>
-                  </Button>
-                </>
+                  </>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={logout} 
+                  className="gap-1.5 text-xs glass border-white/10 hover:border-white/20 hover:bg-white/5 transition-all duration-300"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              </>
               ) : (
                 <a href={getLoginUrl()}>
                   <Button size="sm" className="gap-1.5 text-xs btn-premium text-white">
