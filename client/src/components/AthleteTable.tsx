@@ -64,13 +64,17 @@ export function AthleteTable() {
   const { data: overviewData, isLoading: overviewLoading } = trpc.drillAssignments.getAthleteAssignmentOverview.useQuery();
   const { data: allUsers = [], isLoading: usersLoading } = trpc.admin.getAllUsers.useQuery();
 
-  const isLoading = overviewLoading || usersLoading;
+  // Only show loading if both queries are still pending
+  const isLoading = usersLoading && overviewLoading;
 
-  // Merge data from both sources
+  // Merge data from both sources.
+  // Falls back to allUsers when overviewData is unavailable (e.g. DB probe still warming up).
   const athletes: AthleteRow[] = useMemo(() => {
-    if (!overviewData) return [];
+    const overviewAthletes = overviewData?.athletes ?? [];
 
-    return overviewData.athletes.map((athlete) => {
+    // If overviewData returned athletes, use them merged with allUsers
+    if (overviewAthletes.length > 0) {
+      return overviewAthletes.map((athlete) => {
       // Find matching user record for additional details
       const numericId = parseInt(athlete.id.replace(/^(user-|invite-)/, ""));
       const userRecord = athlete.type === "user"
@@ -95,7 +99,30 @@ export function AthleteTable() {
         createdAt: userRecord?.createdAt ? new Date(userRecord.createdAt) : null,
         lastSignedIn: userRecord?.lastSignedIn ? new Date(userRecord.lastSignedIn) : null,
       };
-    });
+      });
+    }
+
+    // Fallback: build rows directly from allUsers when overviewData is empty/unavailable
+    return (allUsers as any[])
+      .filter((u: any) => u.role !== 'admin' && u.role !== 'parent')
+      .map((u: any) => ({
+        numericId: u.id,
+        id: `user-${u.id}`,
+        name: u.name || u.email?.split('@')[0] || `User ${u.id}`,
+        email: u.email || '',
+        type: 'user' as const,
+        status: u.isActiveClient === 1 ? 'active' as const : 'pending' as const,
+        role: u.role,
+        isActiveClient: u.isActiveClient === 1,
+        hasDrills: false,
+        totalDrills: 0,
+        completedDrills: 0,
+        inProgressDrills: 0,
+        assignedDrills: 0,
+        lastActivity: null,
+        createdAt: u.createdAt ? new Date(u.createdAt) : null,
+        lastSignedIn: u.lastSignedIn ? new Date(u.lastSignedIn) : null,
+      }));
   }, [overviewData, allUsers]);
 
   // Filter

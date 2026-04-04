@@ -199,7 +199,7 @@ export async function getAllAssignments() {
 export async function getAthleteAssignmentOverview() {
   const db = await getDb();
   if (!db) {
-    throw new Error("Database not available");
+    return { athletes: [] };
   }
 
   // Get all athletes (users with role 'athlete' or active clients) — exclude parents and admins
