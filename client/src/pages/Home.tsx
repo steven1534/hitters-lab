@@ -68,6 +68,8 @@ export default function Home() {
 
   const DRILLS_PER_PAGE = 21;
   const hasRestoredScroll = useRef(false);
+  const heroRef = useRef<HTMLElement>(null);
+  const [scrollY, setScrollY] = useState(0);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingDrill, setEditingDrill] = useState<Drill | null>(null);
 
@@ -94,6 +96,12 @@ export default function Home() {
 
   useEffect(() => {
     document.title = "Baseball Training Drills | Coach Steve's Hitters Lab";
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const allDrills = useAllDrills();
