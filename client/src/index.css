@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *), &:is(.coach-dark *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -57,7 +57,7 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light; /* public pages are light theme */
   /* Coach Steve Baseball — Charcoal + Crimson Palette */
   --primary: oklch(0.14 0.005 0);
   --primary-foreground: oklch(0.98 0.005 0);
