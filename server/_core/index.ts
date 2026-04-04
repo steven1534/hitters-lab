@@ -47,6 +47,16 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+  // Hard 15s request timeout — prevents Railway from hanging forever on DB issues
+  app.use((_req, res, next) => {
+    res.setTimeout(15000, () => {
+      if (!res.headersSent) {
+        res.status(503).json({ error: "Request timed out — server busy" });
+      }
+    });
+    next();
+  });
+
   // Email/password auth routes
   registerAuthRoutes(app);
 

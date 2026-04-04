@@ -11,7 +11,7 @@ import {
   drillQuestions, drillAnswers, parentChildren,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 // ── YouTube URL normalizer (server-side) ──────────────────────────────────────
@@ -37,19 +37,32 @@ function normalizeVideoUrl(url: string): string {
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+// postgres-js connect_timeout doesn't fire until the first query.
+// We probe the connection once at startup and cache the result.
+let _dbReady: boolean | null = null;
+
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       const client = postgres(process.env.DATABASE_URL, {
         prepare: false,
-        max: 3,              // hard cap — Supabase pooler has limited slots
-        idle_timeout: 20,    // release idle connections after 20s
-        connect_timeout: 10, // fail fast if can't connect
+        max: 3,
+        idle_timeout: 20,
+        connect_timeout: 8,
       });
-      _db = drizzle(client);
+      const db = drizzle(client);
+      // Probe with a hard 8-second timeout — if Supabase doesn't respond, fail fast
+      await Promise.race([
+        db.execute(sql`SELECT 1`),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("DB connect timeout")), 8000)),
+      ]);
+      _db = db;
+      _dbReady = true;
+      console.log("[Database] Connected to Supabase");
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
+      _dbReady = false;
     }
   }
   return _db;
