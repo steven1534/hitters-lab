@@ -262,7 +262,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* ===== STICKY SEARCH + FILTER BAR ===== */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm shadow-black/20">

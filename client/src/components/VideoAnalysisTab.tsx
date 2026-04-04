@@ -438,8 +438,7 @@ export function VideoAnalysisTab() {
               )}
             </CardContent>
           </Card>
-          );
-        })()}
+        )}
 
         {/* Editable Feedback */}
         {(selectedAnalysis.status === "complete") && (
