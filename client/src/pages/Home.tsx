@@ -134,7 +134,7 @@ export default function Home() {
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm max-w-md w-full p-10 text-center">
           <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-600/20">
-            <Target className="h-7 w-7 text-foreground" />
+            <Target className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Coach Steve's<br/>Hitters Lab</h1>
           <p className="text-slate-500 text-sm leading-relaxed mb-8">
@@ -186,19 +186,19 @@ export default function Home() {
               <div className="h-10 w-10 bg-gradient-to-br from-secondary to-electric rounded-lg flex items-center justify-center font-heading font-bold text-lg text-white shadow-lg shadow-secondary/20">
                 CS
               </div>
-              <span className="font-heading font-bold text-lg text-foreground hidden sm:block">Coach Steve</span>
+              <span className="font-heading font-bold text-lg text-white hidden sm:block">Coach Steve</span>
             </div>
             <div className="hidden sm:block">
-              <span className="font-bold text-slate-900 text-sm tracking-tight">Coach Steve's Hitters Lab</span>
+              <span className="font-bold text-white text-sm tracking-tight">Coach Steve's Hitters Lab</span>
             </div>
-            <span className="sm:hidden font-bold text-slate-900 text-sm">Hitters Lab</span>
+            <span className="sm:hidden font-bold text-white text-sm">Hitters Lab</span>
             <div className="flex items-center gap-2">
             {user ? (
               <>
                 {user.role === 'admin' && (
                   <>
                     <Link href="/coach-dashboard">
-                      <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-600 hover:text-slate-900">
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs border-white/20 text-white/70 hover:text-white hover:border-white/30">
                         <Users className="h-3.5 w-3.5" />
                         <span className="hidden sm:inline">Dashboard</span>
                       </Button>
@@ -239,7 +239,7 @@ export default function Home() {
             {/* Main heading */}
             <div className="animate-fade-in-up stagger-2">
               <h1 className="font-heading font-black tracking-tight leading-none">
-                <span className="block text-foreground text-4xl sm:text-6xl md:text-7xl lg:text-8xl">
+                <span className="block text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl">
                   COACH STEVE'S
                 </span>
                 <span className="block text-5xl sm:text-7xl md:text-8xl lg:text-9xl mt-1 text-gradient">
@@ -248,11 +248,11 @@ export default function Home() {
               </h1>
             </div>
 
-            <h2 className="text-xs md:text-lg text-muted-foreground mt-4 mb-6 max-w-xl mx-auto leading-relaxed animate-fade-in-up stagger-3 font-normal">
+            <h2 className="text-xs md:text-lg text-white/60 mt-4 mb-6 max-w-xl mx-auto leading-relaxed animate-fade-in-up stagger-3 font-normal">
               Professional training drills designed to build{" "}
-              <span className="text-foreground font-semibold">elite mechanics</span>,{" "}
-              <span className="text-foreground font-semibold">explosive power</span>, and{" "}
-              <span className="text-foreground font-semibold">game-ready confidence</span>.
+              <span className="text-white font-semibold">elite mechanics</span>,{" "}
+              <span className="text-white font-semibold">explosive power</span>, and{" "}
+              <span className="text-white font-semibold">game-ready confidence</span>.
             </h2>
             
             {/* Stats row */}
@@ -263,8 +263,8 @@ export default function Home() {
                 { value: "3", label: "Skill Levels" },
               ].map((s) => (
                 <div key={s.label}>
-                  <div className="text-2xl font-black text-slate-900">{s.value}</div>
-                  <div className="text-xs text-slate-400 font-medium">{s.label}</div>
+                  <div className="text-2xl font-black text-white">{s.value}</div>
+                  <div className="text-xs text-white/50 font-medium">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -533,7 +533,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center">
-              <Target className="h-3.5 w-3.5 text-foreground" />
+              <Target className="h-3.5 w-3.5 text-white" />
             </div>
             <span className="font-bold text-slate-900 text-sm">Coach Steve's Hitters Lab</span>
           </div>
