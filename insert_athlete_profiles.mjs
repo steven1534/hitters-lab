@@ -4,9 +4,12 @@ import postgres from 'postgres';
 import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 
-const sql = postgres('postgresql://postgres.gmrrpvctlujsvhiwkivu:Thorbuddy1534!@aws-1-us-east-2.pooler.supabase.com:6543/postgres', { ssl: 'require', prepare: false });
+const DATABASE_URL = process.env.DATABASE_URL
+  || 'postgresql://postgres.gmrrpvctlujsvhiwkivu:Thorbuddy1534!@aws-1-us-east-2.pooler.supabase.com:6543/postgres';
+const sql = postgres(DATABASE_URL, { ssl: 'require', prepare: false });
 
-const rows = parse(fs.readFileSync('/home/user/workspace/athleteProfiles.csv', 'utf8'), {
+const csvPath = process.argv[2] || 'athleteProfiles.csv';
+const rows = parse(fs.readFileSync(csvPath, 'utf8'), {
   columns: true, skip_empty_lines: true, relaxQuotes: true, relax_column_count: true,
 });
 
@@ -38,7 +41,7 @@ for (const row of rows) {
         ${parseInt(row.id)}, ${parseInt(row.userId)}, ${birthDate},
         ${row.position?.trim() || null}, ${row.secondaryPosition?.trim() || null},
         ${bats}, ${throws_}, ${row.teamName?.trim() || null},
-        ${focusAreas ? JSON.stringify(focusAreas) + '::jsonb' : null},
+        ${focusAreas ? sql.json(focusAreas) : null},
         ${row.parentName?.trim() || null}, ${row.parentEmail?.trim() || null},
         ${row.parentPhone?.trim() || null},
         ${new Date(row.createdAt)}, ${new Date(row.updatedAt)}

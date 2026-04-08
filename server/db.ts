@@ -36,34 +36,49 @@ function normalizeVideoUrl(url: string): string {
 }
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _client: ReturnType<typeof postgres> | null = null;
 
-// postgres-js connect_timeout doesn't fire until the first query.
-// We probe the connection once at startup and cache the result.
-let _dbReady: boolean | null = null;
+function resetDb() {
+  if (_client) {
+    _client.end({ timeout: 2 }).catch(() => {});
+  }
+  _db = null;
+  _client = null;
+}
 
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  if (_db) {
     try {
-      const client = postgres(process.env.DATABASE_URL, {
-        prepare: false,
-        max: 3,
-        idle_timeout: 20,
-        connect_timeout: 8,
-      });
-      const db = drizzle(client);
-      // Probe with a hard 8-second timeout — if Supabase doesn't respond, fail fast
       await Promise.race([
-        db.execute(sql`SELECT 1`),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("DB connect timeout")), 8000)),
+        _db.execute(sql`SELECT 1`),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("DB ping timeout")), 5000)),
       ]);
-      _db = db;
-      _dbReady = true;
-      console.log("[Database] Connected to Supabase");
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
-      _dbReady = false;
+      return _db;
+    } catch {
+      console.warn("[Database] Stale connection detected, reconnecting...");
+      resetDb();
     }
+  }
+
+  if (!process.env.DATABASE_URL) return null;
+
+  try {
+    _client = postgres(process.env.DATABASE_URL, {
+      prepare: false,
+      max: 5,
+      idle_timeout: 0,
+      connect_timeout: 8,
+    });
+    const db = drizzle(_client);
+    await Promise.race([
+      db.execute(sql`SELECT 1`),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("DB connect timeout")), 8000)),
+    ]);
+    _db = db;
+    console.log("[Database] Connected to Supabase");
+  } catch (error) {
+    console.warn("[Database] Failed to connect:", error);
+    resetDb();
   }
   return _db;
 }
