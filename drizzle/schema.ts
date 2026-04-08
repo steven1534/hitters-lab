@@ -131,6 +131,7 @@ export const drillDetails = pgTable("drillDetails", {
   commonMistakes: json("commonMistakes").$type<string[]>(),
   progressions: json("progressions").$type<string[]>(),
   instructions: text("instructions"),
+  tags: json("tags").$type<string[]>(),
   createdBy: integer("createdBy").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
