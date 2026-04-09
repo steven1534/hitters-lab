@@ -107,7 +107,7 @@ export default function UserManagement() {
 
   if (!user || user.role !== "admin") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="coach-dark min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md border-destructive">
           <CardHeader>
             <CardTitle>Access Denied</CardTitle>
@@ -123,7 +123,7 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="coach-dark min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">

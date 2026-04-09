@@ -46,11 +46,16 @@ export default function AthleteMessaging() {
   );
 
   if (loading || questionsLoading) {
-    return <div className="container py-12 text-center">Loading...</div>;
+    return (
+      <div className="coach-dark min-h-screen bg-background flex items-center justify-center">
+        <div className="container py-12 text-center text-muted-foreground">Loading...</div>
+      </div>
+    );
   }
 
   if (!user || user.role !== 'athlete') {
     return (
+      <div className="coach-dark min-h-screen bg-background">
       <div className="container py-12">
         <Card className="max-w-2xl mx-auto border-2">
           <CardHeader className="text-center">
@@ -64,11 +69,12 @@ export default function AthleteMessaging() {
           </CardContent>
         </Card>
       </div>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-8 mb-8">
         <div className="container">
@@ -161,12 +167,12 @@ export default function AthleteMessaging() {
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-semibold text-lg">Drill: {question.drillId}</h3>
                           {question.answers.length > 0 && (
-                            <Badge variant="outline" className="gap-1 bg-green-50 text-green-700 border-green-200 text-xs">
+                            <Badge variant="outline" className="gap-1 bg-green-500/10 text-green-400 border-green-500/20 text-xs">
                               Answered
                             </Badge>
                           )}
                           {question.answers.length === 0 && (
-                            <Badge variant="outline" className="gap-1 bg-amber-50 text-amber-700 border-amber-200 text-xs">
+                            <Badge variant="outline" className="gap-1 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
                               Pending
                             </Badge>
                           )}
@@ -194,9 +200,9 @@ export default function AthleteMessaging() {
                             <p className="text-sm font-semibold mb-2">Coach Steve's Response</p>
                             <div className="space-y-2">
                               {question.answers.map((answer: any) => (
-                                <div key={answer.id} className="p-3 bg-red-50 rounded border border-red-200">
-                                  <p className="text-sm text-red-900">{answer.answer}</p>
-                                  <p className="text-xs text-red-700 mt-2">
+                                <div key={answer.id} className="p-3 bg-red-500/10 rounded border border-red-500/20">
+                                  <p className="text-sm text-red-200">{answer.answer}</p>
+                                  <p className="text-xs text-red-400/80 mt-2">
                                     {new Date(answer.createdAt).toLocaleString()}
                                   </p>
                                 </div>
@@ -204,8 +210,8 @@ export default function AthleteMessaging() {
                             </div>
                           </div>
                         ) : (
-                          <div className="p-3 bg-amber-50 rounded border border-amber-200">
-                            <p className="text-sm text-amber-900">
+                          <div className="p-3 bg-amber-500/10 rounded border border-amber-500/20">
+                            <p className="text-sm text-amber-200">
                               Coach Steve hasn't responded yet. Check back soon!
                             </p>
                           </div>

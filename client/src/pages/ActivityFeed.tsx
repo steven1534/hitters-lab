@@ -28,14 +28,14 @@ import { formatDistanceToNow } from "date-fns";
 
 // Activity type icons and colors
 const activityConfig: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
-  portal_login: { icon: <LogIn className="h-4 w-4" />, color: "bg-red-100 text-red-700", label: "Login" },
-  drill_view: { icon: <Eye className="h-4 w-4" />, color: "bg-purple-100 text-purple-700", label: "Viewed" },
-  assignment_view: { icon: <Eye className="h-4 w-4" />, color: "bg-red-100 text-[#DC143C]", label: "Assignments" },
-  drill_start: { icon: <PlayCircle className="h-4 w-4" />, color: "bg-yellow-100 text-yellow-700", label: "Started" },
-  drill_complete: { icon: <CheckCircle className="h-4 w-4" />, color: "bg-green-100 text-green-700", label: "Completed" },
-  video_submit: { icon: <Video className="h-4 w-4" />, color: "bg-pink-100 text-pink-700", label: "Video" },
-  message_sent: { icon: <MessageSquare className="h-4 w-4" />, color: "bg-orange-100 text-orange-700", label: "Message" },
-  profile_update: { icon: <Users className="h-4 w-4" />, color: "bg-gray-100 text-gray-700", label: "Profile" },
+  portal_login: { icon: <LogIn className="h-4 w-4" />, color: "bg-red-500/10 text-red-400", label: "Login" },
+  drill_view: { icon: <Eye className="h-4 w-4" />, color: "bg-purple-500/10 text-purple-400", label: "Viewed" },
+  assignment_view: { icon: <Eye className="h-4 w-4" />, color: "bg-red-500/10 text-[#E8425A]", label: "Assignments" },
+  drill_start: { icon: <PlayCircle className="h-4 w-4" />, color: "bg-yellow-500/10 text-yellow-400", label: "Started" },
+  drill_complete: { icon: <CheckCircle className="h-4 w-4" />, color: "bg-green-500/10 text-green-400", label: "Completed" },
+  video_submit: { icon: <Video className="h-4 w-4" />, color: "bg-pink-500/10 text-pink-400", label: "Video" },
+  message_sent: { icon: <MessageSquare className="h-4 w-4" />, color: "bg-orange-500/10 text-orange-400", label: "Message" },
+  profile_update: { icon: <Users className="h-4 w-4" />, color: "bg-gray-500/10 text-gray-400", label: "Profile" },
 };
 
 export default function ActivityFeed() {
@@ -86,6 +86,7 @@ export default function ActivityFeed() {
   };
 
   return (
+    <div className="coach-dark min-h-screen bg-background">
     <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -109,8 +110,8 @@ export default function ActivityFeed() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Users className="h-5 w-5 text-[#DC143C]" />
+              <div className="p-2 bg-red-500/10 rounded-lg">
+                <Users className="h-5 w-5 text-[#E8425A]" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{summary?.activeAthletesToday || 0}</p>
@@ -123,8 +124,8 @@ export default function ActivityFeed() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Eye className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-purple-500/10 rounded-lg">
+                <Eye className="h-5 w-5 text-purple-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{summary?.drillsViewedToday || 0}</p>
@@ -137,8 +138,8 @@ export default function ActivityFeed() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-green-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{summary?.drillsCompletedToday || 0}</p>
@@ -151,8 +152,8 @@ export default function ActivityFeed() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-pink-100 rounded-lg">
-                <Video className="h-5 w-5 text-pink-600" />
+              <div className="p-2 bg-pink-500/10 rounded-lg">
+                <Video className="h-5 w-5 text-pink-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{summary?.videosSubmittedToday || 0}</p>
@@ -165,8 +166,8 @@ export default function ActivityFeed() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-orange-600" />
+              <div className="p-2 bg-orange-500/10 rounded-lg">
+                <MessageSquare className="h-5 w-5 text-orange-400" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{summary?.messagesReceivedToday || 0}</p>
@@ -285,10 +286,10 @@ export default function ActivityFeed() {
                   {inactiveAthletes.map((athlete: any) => (
                     <div
                       key={athlete.id}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-yellow-200 bg-yellow-50"
+                      className="flex items-center gap-4 p-4 rounded-lg border border-amber-500/30 bg-amber-500/10"
                     >
-                      <div className="p-2 rounded-full bg-yellow-100">
-                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                      <div className="p-2 rounded-full bg-amber-500/20">
+                        <AlertTriangle className="h-5 w-5 text-amber-400" />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">{athlete.name || athlete.email}</p>
@@ -300,7 +301,7 @@ export default function ActivityFeed() {
                         </p>
                       </div>
                       {athlete.daysSinceLastActivity !== null && (
-                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30">
                           {athlete.daysSinceLastActivity} days inactive
                         </Badge>
                       )}
@@ -463,6 +464,7 @@ export default function ActivityFeed() {
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
     </div>
   );
 }

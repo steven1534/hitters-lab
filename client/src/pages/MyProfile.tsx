@@ -108,7 +108,7 @@ export default function MyProfile() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="coach-dark min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-electric" />
       </div>
     );
@@ -118,7 +118,7 @@ export default function MyProfile() {
   const isProfileEmpty = !position && !parentEmail && !birthDate;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header */}
       <header className="glass sticky top-0 z-40 border-b border-border">
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">

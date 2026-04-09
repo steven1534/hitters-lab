@@ -70,7 +70,7 @@ export function ManageDrillVideos() {
 
   if (!user || (user.role !== "coach" && user.role !== "admin")) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="coach-dark min-h-screen bg-background flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Access Denied</CardTitle>
@@ -87,7 +87,7 @@ export function ManageDrillVideos() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header */}
       <header className="bg-primary text-primary-foreground py-6 mb-8">
         <div className="container">

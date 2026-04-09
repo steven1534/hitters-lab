@@ -35,6 +35,7 @@ import { InlineEdit } from "@/components/InlineEdit";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AddNewDrill } from "@/components/AddNewDrill";
 import { NotificationSettings } from "@/components/NotificationSettings";
+import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
 
 interface Drill {
   id: string;
@@ -44,7 +45,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -90,6 +91,7 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   assign: "Assign Drills",
   "bulk-import": "Bulk Import",
   "bulk-goals": "Bulk Goals",
+  "catalog-overrides": "Catalog Overrides",
   "page-layouts": "Page Layouts",
   athletes: "Athletes Table",
   planner: "Practice Planner",
@@ -180,10 +182,10 @@ function InviteUserButton() {
           </>
         ) : (
           <div className="space-y-4 py-2">
-            <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-center">
-              <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <p className="font-semibold text-green-800">Invite created for</p>
-              <p className="text-green-700 text-sm">{email}</p>
+            <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-center">
+              <CheckCircle className="h-8 w-8 text-green-400 mx-auto mb-2" />
+              <p className="font-semibold text-green-400">Invite created for</p>
+              <p className="text-green-300/90 text-sm">{email}</p>
             </div>
             <div className="space-y-2">
               <Label>Share this link with the athlete</Label>
@@ -451,6 +453,13 @@ export default function CoachDashboard() {
           <Upload className="w-4 h-4 shrink-0" />
           <span>Bulk Import</span>
         </button>
+        <button
+          onClick={() => navigate("catalog-overrides")}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all ${activeTab === "catalog-overrides" ? "bg-[#DC143C]/15 text-white border border-[#DC143C]/25" : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"}`}
+        >
+          <Table2 className="w-4 h-4 shrink-0" />
+          <span>Catalog overrides</span>
+        </button>
         <Link href="/drills">
           <div className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-all cursor-pointer">
             <ArrowLeft className="w-4 h-4 shrink-0" />
@@ -627,6 +636,12 @@ export default function CoachDashboard() {
               <div className="max-w-4xl mx-auto space-y-6">
                 <BulkImportCustomDrills />
                 <BulkInstructionImport />
+              </div>
+            )}
+
+            {activeTab === "catalog-overrides" && (
+              <div className="max-w-3xl mx-auto">
+                <DrillCatalogOverridesEditor />
               </div>
             )}
 

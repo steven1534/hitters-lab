@@ -267,7 +267,7 @@ export default function DrillComparison() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.18_0.01_25)] via-[oklch(0.15_0.005_0)] to-[oklch(0.12_0.01_20)]" />

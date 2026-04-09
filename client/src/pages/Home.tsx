@@ -27,10 +27,28 @@ interface Drill {
   isCustom?: boolean;
 }
 
-const DIFFICULTY_CONFIG: Record<string, { label: string; color: string }> = {
-  Easy: { label: "Easy", color: "bg-emerald-50 text-emerald-700 border border-emerald-200" },
-  Medium: { label: "Medium", color: "bg-amber-50 text-amber-700 border border-amber-200" },
-  Hard: { label: "Hard", color: "bg-red-50 text-red-700 border border-red-200" },
+const DIFFICULTY_CONFIG: Record<
+  string,
+  { label: string; color: string; class: string; dotClass: string }
+> = {
+  Easy: {
+    label: "Easy",
+    color: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    class: "bg-emerald-500/80 text-white",
+    dotClass: "bg-emerald-500",
+  },
+  Medium: {
+    label: "Medium",
+    color: "bg-amber-50 text-amber-700 border border-amber-200",
+    class: "bg-amber-500/80 text-white",
+    dotClass: "bg-amber-500",
+  },
+  Hard: {
+    label: "Hard",
+    color: "bg-red-50 text-red-700 border border-red-200",
+    class: "bg-red-500/80 text-white",
+    dotClass: "bg-red-500",
+  },
 };
 
 const CATEGORIES = ["All", "Hitting", "Bunting", "Pitching", "Infield", "Outfield"];

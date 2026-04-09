@@ -9,11 +9,16 @@ export default function DrillGeneratorPage() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="container py-12 text-center">Loading...</div>;
+    return (
+      <div className="coach-dark min-h-screen bg-background flex items-center justify-center">
+        <div className="container py-12 text-center text-muted-foreground">Loading...</div>
+      </div>
+    );
   }
 
   if (!user || user.role !== "admin") {
     return (
+      <div className="coach-dark min-h-screen bg-background">
       <div className="container py-12">
         <Card className="max-w-2xl mx-auto border-2">
           <CardContent className="pt-6 text-center space-y-4">
@@ -24,11 +29,12 @@ export default function DrillGeneratorPage() {
           </CardContent>
         </Card>
       </div>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-8 mb-8">
         <div className="container">

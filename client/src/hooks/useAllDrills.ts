@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import drillsData from "@/data/drills";
+import { mergeDrillWithCatalogOverride } from "@shared/drillCatalogMerge";
 
 export interface UnifiedDrill {
   id: string;
@@ -27,9 +28,12 @@ export interface UnifiedDrill {
  */
 export function useAllDrills(): UnifiedDrill[] {
   const { data: customDrills = [] } = trpc.drillDetails.getCustomDrills.useQuery();
+  const { data: catalogOverrides = [] } = trpc.drillCatalog.getAll.useQuery();
 
   return useMemo(() => {
-    const staticDrills: UnifiedDrill[] = drillsData.map((d) => ({
+    const overrideMap = new Map(catalogOverrides.map((o) => [o.drillId, o]));
+
+    const staticBases: UnifiedDrill[] = drillsData.map((d) => ({
       id: String(d.id),
       name: d.name,
       difficulty: d.difficulty,
@@ -45,7 +49,11 @@ export function useAllDrills(): UnifiedDrill[] {
       drillType: d.drillType,
     }));
 
-    const customDrillsFormatted: UnifiedDrill[] = customDrills.map((cd: any) => ({
+    const staticDrills: UnifiedDrill[] = staticBases
+      .map((base) => mergeDrillWithCatalogOverride(base, overrideMap.get(base.id)))
+      .filter((d): d is UnifiedDrill => d != null);
+
+    const customBases: UnifiedDrill[] = customDrills.map((cd: any) => ({
       id: cd.drillId,
       name: cd.name,
       difficulty: cd.difficulty,
@@ -54,16 +62,20 @@ export function useAllDrills(): UnifiedDrill[] {
       url: `/drill/${cd.drillId}`,
       is_direct_link: true,
       isCustom: true,
-      ageLevel: [],
-      tags: [],
-      problem: [],
-      goal: [],
+      ageLevel: [] as string[],
+      tags: [] as string[],
+      problem: [] as string[],
+      goal: [] as string[],
       drillType: cd.drillType || "Game Simulation",
     }));
+
+    const customDrillsFormatted: UnifiedDrill[] = customBases
+      .map((base) => mergeDrillWithCatalogOverride(base, overrideMap.get(base.id)))
+      .filter((d): d is UnifiedDrill => d != null);
 
     // Merge and sort alphabetically by name (case-insensitive)
     return [...staticDrills, ...customDrillsFormatted].sort((a, b) =>
       a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
     );
-  }, [customDrills]);
+  }, [customDrills, catalogOverrides]);
 }

@@ -8,6 +8,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Link, useRoute, useSearch } from "wouter";
 import { useState, useMemo, useEffect } from "react";
 import drillsData from "@/data/drills";
+import { mergeDrillWithCatalogOverride, type MergeableDrill } from "@shared/drillCatalogMerge";
 import { filterOptions } from "@/data/drills";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { EditDrillDetailsModal } from "@/components/EditDrillDetailsModal";
@@ -1174,21 +1175,54 @@ export default function DrillDetail() {
   
   // Fetch custom drills from database
   const { data: customDrills = [] } = trpc.drillDetails.getCustomDrills.useQuery();
+  const { data: catalogOverrides = [] } = trpc.drillCatalog.getAll.useQuery();
   
   // Look for drill in static data first, then in custom drills
   const staticDrill = drillsData.find(d => d.id.toString() === id);
   const customDrill = customDrills.find((cd: any) => cd.drillId === id);
   
-  // Create a unified drill object
-  const drill = staticDrill || (customDrill ? {
-    id: customDrill.drillId,
-    name: customDrill.name,
-    difficulty: customDrill.difficulty,
-    categories: [customDrill.category],
-    duration: customDrill.duration,
-    url: `/drill/${customDrill.drillId}`,
-    is_direct_link: true,
-  } : null);
+  // Unified drill + Phase 1 catalog overrides (same drillId; hidden → not found)
+  const drill = useMemo(() => {
+    if (!id) return null;
+    let base: MergeableDrill | null = null;
+    if (staticDrill) {
+      base = {
+        id: String(staticDrill.id),
+        name: staticDrill.name,
+        difficulty: staticDrill.difficulty,
+        categories: staticDrill.categories,
+        duration: staticDrill.duration,
+        url: staticDrill.url,
+        is_direct_link: staticDrill.is_direct_link,
+        isCustom: false,
+        ageLevel: staticDrill.ageLevel,
+        tags: staticDrill.tags,
+        problem: staticDrill.problem,
+        goal: staticDrill.goal,
+        drillType: staticDrill.drillType,
+      };
+    } else if (customDrill) {
+      const cd = customDrill as typeof customDrill & { drillType?: string };
+      base = {
+        id: customDrill.drillId,
+        name: customDrill.name,
+        difficulty: customDrill.difficulty,
+        categories: [customDrill.category],
+        duration: customDrill.duration,
+        url: `/drill/${customDrill.drillId}`,
+        is_direct_link: true,
+        isCustom: true,
+        ageLevel: [],
+        tags: [],
+        problem: [],
+        goal: [],
+        drillType: cd.drillType || "Game Simulation",
+      };
+    }
+    if (!base) return null;
+    const ov = catalogOverrides.find((o) => o.drillId === id);
+    return mergeDrillWithCatalogOverride(base, ov);
+  }, [id, staticDrill, customDrill, catalogOverrides]);
   
   // Try to load from database first, fallback to hardcoded details
   const { data: dbDetails } = trpc.drillDetails.getDrillDetail.useQuery(
@@ -1411,7 +1445,7 @@ export default function DrillDetail() {
               <Lock className="h-8 w-8 text-[#DC143C]" />
             </div>
             <div>
-              <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Free Preview Limit Reached</h2>
+              <h2 className="text-2xl font-heading font-bold text-white mb-2">Free Preview Limit Reached</h2>
               <p className="text-white/50 text-sm leading-relaxed">
                 You've viewed your 2 free drills. Log in to access all 200+ professional training drills.
               </p>
@@ -1731,7 +1765,7 @@ export default function DrillDetail() {
         )}
 
         {/* ── New Metadata Fields: always shown for static drills ── */}
-        {staticDrill && (staticDrill.drillType || (staticDrill.ageLevel?.length ?? 0) > 0 || (staticDrill.tags?.length ?? 0) > 0 || (staticDrill.problem?.length ?? 0) > 0 || (staticDrill.goal?.length ?? 0) > 0) && (
+        {staticDrill && (staticDrill.drillType || (staticDrill.ageLevel?.length ?? 0) > 0 || (drill?.tags?.length ?? 0) > 0 || (staticDrill.problem?.length ?? 0) > 0 || (staticDrill.goal?.length ?? 0) > 0) && (
           <div className="grid gap-4 mt-6 px-4 md:px-0">
 
             {/* Drill Type + Age Level */}
@@ -1762,11 +1796,11 @@ export default function DrillDetail() {
             </div>
 
             {/* Focus Area Tags */}
-            {(staticDrill.tags?.length ?? 0) > 0 && (
+            {(drill?.tags?.length ?? 0) > 0 && (
               <div className="glass-card rounded-xl p-4">
                 <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Focus Areas</div>
                 <div className="flex flex-wrap gap-2">
-                  {(staticDrill.tags ?? []).map((tag: string) => (
+                  {(drill?.tags ?? []).map((tag: string) => (
                     <span key={tag} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
                       {tag}
                     </span>

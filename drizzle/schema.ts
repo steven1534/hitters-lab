@@ -286,6 +286,26 @@ export type DrillCustomization = typeof drillCustomizations.$inferSelect;
 export type InsertDrillCustomization = typeof drillCustomizations.$inferInsert;
 
 // ============================================================
+// Drill catalog overrides (Phase 1 — DB overlay on static/custom drills, same drillId)
+// ============================================================
+export const drillCatalogOverrides = pgTable("drillCatalogOverrides", {
+  drillId: varchar("drillId", { length: 255 }).primaryKey(),
+  name: varchar("name", { length: 500 }),
+  difficulty: varchar("difficulty", { length: 50 }),
+  categories: json("categories").$type<string[]>(),
+  duration: varchar("duration", { length: 50 }),
+  tags: json("tags").$type<string[]>(),
+  externalUrl: text("externalUrl"),
+  hiddenFromDirectory: integer("hiddenFromDirectory").default(0).notNull(),
+  updatedBy: integer("updatedBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type DrillCatalogOverride = typeof drillCatalogOverrides.$inferSelect;
+export type InsertDrillCatalogOverride = typeof drillCatalogOverrides.$inferInsert;
+
+// ============================================================
 // Coach Notes & Weekly Goals
 // ============================================================
 export const coachNotes = pgTable("coachNotes", {

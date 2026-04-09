@@ -70,11 +70,11 @@ export default function ParentDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-500/10 text-green-400 border-green-500/20";
       case "in-progress":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       default:
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-500/10 text-red-400 border-red-500/20";
     }
   };
 
@@ -91,17 +91,20 @@ export default function ParentDashboard() {
 
   if (childrenLoading) {
     return (
+      <div className="coach-dark min-h-screen bg-background">
       <div className="container mx-auto py-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/4" />
           <div className="h-32 bg-muted rounded" />
         </div>
       </div>
+      </div>
     );
   }
 
   if (children.length === 0) {
     return (
+      <div className="coach-dark min-h-screen bg-background">
       <div className="container mx-auto py-8">
         <Card>
           <CardContent className="pt-6">
@@ -118,10 +121,12 @@ export default function ParentDashboard() {
           </CardContent>
         </Card>
       </div>
+      </div>
     );
   }
 
   return (
+    <div className="coach-dark min-h-screen bg-background">
     <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div>
@@ -316,6 +321,7 @@ export default function ParentDashboard() {
           </Card>
         </>
       )}
+    </div>
     </div>
   );
 }

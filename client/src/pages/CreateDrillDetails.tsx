@@ -97,7 +97,7 @@ export default function CreateDrillDetails() {
   const selectedDrillData = drillsData.find(d => d.id === selectedDrill);
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="coach-dark min-h-screen bg-background pb-12">
       <div className="container max-w-4xl py-8">
         <Link href="/coach-dashboard">
           <Button variant="ghost" className="mb-6">

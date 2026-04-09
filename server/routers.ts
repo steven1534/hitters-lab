@@ -27,6 +27,7 @@ import { playerReportsRouter } from "./routers-player-reports";
 import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
 import * as drillCustomizationsDb from "./drillCustomizations";
+import * as drillCatalogOverridesDb from "./drillCatalogOverrides";
 import * as drillStatCardsDb from "./drillStatCards";
 import { storagePut } from "./storage";
 
@@ -873,6 +874,58 @@ export const appRouter = router({
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
         }
         return await drillCustomizationsDb.deleteDrillCustomization(input.drillId);
+      }),
+  }),
+
+  /** Phase 1 — catalog field overrides (same drillId as static drills.ts / custom drills) */
+  drillCatalog: router({
+    getAll: publicProcedure.query(async () => {
+      return await drillCatalogOverridesDb.getAllCatalogOverrides();
+    }),
+    get: publicProcedure
+      .input(z.object({ drillId: z.string() }))
+      .query(async ({ input }) => {
+        return await drillCatalogOverridesDb.getCatalogOverride(input.drillId);
+      }),
+    upsert: protectedProcedure
+      .input(
+        z.object({
+          drillId: z.string(),
+          name: z.string().nullable(),
+          difficulty: z.string().nullable(),
+          categories: z.array(z.string()).nullable(),
+          duration: z.string().nullable(),
+          tags: z.array(z.string()).nullable(),
+          externalUrl: z.string().nullable(),
+          hiddenFromDirectory: z.number().int().min(0).max(1),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        return await drillCatalogOverridesDb.upsertCatalogOverride(
+          input.drillId,
+          {
+            name: input.name,
+            difficulty: input.difficulty,
+            categories: input.categories,
+            duration: input.duration,
+            tags: input.tags,
+            externalUrl: input.externalUrl,
+            hiddenFromDirectory: input.hiddenFromDirectory,
+          },
+          ctx.user.id
+        );
+      }),
+    delete: protectedProcedure
+      .input(z.object({ drillId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        }
+        await drillCatalogOverridesDb.deleteCatalogOverride(input.drillId);
+        return { success: true as const };
       }),
   }),
 

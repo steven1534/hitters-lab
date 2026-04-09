@@ -12,6 +12,7 @@ import type { Request, Response, NextFunction } from "express";
 import fs from "fs";
 import path from "path";
 import * as db from "../db";
+import * as drillCatalogOverridesDb from "../drillCatalogOverrides";
 
 const APP_URL = process.env.APP_URL ?? "https://app.coachstevebaseball.com";
 
@@ -68,9 +69,16 @@ export function ogMetaMiddleware(distPath: string) {
 
       // 1. Try static drills first (fastest)
       const staticDrill = staticDrills.find(d => d.id === drillId);
+      let catalogOv: Awaited<ReturnType<typeof drillCatalogOverridesDb.getCatalogOverride>> = null;
+      try {
+        catalogOv = await drillCatalogOverridesDb.getCatalogOverride(drillId);
+      } catch { /* non-critical */ }
+
       if (staticDrill) {
-        drillName = staticDrill.name;
-        drillDescription = `${staticDrill.difficulty} ${staticDrill.categories.join(", ")} drill. Train smarter with Coach Steve's Hitters Lab.`;
+        const cats = catalogOv?.categories?.length ? catalogOv.categories : staticDrill.categories;
+        const diff = (catalogOv?.difficulty && catalogOv.difficulty.trim()) ? catalogOv.difficulty : staticDrill.difficulty;
+        drillName = (catalogOv?.name && catalogOv.name.trim()) ? catalogOv.name : staticDrill.name;
+        drillDescription = `${diff} ${cats.join(", ")} drill. Train smarter with Coach Steve's Hitters Lab.`;
       }
 
       // 2. Try custom drills from DB
@@ -78,8 +86,10 @@ export function ogMetaMiddleware(distPath: string) {
         const customDrills = await db.getCustomDrills();
         const customDrill = customDrills.find((cd: any) => cd.drillId === drillId);
         if (customDrill) {
-          drillName = customDrill.name;
-          drillDescription = `${customDrill.difficulty} ${customDrill.category} drill · ${customDrill.duration}. Train smarter with Coach Steve's Hitters Lab.`;
+          const cats = catalogOv?.categories?.length ? catalogOv.categories : [customDrill.category];
+          const diff = (catalogOv?.difficulty && catalogOv.difficulty.trim()) ? catalogOv.difficulty : customDrill.difficulty;
+          drillName = (catalogOv?.name && catalogOv.name.trim()) ? catalogOv.name : customDrill.name;
+          drillDescription = `${diff} ${cats.filter(Boolean).join(", ")} drill · ${customDrill.duration}. Train smarter with Coach Steve's Hitters Lab.`;
         }
       }
 

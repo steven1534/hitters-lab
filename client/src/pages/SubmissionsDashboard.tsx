@@ -139,11 +139,16 @@ export default function SubmissionsDashboard() {
   };
 
   if (loading || submissionsLoading) {
-    return <div className="container py-12 text-center">Loading submissions...</div>;
+    return (
+      <div className="coach-dark min-h-screen bg-background flex items-center justify-center">
+        <div className="container py-12 text-center text-muted-foreground">Loading submissions...</div>
+      </div>
+    );
   }
 
   if (!user || user.role !== 'admin') {
     return (
+      <div className="coach-dark min-h-screen bg-background">
       <div className="container py-12">
         <Card className="max-w-2xl mx-auto border-2">
           <CardHeader className="text-center">
@@ -157,11 +162,12 @@ export default function SubmissionsDashboard() {
           </CardContent>
         </Card>
       </div>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-8 mb-8">
         <div className="container">
@@ -408,9 +414,9 @@ export default function SubmissionsDashboard() {
                       <p className="text-sm font-semibold mb-2">Previous Feedback</p>
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {feedbackList.map((feedback: any) => (
-                          <div key={feedback.id} className="p-2 bg-red-50 rounded border border-red-200">
-                            <p className="text-xs text-red-900">{feedback.feedback}</p>
-                            <p className="text-xs text-red-700 mt-1">
+                          <div key={feedback.id} className="p-2 bg-red-500/10 rounded border border-red-500/20">
+                            <p className="text-xs text-red-200">{feedback.feedback}</p>
+                            <p className="text-xs text-red-400/80 mt-1">
                               {new Date(feedback.createdAt).toLocaleString()}
                             </p>
                           </div>

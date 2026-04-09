@@ -185,7 +185,7 @@ export function BadgeProgressSkeleton() {
 // Full athlete portal loading skeleton
 export function AthletePortalSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="coach-dark min-h-screen bg-background">
       {/* Header skeleton */}
       <header className="glass sticky top-0 z-40 border-b border-white/10">
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
