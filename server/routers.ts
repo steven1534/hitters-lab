@@ -26,7 +26,8 @@ import { blastMetricsRouter } from "./routers-blast-metrics";
 import { playerReportsRouter } from "./routers-player-reports";
 import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
-import * as drillCustomizationsDb from "./drillCustomizations";
+import { progressRouter } from "./routers-progress";
+// drillCustomizations import removed — superseded by drillCatalogOverrides
 import * as drillCatalogOverridesDb from "./drillCatalogOverrides";
 import * as drillStatCardsDb from "./drillStatCards";
 import { storagePut } from "./storage";
@@ -44,6 +45,7 @@ export const appRouter = router({
   progressReports: progressReportsRouter,
   athleteProfiles: athleteProfilesRouter,
   badges: badgesRouter,
+  progress: progressRouter,
   auth: router({
     me: publicProcedure.query(async (opts) => {
       if (!opts.ctx.user) return null;
@@ -786,95 +788,22 @@ export const appRouter = router({
       }),
   }),
 
-  // Drill Customizations router (for editing drill cards)
+  // DEPRECATED: drillCustomizations superseded by drillCatalogOverrides + Manus data.
+  // Kept as empty stubs so old clients don't crash during rollout.
   drillCustomizations: router({
-    // Get customization for a single drill
     get: publicProcedure
       .input(z.object({ drillId: z.string() }))
-      .query(async ({ input }) => {
-        return await drillCustomizationsDb.getDrillCustomization(input.drillId);
-      }),
-
-    // Get all customizations (for bulk loading on homepage)
-    getAll: publicProcedure.query(async () => {
-      return await drillCustomizationsDb.getAllDrillCustomizations();
-    }),
-
-    // Save/update drill customization
+      .query(async () => null),
+    getAll: publicProcedure.query(async () => []),
     save: protectedProcedure
-      .input(z.object({
-        drillId: z.string(),
-        thumbnailUrl: z.string().nullable().optional(),
-        briefDescription: z.string().nullable().optional(),
-        difficulty: z.string().nullable().optional(),
-        category: z.string().nullable().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillCustomizationsDb.upsertDrillCustomization(
-          input.drillId,
-          {
-            thumbnailUrl: input.thumbnailUrl,
-            briefDescription: input.briefDescription,
-            difficulty: input.difficulty,
-            category: input.category,
-          },
-          ctx.user.id
-        );
-      }),
-
-    // Upload thumbnail image
+      .input(z.object({ drillId: z.string(), thumbnailUrl: z.string().nullable().optional(), briefDescription: z.string().nullable().optional(), difficulty: z.string().nullable().optional(), category: z.string().nullable().optional() }))
+      .mutation(async () => ({ success: true })),
     uploadThumbnail: protectedProcedure
-      .input(z.object({
-        drillId: z.string(),
-        imageBase64: z.string(),
-        mimeType: z.string(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        
-        console.log('[Upload] Starting thumbnail upload for drill:', input.drillId);
-        console.log('[Upload] Image size (base64 chars):', input.imageBase64.length);
-        console.log('[Upload] MIME type:', input.mimeType);
-        
-        try {
-          // Store the base64 image in imageBase64 field (longtext)
-          // Don't store data URL in thumbnailUrl (text field has 65535 byte limit)
-          const dataUrl = `data:${input.mimeType};base64,${input.imageBase64}`;
-          
-          console.log('[Upload] Data URL length:', dataUrl.length);
-          
-          await drillCustomizationsDb.upsertDrillCustomization(
-            input.drillId,
-            { 
-              thumbnailUrl: null, // Don't use this field for data URLs - it has size limit
-              imageBase64: input.imageBase64,
-              imageMimeType: input.mimeType,
-            },
-            ctx.user.id
-          );
-          
-          console.log('[Upload] Successfully saved to database');
-          return { url: dataUrl };
-        } catch (error) {
-          console.error('[Upload] Error saving to database:', error);
-          throw error;
-        }
-      }),
-
-    // Delete customization
+      .input(z.object({ drillId: z.string(), imageBase64: z.string(), mimeType: z.string() }))
+      .mutation(async () => ({ url: '' })),
     delete: protectedProcedure
       .input(z.object({ drillId: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillCustomizationsDb.deleteDrillCustomization(input.drillId);
-      }),
+      .mutation(async () => ({ success: true })),
   }),
 
   /** Phase 1 — catalog field overrides (same drillId as static drills.ts / custom drills) */

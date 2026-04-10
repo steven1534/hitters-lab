@@ -25,17 +25,35 @@ export type MergeableDrill = {
   problem?: string[];
   goal?: string[];
   drillType?: string;
+  // Enriched coaching fields (passed through from Manus drill data)
+  purpose?: string;
+  bestFor?: string;
+  equipment?: string;
+  athletes?: string;
+  description?: string[];
+  videoUrl?: string | null;
+  whatThisFixes?: string[];
+  whatToFeel?: string[];
+  commonMistakes?: string[];
+  coachCue?: string;
+  watchFor?: string;
+  nextSteps?: string[];
+  howToDoIt?: string[];
+  foundationOrAdvanced?: string;
 };
 
 /**
- * Apply DB override on top of base drill. Returns null if drill should be hidden from directory lists.
+ * Apply DB override on top of base drill.
+ * Returns null when hidden — unless `skipHiddenCheck` is true (use on detail pages
+ * where the drill should still be accessible via direct URL).
  */
 export function mergeDrillWithCatalogOverride(
   base: MergeableDrill,
-  ov: CatalogOverrideRow | null | undefined
+  ov: CatalogOverrideRow | null | undefined,
+  opts?: { skipHiddenCheck?: boolean }
 ): MergeableDrill | null {
   if (!ov) return base;
-  if (ov.hiddenFromDirectory === 1) return null;
+  if (ov.hiddenFromDirectory === 1 && !opts?.skipHiddenCheck) return null;
   const url =
     ov.externalUrl != null && ov.externalUrl.trim() !== ""
       ? ov.externalUrl.trim()

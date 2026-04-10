@@ -62,7 +62,8 @@ export function AthleteAssignmentOverview({ onSelectAthlete }: AthleteAssignment
 
   if (!data) return null;
 
-  const { summary, athletes } = data;
+  const { summary, athletes } = data ?? {};
+  if (!summary) return null;
 
   // If viewing a specific athlete's profile
   if (viewingProfileId !== null) {

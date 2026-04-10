@@ -17,6 +17,21 @@ export interface UnifiedDrill {
   problem?: string[];
   goal?: string[];
   drillType?: string;
+  // Enriched coaching fields (from Manus data)
+  purpose?: string;
+  bestFor?: string;
+  equipment?: string;
+  athletes?: string;
+  description?: string[];
+  videoUrl?: string | null;
+  whatThisFixes?: string[];
+  whatToFeel?: string[];
+  commonMistakes?: string[];
+  coachCue?: string;
+  watchFor?: string;
+  nextSteps?: string[];
+  howToDoIt?: string[];
+  foundationOrAdvanced?: string;
 }
 
 /**
@@ -47,6 +62,20 @@ export function useAllDrills(): UnifiedDrill[] {
       problem: d.problem,
       goal: d.goal,
       drillType: d.drillType,
+      purpose: d.purpose,
+      bestFor: d.bestFor,
+      equipment: d.equipment,
+      athletes: d.athletes,
+      description: d.description,
+      videoUrl: d.videoUrl,
+      whatThisFixes: d.whatThisFixes,
+      whatToFeel: d.whatToFeel,
+      commonMistakes: d.commonMistakes,
+      coachCue: d.coachCue,
+      watchFor: d.watchFor,
+      nextSteps: d.nextSteps,
+      howToDoIt: d.howToDoIt,
+      foundationOrAdvanced: d.foundationOrAdvanced,
     }));
 
     const staticDrills: UnifiedDrill[] = staticBases

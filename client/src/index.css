@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *), &:is(.coach-dark *));
+@custom-variant dark (&:is(.dark *), &:is(.coach-dark *), &:is(.film-room *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -41,10 +41,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   
-  /* Premium Typography */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Oswald", sans-serif;
-  --font-display: "Bebas Neue", sans-serif;
+  /* Premium Typography — Film Room */
+  --font-sans: "DM Sans", "Inter", system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", "Oswald", sans-serif;
+  --font-display: "Barlow Condensed", "Bebas Neue", sans-serif;
   --font-mono: "Space Grotesk", monospace;
   
   /* Crimson Red Accent */
@@ -54,6 +54,20 @@
   /* Brand Crimson */
   --color-crimson: oklch(0.50 0.20 25);
   --color-crimson-hover: oklch(0.42 0.18 25);
+
+  /* Film Room Palette */
+  --color-gold: oklch(0.74 0.09 75);
+  --color-gold-dim: oklch(0.60 0.10 75);
+  --color-teal: oklch(0.55 0.12 185);
+  --color-teal-bright: oklch(0.60 0.12 185);
+  --color-canvas: oklch(0.068 0.003 285);
+  --color-surface: oklch(0.09 0.004 285);
+  --color-surface-raised: oklch(0.12 0.004 285);
+  --color-film-fg: oklch(0.96 0.003 65);
+  --color-film-muted: oklch(0.62 0.012 285);
+  --color-film-border: oklch(0.20 0.003 285);
+  --color-foundation: oklch(0.55 0.14 145);
+  --color-advanced: oklch(0.55 0.19 27);
 }
 
 :root {
@@ -175,6 +189,34 @@
   color-scheme: dark;
   color: oklch(0.95 0.005 0);
   background: oklch(0.13 0.005 0);
+}
+
+/* Film Room scope — cinematic dark theme for public drill pages */
+.film-room {
+  --background:          oklch(0.068 0.003 285);
+  --foreground:          oklch(0.96 0.003 65);
+  --card:                oklch(0.09 0.004 285);
+  --card-foreground:     oklch(0.96 0.003 65);
+  --popover:             oklch(0.12 0.004 285);
+  --popover-foreground:  oklch(0.96 0.003 65);
+  --primary:             oklch(0.74 0.09 75);
+  --primary-foreground:  oklch(0.068 0.003 285);
+  --secondary:           oklch(0.55 0.12 185);
+  --secondary-foreground:oklch(0.96 0.003 65);
+  --muted:               oklch(0.12 0.004 285);
+  --muted-foreground:    oklch(0.62 0.012 285);
+  --accent:              oklch(0.12 0.004 285);
+  --accent-foreground:   oklch(0.96 0.003 65);
+  --destructive:         oklch(0.55 0.19 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border:              oklch(0.20 0.003 285);
+  --input:               oklch(0.12 0.004 285);
+  --ring:                oklch(0.74 0.09 75);
+  --electric:            oklch(0.74 0.09 75);
+  --electric-glow:       oklch(0.60 0.10 75);
+  color-scheme: dark;
+  color: oklch(0.96 0.003 65);
+  background: oklch(0.068 0.003 285);
 }
 
 @layer base {

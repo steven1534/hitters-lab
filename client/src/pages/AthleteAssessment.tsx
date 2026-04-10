@@ -473,22 +473,22 @@ export default function AthleteAssessment() {
                 <StatCard
                   icon={<User className="h-5 w-5 text-secondary" />}
                   label="Total Athletes"
-                  value={overview.summary.totalAthletes}
+                  value={overview.summary?.totalAthletes ?? 0}
                 />
                 <StatCard
                   icon={<Target className="h-5 w-5 text-green-500" />}
                   label="With Drills"
-                  value={overview.summary.athletesWithDrills}
+                  value={overview.summary?.athletesWithDrills ?? 0}
                 />
                 <StatCard
                   icon={<BarChart3 className="h-5 w-5 text-yellow-500" />}
                   label="Total Assigned"
-                  value={overview.summary.totalDrillsAssigned}
+                  value={overview.summary?.totalDrillsAssigned ?? 0}
                 />
                 <StatCard
                   icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
                   label="Completion Rate"
-                  value={`${overview.summary.completionRate}%`}
+                  value={`${overview.summary?.completionRate ?? 0}%`}
                 />
               </div>
             )}

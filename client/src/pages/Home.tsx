@@ -91,14 +91,8 @@ export default function Home() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingDrill, setEditingDrill] = useState<Drill | null>(null);
 
-  const { data: drillCustomizations = [], refetch: refetchCustomizations } = trpc.drillCustomizations.getAll.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000, // 5 minutes — don't refetch on every page visit
-  });
-  const customizationsMap = useMemo(() => {
-    const map = new Map<string, typeof drillCustomizations[0]>();
-    drillCustomizations.forEach((c) => map.set(c.drillId, c));
-    return map;
-  }, [drillCustomizations]);
+  // drillCustomizations removed — superseded by Manus data + drillCatalogOverrides
+  const customizationsMap = new Map();
 
   const { data: allVideos = [] } = trpc.videos.getAllVideos.useQuery(undefined, {
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -170,7 +164,7 @@ export default function Home() {
     );
   }
 
-  const handleDrillClick = () => saveScrollPosition(currentQuery || '__default__');
+  const handleDrillClick = (_drillId?: string) => saveScrollPosition(currentQuery || '__default__');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -566,7 +560,7 @@ export default function Home() {
           onClose={() => { setEditModalOpen(false); setEditingDrill(null); }}
           drill={editingDrill}
           customization={customizationsMap.get(editingDrill.id)}
-          onSaved={() => refetchCustomizations()}
+          onSaved={() => {}}
         />
       )}
     </div>

@@ -144,6 +144,15 @@ export function AthleteVideoFeedback() {
 
   const selectedAnalysis = analyses.find((a: any) => a.id === selectedId) as any;
 
+  const parsedAiFeedback = (() => {
+    if (!selectedAnalysis?.aiAnalysis) return null;
+    try {
+      return typeof selectedAnalysis.aiAnalysis === 'string'
+        ? JSON.parse(selectedAnalysis.aiAnalysis)
+        : selectedAnalysis.aiAnalysis;
+    } catch { return null; }
+  })();
+
   // Categorize
   const feedbackReady = analyses.filter((a: any) => a.status === "approved" || a.status === "sent");
   const inProgress = analyses.filter((a: any) =>

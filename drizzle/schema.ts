@@ -755,3 +755,18 @@ export const parentChildren = pgTable("parentChildren", {
 
 export type ParentChild = typeof parentChildren.$inferSelect;
 export type InsertParentChild = typeof parentChildren.$inferInsert;
+
+// ============================================================
+// Drill Progress (personal completion tracking)
+// ============================================================
+export const drillProgress = pgTable("drillProgress", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(),
+  drillId: varchar("drillId", { length: 128 }).notNull(),
+  completedAt: timestamp("completedAt").defaultNow().notNull(),
+  notes: text("notes"),
+  rating: integer("rating"),
+});
+
+export type DrillProgress = typeof drillProgress.$inferSelect;
+export type InsertDrillProgress = typeof drillProgress.$inferInsert;

@@ -19,6 +19,8 @@ import AthleteMessaging from "./pages/AthleteMessaging";
 import VerifyEmail from "./pages/VerifyEmail";
 import UserManagement from "./pages/UserManagement";
 import DrillsDirectory from "./pages/DrillsDirectory";
+import Pathways from "./pages/Pathways";
+import MyProgress from "./pages/MyProgress";
 import ParentDashboard from "./pages/ParentDashboard";
 import ActivityFeed from "./pages/ActivityFeed";
 import DrillComparison from "./pages/DrillComparison";
@@ -51,10 +53,12 @@ function registerServiceWorker() {
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={DrillsDirectory} />
       <Route path={"/login"} component={Login} />
       <Route path={"/register"} component={Login} />
       <Route path={"/drills"} component={DrillsDirectory} />
+      <Route path={"/pathways"} component={Pathways} />
+      <Route path={"/progress"} component={MyProgress} />
       <Route path={"/accept-invite/:token"} component={AcceptInvite} />
       <Route path={"/verify-email/:token"} component={VerifyEmail} />
       <Route path={"/drill/:id"} component={DrillDetail} />
