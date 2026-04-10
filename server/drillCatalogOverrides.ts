@@ -8,23 +8,20 @@ function trimOrNull(s: string | null | undefined): string | null {
   return t === "" ? null : t;
 }
 
-function isRowUnused(row: {
-  name: string | null;
-  difficulty: string | null;
-  categories: string[] | null;
-  duration: string | null;
-  tags: string[] | null;
-  externalUrl: string | null;
-  hiddenFromDirectory: number;
-}): boolean {
+function isRowUnused(row: Record<string, unknown>): boolean {
   return (
     !row.name &&
     !row.difficulty &&
-    (row.categories == null || row.categories.length === 0) &&
+    (row.categories == null || (row.categories as string[]).length === 0) &&
     !row.duration &&
-    (row.tags == null || row.tags.length === 0) &&
+    (row.tags == null || (row.tags as string[]).length === 0) &&
     !row.externalUrl &&
-    row.hiddenFromDirectory === 0
+    (row.hiddenFromDirectory as number) === 0 &&
+    !row.purpose && !row.bestFor && !row.equipment &&
+    !row.coachCue && !row.watchFor &&
+    (row.whatThisFixes == null || (row.whatThisFixes as string[]).length === 0) &&
+    (row.whatToFeel == null || (row.whatToFeel as string[]).length === 0) &&
+    (row.commonMistakes == null || (row.commonMistakes as string[]).length === 0)
   );
 }
 
@@ -53,6 +50,14 @@ export type CatalogOverrideSaveInput = {
   tags: string[] | null;
   externalUrl: string | null;
   hiddenFromDirectory: number;
+  purpose?: string | null;
+  bestFor?: string | null;
+  equipment?: string | null;
+  coachCue?: string | null;
+  watchFor?: string | null;
+  whatThisFixes?: string[] | null;
+  whatToFeel?: string[] | null;
+  commonMistakes?: string[] | null;
 };
 
 export async function upsertCatalogOverride(
@@ -72,6 +77,14 @@ export async function upsertCatalogOverride(
     tags: data.tags != null && data.tags.length > 0 ? data.tags : null,
     externalUrl: trimOrNull(data.externalUrl),
     hiddenFromDirectory: data.hiddenFromDirectory ? 1 : 0,
+    purpose: trimOrNull(data.purpose),
+    bestFor: trimOrNull(data.bestFor),
+    equipment: trimOrNull(data.equipment),
+    coachCue: trimOrNull(data.coachCue),
+    watchFor: trimOrNull(data.watchFor),
+    whatThisFixes: data.whatThisFixes?.length ? data.whatThisFixes : null,
+    whatToFeel: data.whatToFeel?.length ? data.whatToFeel : null,
+    commonMistakes: data.commonMistakes?.length ? data.commonMistakes : null,
   };
 
   if (isRowUnused(row)) {

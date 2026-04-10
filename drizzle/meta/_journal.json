@@ -36,6 +36,13 @@
       "when": 1775800000000,
       "tag": "0004_drill_progress",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1775900000000,
+      "tag": "0005_custom_drill_fields",
+      "breakpoints": true
     }
   ]
 }

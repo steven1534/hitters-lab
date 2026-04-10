@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 import { Database, Trash2 } from "lucide-react";
 
 const DIFFICULTIES = ["Easy", "Medium", "Hard"] as const;
@@ -38,6 +39,14 @@ export function DrillCatalogOverridesEditor() {
   const [tagsCsv, setTagsCsv] = useState("");
   const [externalUrl, setExternalUrl] = useState("");
   const [hidden, setHidden] = useState(false);
+  const [purpose, setPurpose] = useState("");
+  const [bestFor, setBestFor] = useState("");
+  const [equipment, setEquipment] = useState("");
+  const [coachCue, setCoachCue] = useState("");
+  const [watchFor, setWatchFor] = useState("");
+  const [whatThisFixes, setWhatThisFixes] = useState("");
+  const [whatToFeel, setWhatToFeel] = useState("");
+  const [commonMistakes, setCommonMistakes] = useState("");
 
   const drillOptions = useMemo(() => {
     const builtIn = drillsData.map((d) => ({
@@ -73,6 +82,14 @@ export function DrillCatalogOverridesEditor() {
     setTagsCsv((r?.tags ?? []).join(", "));
     setExternalUrl(r?.externalUrl ?? "");
     setHidden((r?.hiddenFromDirectory ?? 0) === 1);
+    setPurpose((r as any)?.purpose ?? "");
+    setBestFor((r as any)?.bestFor ?? "");
+    setEquipment((r as any)?.equipment ?? "");
+    setCoachCue((r as any)?.coachCue ?? "");
+    setWatchFor((r as any)?.watchFor ?? "");
+    setWhatThisFixes(((r as any)?.whatThisFixes ?? []).join("\n"));
+    setWhatToFeel(((r as any)?.whatToFeel ?? []).join("\n"));
+    setCommonMistakes(((r as any)?.commonMistakes ?? []).join("\n"));
   }, [drillId, loadedRow]);
 
   const upsertMutation = trpc.drillCatalog.upsert.useMutation({
@@ -95,6 +112,8 @@ export function DrillCatalogOverridesEditor() {
       setTagsCsv("");
       setExternalUrl("");
       setHidden(false);
+      setPurpose(""); setBestFor(""); setEquipment(""); setCoachCue("");
+      setWatchFor(""); setWhatThisFixes(""); setWhatToFeel(""); setCommonMistakes("");
       await utils.drillCatalog.getAll.invalidate();
       await utils.drillCatalog.get.invalidate({ drillId });
       refetchRow();
@@ -107,6 +126,10 @@ export function DrillCatalogOverridesEditor() {
       toast.error("Select a drill");
       return;
     }
+    const linesOrNull = (s: string): string[] | null => {
+      const arr = s.split("\n").map(l => l.trim()).filter(Boolean);
+      return arr.length ? arr : null;
+    };
     upsertMutation.mutate({
       drillId,
       name: name.trim() || null,
@@ -116,6 +139,14 @@ export function DrillCatalogOverridesEditor() {
       tags: splitList(tagsCsv),
       externalUrl: externalUrl.trim() || null,
       hiddenFromDirectory: hidden ? 1 : 0,
+      purpose: purpose.trim() || null,
+      bestFor: bestFor.trim() || null,
+      equipment: equipment.trim() || null,
+      coachCue: coachCue.trim() || null,
+      watchFor: watchFor.trim() || null,
+      whatThisFixes: linesOrNull(whatThisFixes),
+      whatToFeel: linesOrNull(whatToFeel),
+      commonMistakes: linesOrNull(commonMistakes),
     });
   };
 
@@ -237,6 +268,50 @@ export function DrillCatalogOverridesEditor() {
                 placeholder="timing, barrel path"
                 className="bg-white/[0.04] border-white/[0.08]"
               />
+            </div>
+
+            {/* Coaching field overrides */}
+            <div className="border border-white/[0.06] rounded-lg p-4 space-y-3 bg-white/[0.01]">
+              <p className="text-sm font-semibold text-foreground/80">Coaching Content Overrides</p>
+              <p className="text-xs text-muted-foreground -mt-2">Override coaching fields on built-in drills. Leave empty to keep defaults.</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Purpose</Label>
+                  <Input value={purpose} onChange={e => setPurpose(e.target.value)} placeholder="One-line purpose" className="bg-white/[0.04] border-white/[0.08] text-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Best For</Label>
+                  <Input value={bestFor} onChange={e => setBestFor(e.target.value)} placeholder="Target audience" className="bg-white/[0.04] border-white/[0.08] text-sm" />
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Equipment</Label>
+                  <Input value={equipment} onChange={e => setEquipment(e.target.value)} placeholder="tee, baseballs, net" className="bg-white/[0.04] border-white/[0.08] text-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Coach Cue</Label>
+                  <Input value={coachCue} onChange={e => setCoachCue(e.target.value)} placeholder="Key coaching phrase" className="bg-white/[0.04] border-white/[0.08] text-sm" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Watch For</Label>
+                <Textarea value={watchFor} onChange={e => setWatchFor(e.target.value)} placeholder="What to look for" rows={2} className="bg-white/[0.04] border-white/[0.08] text-sm" />
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">What This Fixes (one per line)</Label>
+                  <Textarea value={whatThisFixes} onChange={e => setWhatThisFixes(e.target.value)} placeholder="rushing the load&#10;poor rhythm" rows={3} className="bg-white/[0.04] border-white/[0.08] text-xs" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">What to Feel (one per line)</Label>
+                  <Textarea value={whatToFeel} onChange={e => setWhatToFeel(e.target.value)} placeholder="controlled load&#10;balance into stride" rows={3} className="bg-white/[0.04] border-white/[0.08] text-xs" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Common Mistakes (one per line)</Label>
+                  <Textarea value={commonMistakes} onChange={e => setCommonMistakes(e.target.value)} placeholder="drifting forward&#10;rushing each phase" rows={3} className="bg-white/[0.04] border-white/[0.08] text-xs" />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-between rounded-lg border border-white/[0.08] px-3 py-2">

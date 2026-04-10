@@ -632,13 +632,20 @@ export async function upsertNotificationPreferences(userId: number, prefs: Parti
 }
 
 export async function createNewDrill(
-  input: { name: string; difficulty: string; category: string; duration: string; goal?: string; instructions?: string; videoUrl?: string },
+  input: {
+    name: string; difficulty: string; category: string; duration: string;
+    goal?: string; instructions?: string; videoUrl?: string;
+    purpose?: string; bestFor?: string; equipment?: string; athletes?: string;
+    description?: string[]; drillType?: string; drillTypeRaw?: string; skillSet?: string;
+    ageLevel?: string[]; tags?: string[]; problem?: string[]; goalTags?: string[];
+    whatThisFixes?: string[]; whatToFeel?: string[]; commonMistakes?: string[];
+    coachCue?: string; watchFor?: string; nextSteps?: string[];
+  },
   createdBy: number
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Generate a URL-safe drill ID from the name
   const drillId = input.name
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
@@ -647,13 +654,31 @@ export async function createNewDrill(
     .substring(0, 80)
     + "-" + Date.now();
 
-  // Insert into customDrills
   const [created] = await db.insert(customDrills).values({
     drillId,
     name: input.name,
     difficulty: input.difficulty,
     category: input.category,
     duration: input.duration,
+    purpose: input.purpose || null,
+    bestFor: input.bestFor || null,
+    equipment: input.equipment || null,
+    athletes: input.athletes || null,
+    description: input.description?.length ? input.description : null,
+    videoUrl: input.videoUrl || null,
+    drillType: input.drillType || "Tee Work",
+    drillTypeRaw: input.drillTypeRaw || null,
+    skillSet: input.skillSet || "Hitting",
+    ageLevel: input.ageLevel?.length ? input.ageLevel : null,
+    tags: input.tags?.length ? input.tags : null,
+    problem: input.problem?.length ? input.problem : null,
+    goalTags: input.goalTags?.length ? input.goalTags : null,
+    whatThisFixes: input.whatThisFixes?.length ? input.whatThisFixes : null,
+    whatToFeel: input.whatToFeel?.length ? input.whatToFeel : null,
+    commonMistakes: input.commonMistakes?.length ? input.commonMistakes : null,
+    coachCue: input.coachCue || null,
+    watchFor: input.watchFor || null,
+    nextSteps: input.nextSteps?.length ? input.nextSteps : null,
     createdBy,
   }).returning();
 

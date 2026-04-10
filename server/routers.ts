@@ -559,10 +559,28 @@ export const appRouter = router({
         goal: z.string().optional(),
         instructions: z.string().optional(),
         videoUrl: z.string().optional(),
+        purpose: z.string().optional(),
+        bestFor: z.string().optional(),
+        equipment: z.string().optional(),
+        athletes: z.string().optional(),
+        description: z.array(z.string()).optional(),
+        drillType: z.string().optional(),
+        drillTypeRaw: z.string().optional(),
+        skillSet: z.string().optional(),
+        ageLevel: z.array(z.string()).optional(),
+        tags: z.array(z.string()).optional(),
+        problem: z.array(z.string()).optional(),
+        goalTags: z.array(z.string()).optional(),
+        whatThisFixes: z.array(z.string()).optional(),
+        whatToFeel: z.array(z.string()).optional(),
+        commonMistakes: z.array(z.string()).optional(),
+        coachCue: z.string().optional(),
+        watchFor: z.string().optional(),
+        nextSteps: z.array(z.string()).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach access required' });
         }
         const result = await db.createNewDrill(input, ctx.user.id);
         return result;
@@ -827,11 +845,19 @@ export const appRouter = router({
           tags: z.array(z.string()).nullable(),
           externalUrl: z.string().nullable(),
           hiddenFromDirectory: z.number().int().min(0).max(1),
+          purpose: z.string().nullable().optional(),
+          bestFor: z.string().nullable().optional(),
+          equipment: z.string().nullable().optional(),
+          coachCue: z.string().nullable().optional(),
+          watchFor: z.string().nullable().optional(),
+          whatThisFixes: z.array(z.string()).nullable().optional(),
+          whatToFeel: z.array(z.string()).nullable().optional(),
+          commonMistakes: z.array(z.string()).nullable().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+        if (ctx.user.role !== "admin" && ctx.user.role !== "coach") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Coach access required" });
         }
         return await drillCatalogOverridesDb.upsertCatalogOverride(
           input.drillId,
@@ -843,6 +869,14 @@ export const appRouter = router({
             tags: input.tags,
             externalUrl: input.externalUrl,
             hiddenFromDirectory: input.hiddenFromDirectory,
+            purpose: input.purpose ?? null,
+            bestFor: input.bestFor ?? null,
+            equipment: input.equipment ?? null,
+            coachCue: input.coachCue ?? null,
+            watchFor: input.watchFor ?? null,
+            whatThisFixes: input.whatThisFixes ?? null,
+            whatToFeel: input.whatToFeel ?? null,
+            commonMistakes: input.commonMistakes ?? null,
           },
           ctx.user.id
         );
