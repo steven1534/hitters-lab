@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
-import { Menu, X, Dumbbell, GitBranch, ClipboardList, LogOut, User, Settings } from "lucide-react";
+import { Menu, X, Dumbbell, GitBranch, ClipboardList, LogOut, User, Settings, Home } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "HITTING DRILLS", href: "/", icon: Dumbbell },
@@ -66,11 +66,31 @@ export default function SiteNav() {
                 </span>
               </Link>
             ))}
+            {user?.role === "athlete" && (
+              <Link href="/athlete-portal">
+                <span
+                  className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
+                  style={{ letterSpacing: "0.08em", color: isActive("/athlete-portal") ? "#C8A96B" : "#1F8A8A" }}
+                >
+                  MY PORTAL
+                </span>
+              </Link>
+            )}
+            {user?.role === "parent" && (
+              <Link href="/parent-dashboard">
+                <span
+                  className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
+                  style={{ letterSpacing: "0.08em", color: isActive("/parent-dashboard") ? "#C8A96B" : "#1F8A8A" }}
+                >
+                  PARENT DASHBOARD
+                </span>
+              </Link>
+            )}
             {isCoachOrAdmin && (
               <Link href="/coach-dashboard">
                 <span
                   className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
-                  style={{ letterSpacing: "0.08em", color: "#1F8A8A" }}
+                  style={{ letterSpacing: "0.08em", color: isActive("/coach-dashboard") ? "#C8A96B" : "#1F8A8A" }}
                 >
                   DASHBOARD
                 </span>
@@ -142,9 +162,25 @@ export default function SiteNav() {
               );
             })}
 
+            {user?.role === "athlete" && (
+              <Link href="/athlete-portal" onClick={() => setMobileOpen(false)}>
+                <span className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer hover:bg-white/5" style={{ color: isActive("/athlete-portal") ? "#C8A96B" : "#1F8A8A" }}>
+                  <Home size={14} />
+                  <span className="font-heading text-[0.85rem]" style={{ letterSpacing: "0.08em" }}>MY PORTAL</span>
+                </span>
+              </Link>
+            )}
+            {user?.role === "parent" && (
+              <Link href="/parent-dashboard" onClick={() => setMobileOpen(false)}>
+                <span className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer hover:bg-white/5" style={{ color: isActive("/parent-dashboard") ? "#C8A96B" : "#1F8A8A" }}>
+                  <Home size={14} />
+                  <span className="font-heading text-[0.85rem]" style={{ letterSpacing: "0.08em" }}>PARENT DASHBOARD</span>
+                </span>
+              </Link>
+            )}
             {isCoachOrAdmin && (
               <Link href="/coach-dashboard" onClick={() => setMobileOpen(false)}>
-                <span className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer hover:bg-white/5" style={{ color: "#1F8A8A" }}>
+                <span className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer hover:bg-white/5" style={{ color: isActive("/coach-dashboard") ? "#C8A96B" : "#1F8A8A" }}>
                   <Settings size={14} />
                   <span className="font-heading text-[0.85rem]" style={{ letterSpacing: "0.08em" }}>DASHBOARD</span>
                 </span>
