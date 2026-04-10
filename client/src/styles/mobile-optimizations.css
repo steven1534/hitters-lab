@@ -126,21 +126,39 @@
   }
 }
 
-/* Dark mode optimizations */
+/* Dark mode optimizations — scoped so they never leak into light pages like Login */
 @media (prefers-color-scheme: dark) {
-  input,
-  textarea,
-  select {
+  .coach-dark input,
+  .coach-dark textarea,
+  .coach-dark select,
+  .film-room input,
+  .film-room textarea,
+  .film-room select {
     background-color: var(--color-background);
     color: var(--color-foreground);
     border-color: var(--color-border);
   }
 
-  input:focus,
-  textarea:focus,
-  select:focus {
+  .coach-dark input:focus,
+  .coach-dark textarea:focus,
+  .coach-dark select:focus,
+  .film-room input:focus,
+  .film-room textarea:focus,
+  .film-room select:focus {
     border-color: var(--color-primary);
   }
+}
+
+/* Force light appearance on login form inputs — prevents iOS/Safari dark-mode
+   autofill from rendering white text on a white background.
+   Only applies outside of dark-scoped wrappers. */
+:root:not(:has(.coach-dark)) :not(.film-room) > form input:-webkit-autofill,
+[style*="color-scheme: light"] input:-webkit-autofill,
+[style*="color-scheme: light"] input:-webkit-autofill:hover,
+[style*="color-scheme: light"] input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1e293b;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Reduce motion for users who prefer it */

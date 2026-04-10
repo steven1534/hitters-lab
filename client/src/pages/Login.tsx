@@ -48,7 +48,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 flex" style={{ colorScheme: 'light' }}>
       {/* Left panel — branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-red-600 to-red-800 flex-col justify-between p-12">
         <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export default function Login() {
                   id="name" type="text" placeholder="Your name"
                   value={name} onChange={(e) => setName(e.target.value)}
                   required autoComplete="name"
-                  className="h-11 border-slate-200 rounded-xl focus-visible:ring-red-500/30 focus-visible:border-red-300"
+                  className="h-11 bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 rounded-xl focus-visible:ring-red-500/30 focus-visible:border-red-300"
                 />
               </div>
             )}
@@ -116,7 +116,7 @@ export default function Login() {
                 id="email" type="email" placeholder="you@example.com"
                 value={email} onChange={(e) => setEmail(e.target.value)}
                 required autoComplete="email"
-                className="h-11 border-slate-200 rounded-xl focus-visible:ring-red-500/30 focus-visible:border-red-300"
+                className="h-11 bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 rounded-xl focus-visible:ring-red-500/30 focus-visible:border-red-300"
               />
             </div>
 
@@ -129,12 +129,12 @@ export default function Login() {
                   placeholder="••••••••"
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   required autoComplete={mode === "login" ? "current-password" : "new-password"}
-                  className="h-11 pr-10 border-slate-200 rounded-xl focus-visible:ring-red-500/30 focus-visible:border-red-300"
+                  className="h-11 pr-10 bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 rounded-xl focus-visible:ring-red-500/30 focus-visible:border-red-300"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors z-10"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
