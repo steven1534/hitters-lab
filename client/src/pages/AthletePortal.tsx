@@ -18,6 +18,7 @@ import { useAllDrills } from "@/hooks/useAllDrills";
 import { AthleteVideoFeedback } from "@/components/AthleteVideoFeedback";
 import { SwingAnalyzer } from "@/components/SwingAnalyzer";
 import { DrillSubmissionForm } from "@/components/DrillSubmissionForm";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { AthleteSessionNotes } from "@/components/AthleteSessionNotes";
 import { AthleteBlastMetrics } from "@/components/AthleteBlastMetrics";
@@ -272,6 +273,7 @@ export default function AthletePortal() {
           </Link>
           <h1 className="font-bold text-lg text-gradient">My Training</h1>
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <Link href="/my-profile">
               <button className="flex items-center gap-1 text-muted-foreground hover:text-electric text-sm transition-colors hover-lift">
                 <User className="w-4 h-4" />

@@ -81,8 +81,16 @@ export function registerAuthRoutes(app: Express) {
       return;
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const isOwner = normalizedEmail === ENV.ownerEmail.toLowerCase();
+
+    // Require invite token for non-owner registrations
+    if (!inviteToken && !isOwner) {
+      res.status(403).json({ error: "An invite link is required to register. Please contact Coach Steve." });
+      return;
+    }
+
     try {
-      // Validate invite token if provided
       let inviteRole: string = "athlete";
       if (inviteToken) {
         const invite = await db.getInviteByToken(inviteToken);
@@ -90,27 +98,21 @@ export function registerAuthRoutes(app: Express) {
           res.status(400).json({ error: "Invalid or expired invite link" });
           return;
         }
-        if (invite.email.toLowerCase() !== email.toLowerCase()) {
+        if (invite.email.toLowerCase() !== normalizedEmail) {
           res.status(400).json({ error: "This invite was sent to a different email address" });
           return;
         }
         inviteRole = invite.role;
-        // Mark invite as accepted
-        await db.acceptInvite(invite.id, 0); // userId will be updated after insert
       }
 
-      // Check if email already exists
-      const existing = await db.getUserByEmail(email.toLowerCase().trim());
+      const existing = await db.getUserByEmail(normalizedEmail);
       if (existing) {
         res.status(409).json({ error: "An account with this email already exists" });
         return;
       }
 
       const passwordHash = await hashPassword(password);
-      const normalizedEmail = email.toLowerCase().trim();
-
-      // Owner always gets admin role
-      const role = normalizedEmail === ENV.ownerEmail.toLowerCase() ? "admin" : inviteRole as any;
+      const role = isOwner ? "admin" : inviteRole as any;
 
       const userId = await db.createUser({
         email: normalizedEmail,
@@ -123,10 +125,14 @@ export function registerAuthRoutes(app: Express) {
         lastSignedIn: new Date(),
       });
 
-      // Update invite with userId
+      // Use the full invites.ts acceptInvite which updates role, activates athlete, and links assignments
       if (inviteToken) {
-        const invite = await db.getInviteByToken(inviteToken);
-        if (invite) await db.acceptInvite(invite.id, userId);
+        try {
+          const inviteDb = await import("../invites");
+          await inviteDb.acceptInvite(inviteToken, userId);
+        } catch (inviteErr) {
+          console.warn("[Auth] Invite acceptance post-register warning:", inviteErr);
+        }
       }
 
       const user = await db.getUserById(userId);

@@ -119,16 +119,16 @@ export default function AcceptInvite() {
             {/* Login Instructions */}
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Click the button below to sign in with your Google account. After signing in, your account will be automatically activated.
+                Create your account or sign in with the email that received this invite. Your account will be automatically activated.
               </p>
               <Button
                 onClick={() => {
-                  window.location.href = getLoginUrl();
+                  window.location.href = `${getLoginUrl()}?token=${encodeURIComponent(token || '')}`;
                 }}
                 className="w-full"
                 size="lg"
               >
-                Sign In to Activate Account
+                Create Account / Sign In
               </Button>
             </div>
 
