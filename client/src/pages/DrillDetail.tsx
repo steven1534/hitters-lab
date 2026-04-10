@@ -365,7 +365,7 @@ export default function DrillDetail() {
   ];
 
   return (
-    <div className="film-room min-h-screen bg-background pb-24 md:pb-12">
+    <div className="film-room min-h-screen bg-background pt-14 pb-24 md:pb-12">
       <SiteNav />
 
       {/* Sticky mini-header â€” appears on mobile scroll */}

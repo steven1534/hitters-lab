@@ -27,7 +27,7 @@ export default function MyProgress() {
   });
 
   return (
-    <div className="film-room min-h-screen bg-background">
+    <div className="film-room min-h-screen bg-background pt-14">
       <SiteNav />
 
       {/* Hero */}

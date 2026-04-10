@@ -150,7 +150,7 @@ export default function DrillsDirectory() {
   };
 
   return (
-    <div className="film-room min-h-screen bg-background">
+    <div className="film-room min-h-screen bg-background pt-14">
       <SiteNav />
 
       {/* Hero */}
@@ -322,8 +322,8 @@ export default function DrillsDirectory() {
           {paginatedDrills.length > 0 ? (
             <>
               <div className={`grid gap-4 ${showSidebar ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"}`}>
-                {paginatedDrills.map((drill) => (
-                  <DrillCard key={drill.id} drill={drill} />
+                {paginatedDrills.map((drill, idx) => (
+                  <DrillCard key={drill.id} drill={drill} animationDelay={idx * 50} />
                 ))}
               </div>
 
