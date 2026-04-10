@@ -9,6 +9,7 @@ import {
   InsertNotificationPreference, invites, drillVideos, drillDetails,
   drillSubmissions, coachFeedback, customDrills,
   drillQuestions, drillAnswers, parentChildren,
+  passwordResetRequests,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc, sql } from "drizzle-orm";
@@ -234,6 +235,61 @@ export async function updateUserPassword(userId: number, passwordHash: string) {
     return true;
   } catch (error) {
     console.error("[Database] Failed to update password:", error);
+    return false;
+  }
+}
+
+export async function updateUserInfo(userId: number, info: { name?: string; email?: string }) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    const updates: Record<string, unknown> = { updatedAt: new Date() };
+    if (info.name !== undefined) updates.name = info.name;
+    if (info.email !== undefined) updates.email = info.email.toLowerCase().trim();
+    await db.update(users).set(updates).where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update user info:", error);
+    return false;
+  }
+}
+
+// ── Password Reset Requests ──────────────────────────────────
+
+export async function createPasswordResetRequest(email: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const normalizedEmail = email.toLowerCase().trim();
+  const user = await getUserByEmail(normalizedEmail);
+  if (!user) return null;
+  try {
+    const result = await db.insert(passwordResetRequests).values({
+      userId: user.id,
+      email: normalizedEmail,
+    }).returning({ id: passwordResetRequests.id });
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to create password reset request:", error);
+    return null;
+  }
+}
+
+export async function getPasswordResetRequests() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(passwordResetRequests)
+    .where(eq(passwordResetRequests.status, "pending"))
+    .orderBy(desc(passwordResetRequests.createdAt));
+}
+
+export async function updateResetRequestStatus(requestId: number, status: "completed" | "dismissed") {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.update(passwordResetRequests).set({ status }).where(eq(passwordResetRequests.id, requestId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update reset request status:", error);
     return false;
   }
 }

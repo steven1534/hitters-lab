@@ -155,6 +155,21 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
+  // ── Request Password Reset (public — creates a pending request for the admin) ──
+  app.post("/api/auth/request-reset", async (req: Request, res: Response) => {
+    const { email } = req.body ?? {};
+    if (!email) {
+      res.status(400).json({ error: "Email is required" });
+      return;
+    }
+    try {
+      await db.createPasswordResetRequest(email);
+    } catch {
+      // swallow — don't reveal whether the email exists
+    }
+    res.json({ message: "If an account with that email exists, your reset request has been sent to Coach Steve." });
+  });
+
   // ── Logout ─────────────────────────────────────────────────
   app.post("/api/auth/logout", (_req: Request, res: Response) => {
     res.clearCookie(COOKIE_NAME, { path: "/" });

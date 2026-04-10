@@ -35,6 +35,7 @@ import { InlineEdit } from "@/components/InlineEdit";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AddNewDrill } from "@/components/AddNewDrill";
 import { NotificationSettings } from "@/components/NotificationSettings";
+import { AccountSettings } from "@/components/AccountSettings";
 import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
 
 interface Drill {
@@ -45,7 +46,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -82,6 +83,7 @@ const NAV_GROUPS = [
     label: "Settings",
     items: [
       { key: "notifications" as ActiveTab, label: "Notifications", icon: Bell },
+      { key: "account" as ActiveTab, label: "My Account", icon: Shield },
     ],
   },
 ];
@@ -100,6 +102,7 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "video-analysis": "Video Analysis",
   "blast-metrics": "Blast Metrics",
   notifications: "Notification Settings",
+  account: "My Account",
 };
 
 // ── Invite User Dialog ────────────────────────────────────────
@@ -572,6 +575,8 @@ export default function CoachDashboard() {
             )}
 
             {activeTab === "notifications" && <NotificationSettings />}
+
+            {activeTab === "account" && <AccountSettings />}
 
             {activeTab === "page-layouts" && (
               <div className="space-y-6">

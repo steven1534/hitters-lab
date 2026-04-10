@@ -4,12 +4,12 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Target, Eye, EyeOff } from "lucide-react";
+import { Target, Eye, EyeOff, CheckCircle } from "lucide-react";
 
 export default function Login() {
   const [, navigate] = useLocation();
   const { refresh } = useAuth();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -19,12 +19,24 @@ export default function Login() {
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
+      if (mode === "forgot") {
+        const res = await fetch("/api/auth/request-reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (!res.ok) { setError("Something went wrong. Please try again."); return; }
+        setResetSent(true);
+        return;
+      }
+
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
       const body =
         mode === "login"
@@ -89,14 +101,25 @@ export default function Login() {
           </div>
 
           <h1 className="text-2xl font-bold text-slate-900 mb-1">
-            {mode === "login" ? "Welcome back" : "Create account"}
+            {mode === "login" ? "Welcome back" : mode === "register" ? "Create account" : "Reset Password"}
           </h1>
           <p className="text-slate-500 text-sm mb-8">
             {mode === "login"
               ? "Sign in to access your training portal."
-              : "Join with your invite link to get started."}
+              : mode === "register"
+              ? "Join with your invite link to get started."
+              : "Enter your email and we'll notify Coach Steve to reset your password."}
           </p>
 
+          {mode === "forgot" && resetSent ? (
+            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-6 text-center">
+              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-3" />
+              <p className="text-sm font-medium text-green-800 mb-1">Request sent!</p>
+              <p className="text-sm text-green-700">
+                Coach Steve has been notified and will reset your password shortly.
+              </p>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div className="space-y-1.5">
@@ -120,6 +143,7 @@ export default function Login() {
               />
             </div>
 
+            {mode !== "forgot" && (
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-sm font-medium text-slate-700">Password</Label>
               <div className="relative">
@@ -139,7 +163,19 @@ export default function Login() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {mode === "login" && (
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => { setMode("forgot"); setError(""); setResetSent(false); }}
+                    className="text-xs text-slate-400 hover:text-red-600 transition-colors"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
+              )}
             </div>
+            )}
 
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
@@ -154,20 +190,33 @@ export default function Login() {
             >
               {loading
                 ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Please wait...</span>
-                : mode === "login" ? "Sign In" : "Create Account"}
+                : mode === "login" ? "Sign In" : mode === "register" ? "Create Account" : "Send Reset Request"}
             </Button>
           </form>
+          )}
 
           {/* Mode toggle */}
           <p className="text-center text-sm text-slate-500 mt-6">
-            {mode === "login" ? "Don't have an account? " : "Already have an account? "}
-            <button
-              type="button"
-              onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}
-              className="text-red-600 hover:text-red-700 font-semibold"
-            >
-              {mode === "login" ? "Sign up" : "Sign in"}
-            </button>
+            {mode === "forgot" ? (
+              <button
+                type="button"
+                onClick={() => { setMode("login"); setError(""); setResetSent(false); }}
+                className="text-red-600 hover:text-red-700 font-semibold"
+              >
+                Back to sign in
+              </button>
+            ) : (
+              <>
+                {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+                <button
+                  type="button"
+                  onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}
+                  className="text-red-600 hover:text-red-700 font-semibold"
+                >
+                  {mode === "login" ? "Sign up" : "Sign in"}
+                </button>
+              </>
+            )}
           </p>
         </div>
       </div>

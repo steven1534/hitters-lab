@@ -786,6 +786,25 @@ export type InsertParentChild = typeof parentChildren.$inferInsert;
 // ============================================================
 // Drill Progress (personal completion tracking)
 // ============================================================
+// ============================================================
+// Password Reset Requests
+// ============================================================
+export const resetRequestStatusEnum = pgEnum("reset_request_status", ["pending", "completed", "dismissed"]);
+
+export const passwordResetRequests = pgTable("passwordResetRequests", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  status: resetRequestStatusEnum("status").default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PasswordResetRequest = typeof passwordResetRequests.$inferSelect;
+export type InsertPasswordResetRequest = typeof passwordResetRequests.$inferInsert;
+
+// ============================================================
+// Drill Progress (personal completion tracking)
+// ============================================================
 export const drillProgress = pgTable("drillProgress", {
   id: serial("id").primaryKey(),
   userId: integer("userId").notNull(),
