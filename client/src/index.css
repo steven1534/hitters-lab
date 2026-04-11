@@ -56,18 +56,18 @@
   --color-crimson-hover: oklch(0.42 0.18 25);
 
   /* Film Room Palette */
-  --color-gold: oklch(0.74 0.09 75);
-  --color-gold-dim: oklch(0.60 0.10 75);
-  --color-teal: oklch(0.55 0.12 185);
-  --color-teal-bright: oklch(0.60 0.12 185);
-  --color-canvas: oklch(0.068 0.003 285);
-  --color-surface: oklch(0.09 0.004 285);
-  --color-surface-raised: oklch(0.12 0.004 285);
+  --color-gold: oklch(0.76 0.10 75);
+  --color-gold-dim: oklch(0.62 0.10 75);
+  --color-teal: oklch(0.58 0.12 185);
+  --color-teal-bright: oklch(0.64 0.13 185);
+  --color-canvas: oklch(0.11 0.006 260);
+  --color-surface: oklch(0.14 0.007 260);
+  --color-surface-raised: oklch(0.17 0.008 260);
   --color-film-fg: oklch(0.96 0.003 65);
-  --color-film-muted: oklch(0.62 0.012 285);
-  --color-film-border: oklch(0.20 0.003 285);
-  --color-foundation: oklch(0.55 0.14 145);
-  --color-advanced: oklch(0.55 0.19 27);
+  --color-film-muted: oklch(0.58 0.015 260);
+  --color-film-border: oklch(0.24 0.008 260);
+  --color-foundation: oklch(0.58 0.16 145);
+  --color-advanced: oklch(0.58 0.20 27);
 }
 
 :root {
@@ -193,30 +193,30 @@
 
 /* Film Room scope — cinematic dark theme for public drill pages */
 .film-room {
-  --background:          oklch(0.068 0.003 285);
+  --background:          oklch(0.11 0.006 260);
   --foreground:          oklch(0.96 0.003 65);
-  --card:                oklch(0.09 0.004 285);
+  --card:                oklch(0.14 0.007 260);
   --card-foreground:     oklch(0.96 0.003 65);
-  --popover:             oklch(0.12 0.004 285);
+  --popover:             oklch(0.16 0.007 260);
   --popover-foreground:  oklch(0.96 0.003 65);
   --primary:             oklch(0.74 0.09 75);
-  --primary-foreground:  oklch(0.068 0.003 285);
+  --primary-foreground:  oklch(0.11 0.006 260);
   --secondary:           oklch(0.55 0.12 185);
   --secondary-foreground:oklch(0.96 0.003 65);
-  --muted:               oklch(0.12 0.004 285);
-  --muted-foreground:    oklch(0.62 0.012 285);
-  --accent:              oklch(0.12 0.004 285);
+  --muted:               oklch(0.16 0.007 260);
+  --muted-foreground:    oklch(0.62 0.012 260);
+  --accent:              oklch(0.16 0.007 260);
   --accent-foreground:   oklch(0.96 0.003 65);
   --destructive:         oklch(0.55 0.19 27);
   --destructive-foreground: oklch(1 0 0);
-  --border:              oklch(0.20 0.003 285);
-  --input:               oklch(0.12 0.004 285);
+  --border:              oklch(0.22 0.008 260);
+  --input:               oklch(0.16 0.007 260);
   --ring:                oklch(0.74 0.09 75);
   --electric:            oklch(0.74 0.09 75);
   --electric-glow:       oklch(0.60 0.10 75);
   color-scheme: dark;
   color: oklch(0.96 0.003 65);
-  background: oklch(0.068 0.003 285);
+  background: oklch(0.11 0.006 260);
 }
 
 @layer base {
@@ -954,11 +954,23 @@
   opacity: 0.4;
 }
 
+/* Film Room body typography baseline */
+.film-room {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Film Room scrollbar */
-.film-room ::-webkit-scrollbar { width: 4px; height: 4px; }
-.film-room ::-webkit-scrollbar-track { background: #0B0B0C; }
-.film-room ::-webkit-scrollbar-thumb { background: #2a2c30; border-radius: 2px; }
-.film-room ::-webkit-scrollbar-thumb:hover { background: #C8A96B; }
+.film-room ::-webkit-scrollbar { width: 5px; height: 5px; }
+.film-room ::-webkit-scrollbar-track { background: oklch(0.11 0.006 260); }
+.film-room ::-webkit-scrollbar-thumb { background: oklch(0.25 0.008 260); border-radius: 3px; }
+.film-room ::-webkit-scrollbar-thumb:hover { background: oklch(0.76 0.10 75); }
+
+/* Film Room selection color */
+.film-room ::selection {
+  background: oklch(0.76 0.10 75 / 0.3);
+}
 
 /* Stagger animations for drill card grids */
 @keyframes fadeUp {

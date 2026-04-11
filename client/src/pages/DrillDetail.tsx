@@ -1,4 +1,4 @@
-﻿import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Clock, Users, Dumbbell, Target, ExternalLink, Lock, LogIn, ChevronDown, AlertCircle, TrendingUp, Lightbulb, Star, AlertTriangle, Eye, MessageSquare } from "lucide-react";
@@ -426,8 +426,9 @@ export default function DrillDetail() {
       {/* Header â€” always rendered (blurred behind modal when limit reached) */}
       <>
       <header className="relative overflow-hidden mb-0 md:mb-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.18_0.01_25)] via-[oklch(0.15_0.005_0)] to-[oklch(0.12_0.01_20)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.45_0.15_250/0.15),transparent_60%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.16_0.020_40)] via-[oklch(0.12_0.008_260)] to-[oklch(0.09_0.010_250)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.22_0.04_55/0.18),transparent_60%)]" />
+        <div className="absolute inset-0 noise-overlay" />
         <div className="container relative z-10 pt-4 pb-6 md:py-10">
           <Link href={backHref}>
             <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10 mb-3 md:mb-4 pl-0 gap-2 text-sm h-9">
