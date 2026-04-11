@@ -124,7 +124,7 @@ function generateDrillAssignmentEmailHtml(data: DrillAssignmentEmailData): strin
           </div>
           
           <div class="footer">
-            <p>This is an automated email from Coach Steve's Mobile Coach. Please don't reply to this email.</p>
+            <p>This is an automated email from Coach Steve's Hitter's Lab. Please don't reply to this email.</p>
           </div>
         </div>
       </body>
@@ -209,7 +209,7 @@ export async function sendSubmissionNotificationToCoach(data: SubmissionNotifica
         </div>
         
         <div class="footer">
-          <p>This is an automated notification from Coach Steve's Mobile Coach.</p>
+          <p>This is an automated notification from Coach Steve's Hitter's Lab.</p>
         </div>
       </div>
     </div>
@@ -293,7 +293,7 @@ export async function sendFeedbackNotificationToAthlete(data: FeedbackNotificati
         </div>
         
         <div class="footer">
-          <p>This is an automated notification from Coach Steve's Mobile Coach.</p>
+          <p>This is an automated notification from Coach Steve's Hitter's Lab.</p>
         </div>
       </div>
     </div>
@@ -337,8 +337,8 @@ export async function sendInviteEmail(data: InviteEmailData): Promise<{ success:
   try {
     const emailHtml = generateInviteEmailHtml(data);
     const subject = data.inviteType === "coach" 
-      ? "You're Invited to USA Baseball Drills Directory"
-      : "Join Your Team on USA Baseball Drills Directory";
+      ? "You're Invited to Coach Steve's Hitter's Lab"
+      : "Join Your Team on Coach Steve's Hitter's Lab";
 
     const result = await getResend().emails.send({
       from: "coach@coachstevebaseball.com",
@@ -392,13 +392,13 @@ function generateInviteEmailHtml(data: InviteEmailData): string {
       <body>
         <div class="container">
           <div class="header">
-            <h1>⚾ Coach Steve Baseball — Player Drill Library</h1>
+            <h1>⚾ Coach Steve's Hitter's Lab</h1>
             <p>You're Invited!</p>
           </div>
           
           <div class="content">
             <p>Hi there!</p>
-            <p>You've been invited to join Coach Steve's Baseball — Player Drill Library as an <strong>${roleText}</strong>.</p>
+            <p>You've been invited to join Coach Steve's Hitter's Lab as an <strong>${roleText}</strong>.</p>
             
             <div class="features-list">
               <strong>What you'll get access to:</strong>
@@ -434,7 +434,7 @@ function generateInviteEmailHtml(data: InviteEmailData): string {
           </div>
           
           <div class="footer">
-            <p>© 2026 Coach Steve Baseball — Player Drill Library. All rights reserved.</p>
+            <p>© 2026 Coach Steve's Hitter's Lab. All rights reserved.</p>
             <p>If you didn't expect this invitation, you can safely ignore this email.</p>
           </div>
         </div>
@@ -462,7 +462,7 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
     const result = await getResend().emails.send({
       from: "coach@coachstevebaseball.com",
       to: data.toEmail,
-      subject: "Verify Your Email - Coach Steve Baseball Drills",
+      subject: "Verify Your Email - Coach Steve's Hitter's Lab",
       html: emailHtml,
     });
 
@@ -499,7 +499,7 @@ function generateEmailVerificationHtml(data: EmailVerificationData): string {
       <body>
         <div class="container">
           <div class="header">
-            <h1>⚾ Coach Steve Baseball — Player Drill Library</h1>
+            <h1>⚾ Coach Steve's Hitter's Lab</h1>
             <p>Verify Your Email</p>
           </div>
           
@@ -523,7 +523,7 @@ function generateEmailVerificationHtml(data: EmailVerificationData): string {
           </div>
           
           <div class="footer">
-            <p>© 2026 Coach Steve Baseball — Player Drill Library. All rights reserved.</p>
+            <p>© 2026 Coach Steve's Hitter's Lab. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -550,7 +550,7 @@ export async function sendInviteExpirationReminderEmail(data: InviteExpirationRe
     const result = await getResend().emails.send({
       from: "coach@coachstevebaseball.com",
       to: data.toEmail,
-      subject: "Your Invitation Expires Soon - Coach Steve Baseball Drills",
+      subject: "Your Invitation Expires Soon - Coach Steve's Hitter's Lab",
       html: emailHtml,
     });
 
@@ -597,13 +597,13 @@ function generateInviteExpirationReminderHtml(data: InviteExpirationReminderData
       <body>
         <div class="container">
           <div class="header">
-            <h1>⚾ Coach Steve Baseball — Player Drill Library</h1>
+            <h1>⚾ Coach Steve's Hitter's Lab</h1>
             <p>Invitation Expiring Soon</p>
           </div>
           
           <div class="content">
             <p>Hi ${data.athleteName},</p>
-            <p>Your invitation to join Coach Steve's Baseball Drills platform is expiring soon. Don't miss out—accept your invitation now to get started!</p>
+            <p>Your invitation to join Coach Steve's Hitter's Lab is expiring soon. Don't miss out—accept your invitation now to get started!</p>
             
             <div class="warning-box">
               <div class="warning-label">⏰ Expires On</div>
@@ -628,7 +628,7 @@ function generateInviteExpirationReminderHtml(data: InviteExpirationReminderData
           </div>
           
           <div class="footer">
-            <p>© 2026 Coach Steve Baseball — Player Drill Library. All rights reserved.</p>
+            <p>© 2026 Coach Steve's Hitter's Lab. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -655,7 +655,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<{ succes
     const result = await getResend().emails.send({
       from: "coach@coachstevebaseball.com",
       to: data.athleteEmail,
-      subject: "Welcome to Coach Steve's Baseball Drills Directory! 🎉",
+      subject: "Welcome to Coach Steve's Hitter's Lab! 🎉",
       html: emailHtml,
     });
 
@@ -705,14 +705,14 @@ function generateWelcomeEmailHtml(data: WelcomeEmailData): string {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎉 Welcome to Coach Steve's Baseball Drills!</h1>
+            <h1>🎉 Welcome to Coach Steve's Hitter's Lab!</h1>
             <p>Your account is now active and ready to go</p>
           </div>
           
           <div class="content">
             <p>Hi ${data.athleteName},</p>
             
-            <p>Welcome to Coach Steve's Baseball Drills Directory! Your account has been activated and you now have full access to all the drills and training materials.</p>
+            <p>Welcome to Coach Steve's Hitter's Lab! Your account has been activated and you now have full access to all the drills and training materials.</p>
             
             <div class="welcome-section">
               <h2>What You Can Do Now</h2>
@@ -762,7 +762,7 @@ function generateWelcomeEmailHtml(data: WelcomeEmailData): string {
           </div>
           
           <div class="footer">
-            <p>© 2026 Coach Steve Baseball — Drills Directory. All rights reserved.</p>
+            <p>© 2026 Coach Steve's Hitter's Lab. All rights reserved.</p>
             <p>This is an automated welcome message. Please do not reply to this email.</p>
           </div>
         </div>
@@ -1004,7 +1004,7 @@ export async function sendDrillFollowUpReminder(data: DrillFollowUpReminderData)
         <p style="color: #666; font-size: 14px; margin-top: 20px;">Log in and start working through your drills. Your coach is tracking your progress and is here to help!</p>
       </div>
       <div class="footer">
-        <p>This is an automated reminder from Coach Steve's Mobile Coach.</p>
+        <p>This is an automated reminder from Coach Steve's Hitter's Lab.</p>
       </div>
     </div>
   </body>
@@ -1123,7 +1123,7 @@ export async function sendPracticePlanShareEmail(data: PracticePlanShareData): P
         <p style="color: #666; font-size: 14px; margin-top: 20px;">Log in to your athlete portal to see the full session breakdown with all drill details and coaching notes.</p>
       </div>
       <div class="footer">
-        <p>This is an automated notification from Coach Steve's Mobile Coach.</p>
+        <p>This is an automated notification from Coach Steve's Hitter's Lab.</p>
       </div>
     </div>
   </body>
@@ -1216,7 +1216,7 @@ export async function sendVideoAnalysisFeedbackEmail(data: VideoAnalysisFeedback
         </p>
         <div class="footer">
           <p>This feedback was generated with AI assistance and reviewed by your coach.</p>
-          <p>USA Baseball Mobile Coach — Drill Library</p>
+          <p>Coach Steve's Hitter's Lab</p>
         </div>
       </div>
     </div>
