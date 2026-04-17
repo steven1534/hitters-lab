@@ -155,6 +155,81 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
+  // ── Accept Invite (auto-provisions account with default password) ──
+  app.post("/api/auth/accept-invite", async (req: Request, res: Response) => {
+    const { token } = req.body ?? {};
+    if (!token) {
+      res.status(400).json({ error: "Invite token is required" });
+      return;
+    }
+
+    try {
+      const inviteDb = await import("../invites");
+      const invite = await inviteDb.getInviteByToken(token);
+
+      if (!invite || !inviteDb.isInviteValid(invite)) {
+        res.status(400).json({ error: "Invalid or expired invite link" });
+        return;
+      }
+
+      const normalizedEmail = invite.email.toLowerCase().trim();
+      let user = await db.getUserByEmail(normalizedEmail);
+
+      if (!user) {
+        const passwordHash = await hashPassword("player123");
+        const name = (invite as any).name || normalizedEmail.split("@")[0];
+        const role = invite.role === "coach" ? "coach" : "athlete";
+
+        const userId = await db.createUser({
+          email: normalizedEmail,
+          passwordHash,
+          name,
+          role: role as any,
+          isActiveClient: 1,
+          emailVerified: 1,
+          loginMethod: "email",
+          lastSignedIn: new Date(),
+        });
+
+        user = await db.getUserById(userId);
+        if (!user) {
+          res.status(500).json({ error: "Failed to create account" });
+          return;
+        }
+        console.log(`[Auth] Auto-created account for ${normalizedEmail} with default password`);
+      }
+
+      await inviteDb.acceptInvite(token, user.id);
+
+      const sessionToken = await createSessionToken(user.id, user.email!);
+      res.cookie(COOKIE_NAME, sessionToken, getCookieOptions(req));
+      res.json({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      });
+    } catch (err: any) {
+      console.error("[Auth] Accept-invite error:", err);
+      res.status(500).json({ error: err.message || "Failed to accept invite" });
+    }
+  });
+
+  // ── Request Password Reset (public — creates a pending request for the admin) ──
+  app.post("/api/auth/request-reset", async (req: Request, res: Response) => {
+    const { email } = req.body ?? {};
+    if (!email) {
+      res.status(400).json({ error: "Email is required" });
+      return;
+    }
+    try {
+      await db.createPasswordResetRequest(email);
+    } catch {
+      // swallow — don't reveal whether the email exists
+    }
+    res.json({ message: "If an account with that email exists, your reset request has been sent to Coach Steve." });
+  });
+
   // ── Logout ─────────────────────────────────────────────────
   app.post("/api/auth/logout", (_req: Request, res: Response) => {
     res.clearCookie(COOKIE_NAME, { path: "/" });

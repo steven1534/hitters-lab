@@ -1,20 +1,17 @@
-# Coach Steve Hitter's Lab — Migration Guide
-## Manus AI → Railway + Supabase
+# Coach Steve's Hitters Lab — Deployment Guide
+## Render + Supabase
 
 ---
 
-## What Changed
+## Architecture
 
-| Was (Manus) | Now (Standard) |
+| Component | Service |
 |---|---|
-| Manus OAuth login | Email + password login |
-| MySQL database | PostgreSQL (Supabase) |
-| `vite-plugin-manus-runtime` | Removed |
-| Manus-specific SDK/OAuth | Standard JWT cookies |
-| `openId` user identifier | `email` + `id` |
-| Manus hosting | Railway |
-
-Everything else is **identical** — all your drills, components, pages, tRPC routers, Resend emails, OpenAI/Gemini, S3 storage, blast metrics, session notes, practice plans — all untouched.
+| Frontend + API | Render (Web Service) |
+| Database | Supabase (PostgreSQL) |
+| Email | Resend |
+| AI | OpenAI + Gemini |
+| File Storage | AWS S3 |
 
 ---
 
@@ -51,19 +48,21 @@ pnpm run db:push
 
 ---
 
-## Step 3: Deploy to Railway
+## Step 3: Deploy to Render
 
-1. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-2. Push this code to a **new GitHub repo** first:
+1. Push this code to a **GitHub repo**:
    ```bash
-   git init
    git add .
    git commit -m "Initial commit"
    git remote add origin https://github.com/YOUR_USERNAME/hitters-lab.git
    git push -u origin main
    ```
-3. In Railway: select your repo → it will auto-detect and build
-4. Go to **Variables** and add all values from `.env.example`:
+2. Go to [render.com](https://render.com) → New → Web Service
+3. Connect your GitHub repo
+4. Render will detect the `render.yaml` config automatically, or set manually:
+   - **Build command:** `pnpm install && pnpm build`
+   - **Start command:** `node dist/index.js`
+5. Add environment variables:
    - `DATABASE_URL` (from Supabase)
    - `JWT_SECRET` (generate at https://generate-secret.vercel.app/32)
    - `OWNER_EMAIL` = `coach@coachstevebaseball.com`
@@ -72,8 +71,8 @@ pnpm run db:push
    - `GEMINI_API_KEY`
    - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_BUCKET_NAME`
    - `NODE_ENV` = `production`
-5. Railway gives you a URL like `your-app.railway.app` — set `APP_URL` to that
-6. In **Settings → Networking** → add your custom domain (`coachstevemobilecoach.com`)
+   - `NODE_VERSION` = `22`
+6. Set `APP_URL` to your Render URL (e.g. `https://coach-steves-hitters-lab.onrender.com`)
 
 ---
 
@@ -81,7 +80,7 @@ pnpm run db:push
 
 Once deployed, go to:
 ```
-https://your-app.railway.app/register
+https://your-render-url.onrender.com/register
 ```
 
 Sign up with `coach@coachstevebaseball.com` — it will automatically get the **admin role** because that matches `OWNER_EMAIL`.
@@ -90,15 +89,15 @@ Sign up with `coach@coachstevebaseball.com` — it will automatically get the **
 
 ## Step 5: Invite Athletes
 
-The invite system works exactly the same as before — go to your Coach Dashboard, invite athletes by email. They get an invite link, click it, set a password, and they're in.
+Go to your Coach Dashboard, invite athletes by email. They get an invite link, click it, set a password, and they're in.
 
 ---
 
 ## Connecting Your Domain
 
-In Railway: Settings → Networking → Custom Domain → enter `coachstevemobilecoach.com`
+In Render: Settings → Custom Domains → add `coachstevemobilecoach.com`
 
-In your Hostinger DNS: add a CNAME record pointing `coachstevemobilecoach.com` → your Railway URL.
+In your DNS provider: add a CNAME record pointing your domain → your Render URL.
 
 ---
 
@@ -106,10 +105,8 @@ In your Hostinger DNS: add a CNAME record pointing `coachstevemobilecoach.com` �
 
 | Service | Cost |
 |---|---|
-| Railway (Hobby plan) | ~$5/month |
+| Render (Free tier) | $0 (750 hrs/month) |
 | Supabase (Free tier) | $0 (up to 500MB, 50,000 MAU) |
 | Resend (Free tier) | $0 (up to 3,000 emails/month) |
 | AWS S3 (video storage) | ~$2-5/month depending on usage |
-| **Total** | **~$7-10/month** |
-
-No credit limits. No surprise lockouts.
+| **Total** | **~$2-5/month** |

@@ -11,7 +11,7 @@ export async function sendStreakReminderEmail(
 ): Promise<boolean> {
   try {
     await getResend().emails.send({
-      from: "USA Baseball Drills <noreply@manus.space>",
+      from: "Coach Steve's Hitters Lab <coach@coachstevehitting.com>",
       to: athleteEmail,
       subject: `🔥 Keep your ${streakDays}-day streak alive!`,
       html: `
@@ -31,7 +31,7 @@ export async function sendStreakReminderEmail(
           </div>
           <p style="font-size: 14px; color: #666;">
             Keep up the great work!<br>
-            USA Baseball Drills Directory
+            Coach Steve's Hitters Lab
           </p>
         </div>
       `,

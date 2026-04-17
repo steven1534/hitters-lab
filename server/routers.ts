@@ -62,6 +62,39 @@ export const appRouter = router({
       } as const;
     }),
 
+    // ── Admin account management ────────────────────────────
+    changePassword: protectedProcedure
+      .input(z.object({ currentPassword: z.string(), newPassword: z.string().min(8) }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const { verifyPassword, hashPassword } = await import('./_core/auth');
+        const user = await db.getUserById(ctx.user.id);
+        if (!user?.passwordHash) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'No password set for this account' });
+        }
+        const valid = await verifyPassword(input.currentPassword, user.passwordHash);
+        if (!valid) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Current password is incorrect' });
+        }
+        const hash = await hashPassword(input.newPassword);
+        const success = await db.updateUserPassword(ctx.user.id, hash);
+        if (!success) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to update password' });
+        return { success: true };
+      }),
+
+    updateMyAccount: protectedProcedure
+      .input(z.object({ name: z.string().optional(), email: z.string().email().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const success = await db.updateUserInfo(ctx.user.id, { name: input.name, email: input.email });
+        if (!success) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to update account' });
+        return { success: true };
+      }),
+
     // ── Impersonation (admin only) ──────────────────────────
     impersonate: protectedProcedure
       .input(z.object({ userId: z.number() }))
@@ -150,6 +183,21 @@ export const appRouter = router({
         
         return { success };
       }),
+    deleteUser: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        if (input.userId === ctx.user.id) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot delete your own account' });
+        }
+        const success = await db.deleteUser(input.userId);
+        if (!success) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to delete user' });
+        }
+        return { success: true };
+      }),
     convertToAthlete: protectedProcedure
       .input(z.object({ userId: z.number() }))
       .mutation(async ({ ctx, input }) => {
@@ -215,6 +263,66 @@ export const appRouter = router({
         }
         const { runStreakReminderJob } = await import('./streakReminderJob');
         await runStreakReminderJob();
+        return { success: true };
+      }),
+
+    resetUserPassword: protectedProcedure
+      .input(z.object({ userId: z.number(), newPassword: z.string().min(4) }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const { hashPassword } = await import('./_core/auth');
+        const hash = await hashPassword(input.newPassword);
+        const success = await db.updateUserPassword(input.userId, hash);
+        if (!success) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to reset password' });
+        return { success: true };
+      }),
+
+    updateUserInfo: protectedProcedure
+      .input(z.object({ userId: z.number(), name: z.string().optional(), email: z.string().email().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const success = await db.updateUserInfo(input.userId, { name: input.name, email: input.email });
+        if (!success) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to update user' });
+        return { success: true };
+      }),
+
+    getPasswordResetRequests: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+      }
+      const requests = await db.getPasswordResetRequests();
+      const enriched = await Promise.all(requests.map(async (r) => {
+        const user = await db.getUserById(r.userId);
+        return { ...r, userName: user?.name ?? null };
+      }));
+      return enriched;
+    }),
+
+    dismissResetRequest: protectedProcedure
+      .input(z.object({ requestId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        await db.updateResetRequestStatus(input.requestId, "dismissed");
+        return { success: true };
+      }),
+
+    completeResetRequest: protectedProcedure
+      .input(z.object({ requestId: z.number(), userId: z.number(), newPassword: z.string().min(4) }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const { hashPassword } = await import('./_core/auth');
+        const hash = await hashPassword(input.newPassword);
+        const pwSuccess = await db.updateUserPassword(input.userId, hash);
+        if (!pwSuccess) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to reset password' });
+        await db.updateResetRequestStatus(input.requestId, "completed");
         return { success: true };
       }),
   }),
