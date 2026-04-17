@@ -44,7 +44,7 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
   };
 
   return (
-    <Card className="border-l-4 border-l-[#DC143C]">
+    <Card className="border-l-4 border-l-[#DC143C] border-white/[0.08] bg-white/[0.02]">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Video className="h-5 w-5 text-[#DC143C]" />
@@ -52,7 +52,7 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-800 flex gap-2">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 flex gap-2">
           <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold mb-1">Supported Platforms:</p>
@@ -69,7 +69,7 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
             className="font-mono text-sm"
           />
           {error && (
-            <p className="text-sm text-red-600 flex items-center gap-1">
+            <p className="text-sm text-red-400 flex items-center gap-1">
               <AlertCircle className="h-4 w-4" />
               {error}
             </p>
@@ -108,14 +108,14 @@ export function VideoUrlManager({ drillId, drillName, currentVideoUrl, onSave }:
         </div>
 
         {currentVideoUrl && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
-            <p className="font-semibold text-green-900 mb-1">Current Video:</p>
-            <p className="text-green-800 break-all font-mono text-xs">{currentVideoUrl}</p>
+          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm">
+            <p className="font-semibold text-green-400 mb-1">Current Video:</p>
+            <p className="text-green-300 break-all font-mono text-xs">{currentVideoUrl}</p>
           </div>
         )}
 
-        <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600 space-y-2">
-          <p className="font-semibold text-gray-700">Examples:</p>
+        <div className="bg-white/[0.04] rounded-lg p-3 text-xs text-muted-foreground space-y-2">
+          <p className="font-semibold text-foreground/70">Examples:</p>
           <ul className="space-y-1 list-disc list-inside">
             <li>YouTube: https://www.youtube.com/watch?v=dQw4w9WgXcQ</li>
             <li>YouTube Short: https://youtu.be/dQw4w9WgXcQ</li>

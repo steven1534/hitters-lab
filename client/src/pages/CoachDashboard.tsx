@@ -42,6 +42,7 @@ import UserManagement from "@/pages/UserManagement";
 import SubmissionsDashboard from "@/pages/SubmissionsDashboard";
 import CoachMessaging from "@/pages/CoachMessaging";
 import ActivityFeed from "@/pages/ActivityFeed";
+import { ManageDrillVideos } from "@/pages/ManageDrillVideos";
 
 interface Drill {
   id: string;
@@ -51,7 +52,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "messaging" | "activity-feed" | "drill-library";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "messaging" | "activity-feed" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -68,6 +69,7 @@ const NAV_GROUPS = [
     items: [
       { key: "assign" as ActiveTab, label: "Assign Drills", icon: Plus },
       { key: "drill-library" as ActiveTab, label: "Drill Library", icon: BookOpen },
+      { key: "drill-videos" as ActiveTab, label: "Manage Videos", icon: Video },
       { key: "challenges" as ActiveTab, label: "Weekly Challenges", icon: Trophy },
       { key: "planner" as ActiveTab, label: "Practice Planner", icon: Target },
       { key: "page-layouts" as ActiveTab, label: "Page Layouts", icon: LayoutTemplate },
@@ -110,7 +112,6 @@ const ADMIN_LINK_GROUPS = [
     items: [
       { href: "/drill-generator", label: "Drill Generator", icon: Wand2 },
       { href: "/drill-comparison", label: "Drill Comparison", icon: GitCompare },
-      { href: "/manage-drill-videos", label: "Manage Videos", icon: Video },
       { href: "/athlete-assessment", label: "Athlete Assessment", icon: ClipboardCheck },
     ],
   },
@@ -130,6 +131,7 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "video-analysis": "Video Analysis",
   "blast-metrics": "Blast Metrics",
   "drill-library": "Drill Library",
+  "drill-videos": "Manage Videos",
   challenges: "Weekly Challenges",
   "user-management": "User Management",
   submissions: "Submissions",
@@ -662,6 +664,8 @@ export default function CoachDashboard() {
             {activeTab === "account" && <AccountSettings />}
 
             {activeTab === "drill-library" && <DrillLibraryTab />}
+
+            {activeTab === "drill-videos" && <ManageDrillVideos embedded />}
 
             {activeTab === "user-management" && <UserManagement embedded />}
             {activeTab === "submissions" && <SubmissionsDashboard embedded />}
