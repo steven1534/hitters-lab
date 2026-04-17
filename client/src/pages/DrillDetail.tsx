@@ -895,21 +895,21 @@ export default function DrillDetail() {
             {/* Drill Type + Age Level */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {staticDrill.drillType && (
-                <div className="glass-card rounded-xl p-4">
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Drill Type</div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                <div className="rounded-[2px] border border-film-border bg-surface p-4">
+                  <div className="font-heading text-[0.6rem] font-bold uppercase tracking-[0.12em] text-film-muted mb-2.5">Drill Type</div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-[2px] text-[0.78rem] font-semibold bg-teal/10 text-teal border border-teal/20">
                     {staticDrill.drillType}
                   </span>
                 </div>
               )}
               {(staticDrill.ageLevel?.length ?? 0) > 0 && (
-                <div className="glass-card rounded-xl p-4">
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Age / Level</div>
+                <div className="rounded-[2px] border border-film-border bg-surface p-4">
+                  <div className="font-heading text-[0.6rem] font-bold uppercase tracking-[0.12em] text-film-muted mb-2.5">Age / Level</div>
                   <div className="flex flex-wrap gap-2">
                     {(staticDrill.ageLevel ?? []).filter((v: string) => v !== 'all').map((level: string) => {
                       const label = filterOptions.ageLevel.find(o => o.value === level)?.label ?? level;
                       return (
-                        <span key={level} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200">
+                        <span key={level} className="inline-flex items-center px-2.5 py-1 rounded-[2px] text-[0.72rem] font-medium bg-gold/10 text-gold border border-gold/20">
                           {label}
                         </span>
                       );
@@ -921,11 +921,11 @@ export default function DrillDetail() {
 
             {/* Focus Area Tags */}
             {(drill?.tags?.length ?? 0) > 0 && (
-              <div className="glass-card rounded-xl p-4">
-                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Focus Areas</div>
+              <div className="rounded-[2px] border border-film-border bg-surface p-4">
+                <div className="font-heading text-[0.6rem] font-bold uppercase tracking-[0.12em] text-film-muted mb-2.5">Focus Areas</div>
                 <div className="flex flex-wrap gap-2">
                   {(drill?.tags ?? []).map((tag: string) => (
-                    <span key={tag} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                    <span key={tag} className="inline-flex items-center px-2.5 py-1 rounded-[2px] text-[0.72rem] font-medium bg-white/[0.06] text-film-fg/80 border border-film-border">
                       {tag}
                     </span>
                   ))}
@@ -936,13 +936,13 @@ export default function DrillDetail() {
             {/* Problems + Goals */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {(staticDrill.problem?.length ?? 0) > 0 && (
-                <div className="glass-card rounded-xl p-4">
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Fixes These Problems</div>
+                <div className="rounded-[2px] border border-film-border bg-surface p-4">
+                  <div className="font-heading text-[0.6rem] font-bold uppercase tracking-[0.12em] text-film-muted mb-2.5">Fixes These Problems</div>
                   <div className="flex flex-wrap gap-2">
                     {(staticDrill.problem ?? []).map((p: string) => {
                       const label = filterOptions.problem.find(o => o.value === p)?.label ?? p;
                       return (
-                        <span key={p} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                        <span key={p} className="inline-flex items-center px-2.5 py-1 rounded-[2px] text-[0.72rem] font-medium bg-advanced/10 text-advanced border border-advanced/20">
                           {label}
                         </span>
                       );
@@ -951,13 +951,13 @@ export default function DrillDetail() {
                 </div>
               )}
               {(staticDrill.goal?.length ?? 0) > 0 && (
-                <div className="glass-card rounded-xl p-4">
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Helps You</div>
+                <div className="rounded-[2px] border border-film-border bg-surface p-4">
+                  <div className="font-heading text-[0.6rem] font-bold uppercase tracking-[0.12em] text-film-muted mb-2.5">Helps You</div>
                   <div className="flex flex-wrap gap-2">
                     {(staticDrill.goal ?? []).map((g: string) => {
                       const label = filterOptions.goal.find(o => o.value === g)?.label ?? g;
                       return (
-                        <span key={g} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                        <span key={g} className="inline-flex items-center px-2.5 py-1 rounded-[2px] text-[0.72rem] font-medium bg-foundation/10 text-foundation border border-foundation/20">
                           {label}
                         </span>
                       );
