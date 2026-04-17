@@ -169,7 +169,7 @@ export default function DrillsDirectory() {
           <div className="flex items-center gap-3 mb-5 animate-fade-up">
             <div className="h-px w-8 bg-gold/60" />
             <p className="font-heading text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold">
-              Coach Steve&apos;s Hitter&apos;s Lab
+              Coach Steve&apos;s Hitters Lab
             </p>
           </div>
 

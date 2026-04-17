@@ -119,6 +119,6 @@ export async function uploadVideoFile(
 
   throw new Error(
     "No video storage configured. Set AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY + AWS_BUCKET_NAME, " +
-    "or set SUPABASE_SERVICE_ROLE_KEY in Railway environment variables."
+    "or set SUPABASE_SERVICE_ROLE_KEY in your environment variables."
   );
 }

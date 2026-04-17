@@ -1,4 +1,5 @@
 import { useState, useMemo, Fragment } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import {
   Target,
   TrendingUp,
   Eye,
+  Trash2,
 } from "lucide-react";
 import { InlineEdit } from "./InlineEdit";
 
@@ -266,6 +268,33 @@ export function AthleteTable() {
   const toggleActiveMutation = trpc.admin.toggleClientAccess.useMutation({
     onSuccess: () => {
       utils.admin.getAllUsers.invalidate();
+    },
+  });
+
+  const deleteUserMutation = trpc.admin.deleteUser.useMutation({
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      utils.admin.getAllUsers.invalidate();
+      utils.drillAssignments.getAthleteAssignmentOverview.invalidate();
+      setExpandedRow(null);
+    },
+    onError: (err) => {
+      toast.error(`Delete failed: ${err.message}`);
+      utils.admin.getAllUsers.invalidate();
+      utils.drillAssignments.getAthleteAssignmentOverview.invalidate();
+    },
+  });
+
+  const deleteInviteMutation = trpc.invites.deleteInvite.useMutation({
+    onSuccess: () => {
+      toast.success("Invite deleted successfully");
+      utils.admin.getAllUsers.invalidate();
+      utils.drillAssignments.getAthleteAssignmentOverview.invalidate();
+      utils.invites.getAllInvites.invalidate();
+      setExpandedRow(null);
+    },
+    onError: (err) => {
+      toast.error(`Delete failed: ${err.message}`);
     },
   });
 
@@ -579,6 +608,26 @@ export function AthleteTable() {
                                 👁️ {impersonateMutation.isPending ? "Switching..." : "View As This Athlete"}
                               </Button>
                             )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5 text-xs border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                              disabled={deleteUserMutation.isPending || deleteInviteMutation.isPending}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const label = athlete.type === "invite" ? "invite" : "account";
+                                if (confirm(`Delete ${athlete.name} (${athlete.email})?\n\nThis permanently removes their ${label} and all related data.`)) {
+                                  if (athlete.type === "invite") {
+                                    deleteInviteMutation.mutate({ inviteId: athlete.numericId });
+                                  } else {
+                                    deleteUserMutation.mutate({ userId: athlete.numericId });
+                                  }
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              {(deleteUserMutation.isPending || deleteInviteMutation.isPending) ? "Deleting..." : "Delete"}
+                            </Button>
                           </div>
                           {athlete.type === "user" && athlete.totalDrills > athlete.completedDrills && (
                             <div className="mt-2 flex items-center gap-2">

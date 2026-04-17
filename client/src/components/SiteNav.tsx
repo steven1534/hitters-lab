@@ -45,7 +45,7 @@ export default function SiteNav() {
                 COACH STEVE&apos;S
               </span>
               <span className="font-heading text-[0.6rem] font-semibold" style={{ color: "#C8A96B", letterSpacing: "0.12em" }}>
-                HITTER&apos;S LAB
+                HITTERS LAB
               </span>
             </div>
           </Link>

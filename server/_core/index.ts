@@ -47,7 +47,7 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-  // Hard 15s request timeout — prevents Railway from hanging forever on DB issues
+  // Hard 15s request timeout — prevents hanging on DB issues
   app.use((_req, res, next) => {
     res.setTimeout(15000, () => {
       if (!res.headersSent) {
@@ -143,7 +143,7 @@ async function startServer() {
     serveStatic(app);
   }
 
-  // In production (Railway), always bind to the exact PORT Railway provides
+  // In production, bind to the PORT env var provided by the host
   // In development, scan for an available port
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = process.env.NODE_ENV === "production"
