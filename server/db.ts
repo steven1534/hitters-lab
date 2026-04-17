@@ -264,7 +264,7 @@ export async function deleteUser(userId: number): Promise<boolean> {
       drillSubmissions: submissionsTable, coachFeedback: feedbackTable,
       sessionNotes, practicePlans, playerReports, videoAnalysis,
       blastPlayers, drillQuestions: questionsTable, drillAnswers: answersTable,
-      emailAlertPreferences, parentChildren: parentChildrenTable,
+      coachAlertPreferences, parentChildren: parentChildrenTable,
     } = await import("../drizzle/schema");
 
     // Delete from all related tables first
@@ -283,7 +283,7 @@ export async function deleteUser(userId: number): Promise<boolean> {
     await db.delete(parentChildrenTable).where(eq(parentChildrenTable.childId, userId));
 
     // Try optional tables that may not exist yet
-    try { await db.delete(emailAlertPreferences).where(eq(emailAlertPreferences.coachId, userId)); } catch {}
+    try { await db.delete(coachAlertPreferences).where(eq(coachAlertPreferences.coachId, userId)); } catch {}
     try { await db.delete(blastPlayers).where(eq(blastPlayers.userId, userId)); } catch {}
 
     // Finally delete the user
@@ -619,6 +619,17 @@ export async function getSubmissionsByUser(userId: number) {
     return await db.select().from(drillSubmissions).where(eq(drillSubmissions.userId, userId));
   } catch (error) {
     console.error("[Database] Failed to get user submissions:", error);
+    return [];
+  }
+}
+
+export async function getAllSubmissions() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(drillSubmissions).orderBy(desc(drillSubmissions.submittedAt));
+  } catch (error) {
+    console.error("[Database] Failed to get all submissions:", error);
     return [];
   }
 }

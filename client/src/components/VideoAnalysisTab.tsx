@@ -90,13 +90,31 @@ export function VideoAnalysisTab() {
   const [statusFilter, setStatusFilter] = useState<AnalysisStatus | "all">("all");
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisRecord | null>(null);
   const [editedFeedback, setEditedFeedback] = useState("");
-  const [, setCoachNotes] = useState("");
+  const [coachNotes, setCoachNotes] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState("");
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [uploadAthleteId, setUploadAthleteId] = useState<string>("");
+  const [uploadVideoUrl, setUploadVideoUrl] = useState("");
+  const [uploadTitle, setUploadTitle] = useState("");
 
   const utils = trpc.useUtils();
 
   const { data: analyses = [], isLoading } = trpc.videoAnalysis.getAllAnalyses.useQuery();
+  const { data: allUsers = [] } = trpc.admin.getAllUsers.useQuery();
+  const athletes = useMemo(() => (allUsers as any[]).filter((u: any) => u.role === "athlete" || u.role === "user"), [allUsers]);
+
+  const coachUploadMutation = trpc.videoAnalysis.coachUploadForAthlete.useMutation({
+    onSuccess: () => {
+      utils.videoAnalysis.getAllAnalyses.invalidate();
+      setUploadDialogOpen(false);
+      setUploadAthleteId("");
+      setUploadVideoUrl("");
+      setUploadTitle("");
+      toast.success("Video uploaded for athlete! It will appear in the analysis queue.");
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
   const analyzeMutation = trpc.videoAnalysis.analyzeVideo.useMutation({
     onSuccess: () => {
@@ -163,7 +181,7 @@ export function VideoAnalysisTab() {
   const openDetail = (analysis: AnalysisRecord) => {
     setSelectedAnalysis(analysis);
     setEditedFeedback(analysis.coachFeedbackText || "");
-    
+    setCoachNotes((analysis as any).coachNotes || "");
   };
 
   // Handle analyze
@@ -176,8 +194,8 @@ export function VideoAnalysisTab() {
     if (!selectedAnalysis) return;
     updateFeedbackMutation.mutate({
       analysisId: selectedAnalysis.id,
-      coachEditedFeedback: editedFeedback, // mapped to coachFeedbackText server-side
-      
+      coachEditedFeedback: editedFeedback,
+      coachNotes,
     });
   };
 
@@ -464,7 +482,7 @@ export function VideoAnalysisTab() {
                   Coach Notes (private — not sent to athlete)
                 </label>
                 <Textarea
-                  value={editedFeedback}
+                  value={coachNotes}
                   onChange={(e) => setCoachNotes(e.target.value)}
                   className="min-h-[100px] bg-muted/30"
                   placeholder="Your private notes about this analysis..."
@@ -554,7 +572,67 @@ export function VideoAnalysisTab() {
           </h2>
           <InlineEdit contentKey="coach.videoAnalysis.desc" defaultValue="Review AI-generated feedback on athlete video submissions" as="p" className="text-muted-foreground mt-1" />
         </div>
+        <Button onClick={() => setUploadDialogOpen(true)} className="gap-2">
+          <Video className="h-4 w-4" />
+          Upload Swing for Athlete
+        </Button>
       </div>
+
+      {/* Coach Upload Dialog */}
+      <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Video className="h-5 w-5" />Upload Swing Video
+            </DialogTitle>
+            <DialogDescription>Upload a swing video on behalf of an athlete for AI analysis.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select Athlete *</label>
+              <select
+                value={uploadAthleteId}
+                onChange={(e) => setUploadAthleteId(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Choose an athlete...</option>
+                {athletes.map((u: any) => (
+                  <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Video URL *</label>
+              <Input
+                placeholder="https://... (paste video link)"
+                value={uploadVideoUrl}
+                onChange={(e) => setUploadVideoUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Title (optional)</label>
+              <Input
+                placeholder="e.g. Front Toss — April 16"
+                value={uploadTitle}
+                onChange={(e) => setUploadTitle(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
+            <Button
+              onClick={() => coachUploadMutation.mutate({
+                athleteId: parseInt(uploadAthleteId),
+                videoUrl: uploadVideoUrl,
+                title: uploadTitle || undefined,
+              })}
+              disabled={!uploadAthleteId || !uploadVideoUrl || coachUploadMutation.isPending}
+            >
+              {coachUploadMutation.isPending ? "Uploading..." : "Upload & Queue for Analysis"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

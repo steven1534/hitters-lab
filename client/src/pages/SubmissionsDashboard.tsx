@@ -21,7 +21,7 @@ interface Submission {
   athleteName?: string;
 }
 
-export default function SubmissionsDashboard() {
+export default function SubmissionsDashboard({ embedded = false }: { embedded?: boolean }) {
   const { user, loading, logout } = useAuth();
   const { addToast } = useNotification();
   const [, navigate] = useLocation();
@@ -40,8 +40,8 @@ export default function SubmissionsDashboard() {
     enabled: user?.role === 'admin',
   });
 
-  // Fetch all submissions from all athletes
-  const { data: allSubmissions = [], isLoading: submissionsLoading, refetch } = trpc.submissions.drillSubmissions.getSubmissionsByUser.useQuery(
+  // Fetch all submissions from all athletes (admin-only route)
+  const { data: allSubmissions = [], isLoading: submissionsLoading, refetch } = trpc.submissions.drillSubmissions.getAllSubmissions.useQuery(
     undefined,
     { enabled: user?.role === 'admin' }
   );
@@ -166,31 +166,8 @@ export default function SubmissionsDashboard() {
     );
   }
 
-  return (
-    <div className="coach-dark min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-8 mb-8">
-        <div className="container">
-          <div className="flex items-center justify-between mb-4">
-            <Link href="/coach-dashboard">
-              <Button variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 pl-0">
-                <Home className="mr-2 h-4 w-4" />
-                Coach Dashboard
-              </Button>
-            </Link>
-            <Button onClick={() => logout()} variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-              <LogOut className="mr-2 h-4 w-4" />
-              Log Out
-            </Button>
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-heading font-black">Athlete Submissions</h1>
-            <p className="text-primary-foreground/90">Review and provide feedback on athlete drill submissions</p>
-          </div>
-        </div>
-      </header>
-
-      <main className="container max-w-7xl pb-12">
+  const mainContent = (
+    <>
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
@@ -458,7 +435,32 @@ export default function SubmissionsDashboard() {
             )}
           </div>
         </div>
-      </main>
+    </>
+  );
+
+  if (embedded) return <div className="space-y-6">{mainContent}</div>;
+
+  return (
+    <div className="coach-dark min-h-screen bg-background">
+      <header className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-8 mb-8">
+        <div className="container">
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/coach-dashboard">
+              <Button variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 pl-0">
+                <Home className="mr-2 h-4 w-4" />Coach Dashboard
+              </Button>
+            </Link>
+            <Button onClick={() => logout()} variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <LogOut className="mr-2 h-4 w-4" />Log Out
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-heading font-black">Athlete Submissions</h1>
+            <p className="text-primary-foreground/90">Review and provide feedback on athlete drill submissions</p>
+          </div>
+        </div>
+      </header>
+      <main className="container max-w-7xl pb-12">{mainContent}</main>
     </div>
   );
 }

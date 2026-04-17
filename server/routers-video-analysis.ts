@@ -62,6 +62,31 @@ export const videoAnalysisRouter = router({
       return { id: inserted.id, status: "pending" as const };
     }),
 
+  /** Coach uploads a swing video on behalf of an athlete */
+  coachUploadForAthlete: protectedProcedure
+    .input(z.object({
+      athleteId: z.number(),
+      videoUrl: z.string().min(1),
+      title: z.string().optional(),
+      analysisType: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      requireCoach(ctx.user.role);
+      const database = await requireDb();
+      const [inserted] = await database
+        .insert(videoAnalysis)
+        .values({
+          athleteId: input.athleteId,
+          coachId: ctx.user.id,
+          videoUrl: input.videoUrl,
+          title: input.title || "Coach-Uploaded Swing Analysis",
+          analysisType: input.analysisType || "swing",
+          status: "pending",
+        })
+        .returning({ id: videoAnalysis.id });
+      return { id: inserted.id, status: "pending" as const };
+    }),
+
   /** Get all swing submissions for the current athlete */
   getMySwings: protectedProcedure
     .query(async ({ ctx }) => {

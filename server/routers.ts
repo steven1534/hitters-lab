@@ -27,6 +27,7 @@ import { playerReportsRouter } from "./routers-player-reports";
 import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
 import { progressRouter } from "./routers-progress";
+import { challengesRouter } from "./routers-challenges";
 // drillCustomizations import removed — superseded by drillCatalogOverrides
 import * as drillCatalogOverridesDb from "./drillCatalogOverrides";
 import * as drillStatCardsDb from "./drillStatCards";
@@ -46,6 +47,7 @@ export const appRouter = router({
   athleteProfiles: athleteProfilesRouter,
   badges: badgesRouter,
   progress: progressRouter,
+  challenges: challengesRouter,
   auth: router({
     me: publicProcedure.query(async (opts) => {
       if (!opts.ctx.user) return null;
@@ -824,12 +826,16 @@ export const appRouter = router({
   // Invite management router
   invites: router({
     createInvite: protectedProcedure
-      .input(z.object({ email: z.string().email() }))
+      .input(z.object({
+        email: z.string().email(),
+        name: z.string().optional(),
+        role: z.enum(["athlete", "coach"]).optional(),
+      }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
         }
-        return await inviteDb.createInvite(input.email, ctx.user.id);
+        return await inviteDb.createInvite(input.email, ctx.user.id, input.role ?? "athlete", 7, true, input.name);
       }),
     
     getAllInvites: protectedProcedure.query(async ({ ctx }) => {

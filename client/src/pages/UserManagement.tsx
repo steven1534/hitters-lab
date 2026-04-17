@@ -40,7 +40,7 @@ interface User {
   lastSignedIn: Date;
 }
 
-export default function UserManagement() {
+export default function UserManagement({ embedded = false }: { embedded?: boolean }) {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -191,13 +191,14 @@ export default function UserManagement() {
     );
   }
 
-  return (
-    <div className="coach-dark min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+  const content = (
+    <>
+      {!embedded && (
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">User Management</h1>
           <p className="text-muted-foreground">Manage user roles, access, and passwords</p>
         </div>
+      )}
 
         {/* Password Reset Requests Banner */}
         {resetRequests.length > 0 && (
@@ -360,7 +361,6 @@ export default function UserManagement() {
             )}
           </CardContent>
         </Card>
-      </div>
 
       {/* Reset Password Dialog */}
       <Dialog open={!!resetDialogUser} onOpenChange={(open) => { if (!open) { setResetDialogUser(null); setResetRequestId(null); } }}>
@@ -436,6 +436,16 @@ export default function UserManagement() {
           </div>
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  if (embedded) return <div className="space-y-6">{content}</div>;
+
+  return (
+    <div className="coach-dark min-h-screen bg-background p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        {content}
+      </div>
     </div>
   );
 }

@@ -842,3 +842,21 @@ export const drillProgress = pgTable("drillProgress", {
 
 export type DrillProgress = typeof drillProgress.$inferSelect;
 export type InsertDrillProgress = typeof drillProgress.$inferInsert;
+
+// ============================================================
+// Weekly Challenges (coach-set goals for athletes)
+// ============================================================
+export const weeklyChallenges = pgTable("weeklyChallenges", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 256 }).notNull(),
+  description: text("description"),
+  targetCount: integer("targetCount").notNull().default(5),
+  drillCategory: varchar("drillCategory", { length: 128 }),
+  startsAt: timestamp("startsAt").notNull(),
+  endsAt: timestamp("endsAt").notNull(),
+  createdByUserId: integer("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WeeklyChallenge = typeof weeklyChallenges.$inferSelect;
+export type InsertWeeklyChallenge = typeof weeklyChallenges.$inferInsert;

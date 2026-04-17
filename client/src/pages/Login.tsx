@@ -195,9 +195,9 @@ export default function Login() {
           </form>
           )}
 
-          {/* Mode toggle */}
-          <p className="text-center text-sm text-slate-500 mt-6">
-            {mode === "forgot" ? (
+          {/* Mode toggle — invite-only, no public sign-up */}
+          {mode === "forgot" && (
+            <p className="text-center text-sm text-slate-500 mt-6">
               <button
                 type="button"
                 onClick={() => { setMode("login"); setError(""); setResetSent(false); }}
@@ -205,19 +205,8 @@ export default function Login() {
               >
                 Back to sign in
               </button>
-            ) : (
-              <>
-                {mode === "login" ? "Don't have an account? " : "Already have an account? "}
-                <button
-                  type="button"
-                  onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}
-                  className="text-red-600 hover:text-red-700 font-semibold"
-                >
-                  {mode === "login" ? "Sign up" : "Sign in"}
-                </button>
-              </>
-            )}
-          </p>
+            </p>
+          )}
         </div>
       </div>
     </div>

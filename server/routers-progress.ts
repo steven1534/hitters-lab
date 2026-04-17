@@ -118,4 +118,28 @@ export const progressRouter = router({
       submissionsCount,
     };
   }),
+
+  weeklyActivity: protectedProcedure.query(async ({ ctx }) => {
+    const db = requireDb(await getDb());
+    const userId = ctx.user.id;
+    const twelveWeeksAgo = new Date();
+    twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84);
+
+    const rows = await db
+      .select({
+        week: sql<string>`to_char(date_trunc('week', ${drillProgress.completedAt}), 'YYYY-MM-DD')`.as("week"),
+        count: sql<number>`count(*)`.as("count"),
+      })
+      .from(drillProgress)
+      .where(
+        and(eq(drillProgress.userId, userId), gte(drillProgress.completedAt, twelveWeeksAgo))
+      )
+      .groupBy(sql`date_trunc('week', ${drillProgress.completedAt})`)
+      .orderBy(sql`date_trunc('week', ${drillProgress.completedAt})`);
+
+    return rows.map((r) => ({
+      week: r.week,
+      count: Number(r.count),
+    }));
+  }),
 });

@@ -89,6 +89,14 @@ export const submissionsRouter = router({
         return await db.getSubmissionsByUser(ctx.user.id);
       }),
 
+    getAllSubmissions: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        return await db.getAllSubmissions();
+      }),
+
     updateSubmission: protectedProcedure
       .input(z.object({
         submissionId: z.number(),

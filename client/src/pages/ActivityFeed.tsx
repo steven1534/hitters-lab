@@ -38,7 +38,7 @@ const activityConfig: Record<string, { icon: React.ReactNode; color: string; lab
   profile_update: { icon: <Users className="h-4 w-4" />, color: "bg-gray-500/10 text-gray-400", label: "Profile" },
 };
 
-export default function ActivityFeed() {
+export default function ActivityFeed({ embedded = false }: { embedded?: boolean }) {
   const [activeTab, setActiveTab] = useState("feed");
 
   // Fetch activity data
@@ -85,9 +85,8 @@ export default function ActivityFeed() {
     }
   };
 
-  return (
-    <div className="coach-dark min-h-screen bg-background">
-    <div className="container mx-auto py-8 space-y-6">
+  const mainContent = (
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -465,6 +464,13 @@ export default function ActivityFeed() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+
+  if (embedded) return mainContent;
+
+  return (
+    <div className="coach-dark min-h-screen bg-background">
+      <div className="container mx-auto py-8">{mainContent}</div>
     </div>
   );
 }
