@@ -42,15 +42,22 @@ export async function createInvite(
 
   const inviteUrl = `${ENV.appUrl}/accept-invite/${inviteToken}`;
 
-  // Send invite email if enabled
+  let emailSent = false;
+  let emailError: string | undefined;
+
   if (sendEmail) {
     const inviteType = role === "coach" ? "coach" : "athlete";
-    await sendInviteEmail({
+    const result = await sendInviteEmail({
       toEmail: email,
       inviteLink: inviteUrl,
       inviteType,
       expiresAt,
     });
+    emailSent = result.success;
+    if (!result.success) {
+      emailError = result.error;
+      console.error(`[Invites] Failed to send invite email to ${email}: ${result.error}`);
+    }
   }
 
   return {
@@ -59,6 +66,8 @@ export async function createInvite(
     inviteToken,
     expiresAt,
     inviteUrl,
+    emailSent,
+    emailError,
   };
 }
 

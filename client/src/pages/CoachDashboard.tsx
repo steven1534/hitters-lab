@@ -150,10 +150,18 @@ function InviteUserButton() {
   const [sent, setSent] = useState(false);
   const utils = trpc.useUtils();
 
+  const [emailFailed, setEmailFailed] = useState(false);
+  const [emailErrorMsg, setEmailErrorMsg] = useState("");
+
   const inviteMutation = trpc.invites.createInvite.useMutation({
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       utils.invites.getAllInvites.invalidate();
       setSent(true);
+      if (data.emailSent === false) {
+        setEmailFailed(true);
+        setEmailErrorMsg(data.emailError || "Email service not configured");
+        toast.error("Invite created but email failed to send: " + (data.emailError || "Email service not configured"));
+      }
     },
     onError: (err: any) => {
       toast.error(err.message || "Failed to send invite");
@@ -166,6 +174,8 @@ function InviteUserButton() {
     setName("");
     setRole("athlete");
     setSent(false);
+    setEmailFailed(false);
+    setEmailErrorMsg("");
   };
 
   const handleSend = () => {
@@ -250,14 +260,28 @@ function InviteUserButton() {
           </>
         ) : (
           <div className="space-y-4 py-4">
-            <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-6 text-center">
-              <CheckCircle className="h-10 w-10 text-green-400 mx-auto mb-3" />
-              <p className="font-semibold text-green-400 text-lg">Invite Sent!</p>
-              <p className="text-green-300/90 text-sm mt-1">
-                An email has been sent to <strong>{email}</strong> with a link to join as {role === "coach" ? "a coach" : "an athlete"}.
-              </p>
-              <p className="text-muted-foreground text-xs mt-3">The invite expires in 7 days.</p>
-            </div>
+            {emailFailed ? (
+              <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-6 text-center">
+                <AlertCircle className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
+                <p className="font-semibold text-yellow-400 text-lg">Invite Created — Email Failed</p>
+                <p className="text-yellow-300/90 text-sm mt-1">
+                  The invite for <strong>{email}</strong> was created, but the email could not be sent.
+                </p>
+                <p className="text-red-400 text-xs mt-2">{emailErrorMsg}</p>
+                <p className="text-muted-foreground text-xs mt-3">
+                  Check that RESEND_API_KEY is set in your environment variables and that your domain is verified with Resend.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-6 text-center">
+                <CheckCircle className="h-10 w-10 text-green-400 mx-auto mb-3" />
+                <p className="font-semibold text-green-400 text-lg">Invite Sent!</p>
+                <p className="text-green-300/90 text-sm mt-1">
+                  An email has been sent to <strong>{email}</strong> with a link to join as {role === "coach" ? "a coach" : "an athlete"}.
+                </p>
+                <p className="text-muted-foreground text-xs mt-3">The invite expires in 7 days.</p>
+              </div>
+            )}
             <div className="flex justify-end">
               <Button onClick={handleClose}>Done</Button>
             </div>
