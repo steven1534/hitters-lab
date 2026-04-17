@@ -9,10 +9,10 @@ import {
   InsertNotificationPreference, invites, drillVideos, drillDetails,
   drillSubmissions, coachFeedback, customDrills,
   drillQuestions, drillAnswers, parentChildren,
-  passwordResetRequests,
+  passwordResetRequests, drills,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, or, isNull } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 // ── YouTube URL normalizer (server-side) ──────────────────────────────────────
@@ -254,6 +254,48 @@ export async function updateUserInfo(userId: number, info: { name?: string; emai
   }
 }
 
+export async function deleteUser(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    const {
+      drillAssignments, badges, drillFavorites, athleteActivity,
+      notifications: notificationsTable, notificationPreferences: notifPrefsTable,
+      drillSubmissions: submissionsTable, coachFeedback: feedbackTable,
+      sessionNotes, practicePlans, playerReports, videoAnalysis,
+      blastPlayers, drillQuestions: questionsTable, drillAnswers: answersTable,
+      emailAlertPreferences, parentChildren: parentChildrenTable,
+    } = await import("../drizzle/schema");
+
+    // Delete from all related tables first
+    await db.delete(drillAssignments).where(eq(drillAssignments.userId, userId));
+    await db.delete(badges).where(eq(badges.userId, userId));
+    await db.delete(drillFavorites).where(eq(drillFavorites.userId, userId));
+    await db.delete(athleteActivity).where(eq(athleteActivity.athleteId, userId));
+    await db.delete(notificationsTable).where(eq(notificationsTable.userId, userId));
+    await db.delete(notifPrefsTable).where(eq(notifPrefsTable.userId, userId));
+    await db.delete(submissionsTable).where(eq(submissionsTable.userId, userId));
+    await db.delete(questionsTable).where(eq(questionsTable.athleteId, userId));
+    await db.delete(sessionNotes).where(eq(sessionNotes.athleteId, userId));
+    await db.delete(practicePlans).where(eq(practicePlans.athleteId, userId));
+    await db.delete(playerReports).where(eq(playerReports.athleteId, userId));
+    await db.delete(videoAnalysis).where(eq(videoAnalysis.athleteId, userId));
+    await db.delete(parentChildrenTable).where(eq(parentChildrenTable.childId, userId));
+
+    // Try optional tables that may not exist yet
+    try { await db.delete(emailAlertPreferences).where(eq(emailAlertPreferences.coachId, userId)); } catch {}
+    try { await db.delete(blastPlayers).where(eq(blastPlayers.userId, userId)); } catch {}
+
+    // Finally delete the user
+    await db.delete(users).where(eq(users.id, userId));
+    console.log(`[Database] Deleted user ${userId} and all related data`);
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete user:", error);
+    return false;
+  }
+}
+
 // ── Password Reset Requests ──────────────────────────────────
 
 export async function createPasswordResetRequest(email: string) {
@@ -385,6 +427,22 @@ export async function saveDrillDetail(drillId: string, detail: {
   const db = await getDb();
   if (!db) return false;
   try {
+    // Try updating the unified drills table first
+    const drillRow = await db.select().from(drills).where(eq(drills.drillId, drillId)).limit(1);
+    if (drillRow.length > 0) {
+      const updateData: Record<string, any> = { updatedAt: new Date() };
+      if (detail.skillSet !== undefined) updateData.skillSet = detail.skillSet;
+      if (detail.difficulty !== undefined) updateData.difficulty = detail.difficulty;
+      if (detail.goal !== undefined) updateData.goal = detail.goal;
+      if (detail.commonMistakes !== undefined) updateData.commonMistakes = detail.commonMistakes.join("\n");
+      if (detail.progressions !== undefined) updateData.progressions = detail.progressions.join("\n");
+      if (detail.instructions !== undefined) updateData.instructions = detail.instructions;
+      if (detail.description !== undefined) updateData.instructions = detail.description.join("\n");
+      await db.update(drills).set(updateData).where(eq(drills.drillId, drillId));
+      return true;
+    }
+
+    // Fall back to legacy drillDetails table
     const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, drillId));
     if (existing.length > 0) {
       const updateData: Record<string, any> = { updatedAt: new Date() };
@@ -426,28 +484,33 @@ export async function getDrillDetail(drillId: string) {
   const db = await getDb();
   if (!db) return null;
   try {
+    // Check unified drills table first
+    const drill = await db.select().from(drills).where(eq(drills.drillId, drillId)).limit(1);
+    if (drill[0]) {
+      const d = drill[0];
+      return {
+        id: Number(d.id),
+        drillId: d.drillId ?? drillId,
+        skillSet: d.skillSet ?? d.category ?? "Hitting",
+        difficulty: d.difficulty ?? "Medium",
+        athletes: "All Ages",
+        time: "Varies",
+        equipment: "Varies",
+        goal: d.goal ?? "",
+        description: d.instructions ? [d.instructions] : [],
+        commonMistakes: d.commonMistakes ? d.commonMistakes.split("\n").filter(Boolean) : [],
+        progressions: d.progressions ? d.progressions.split("\n").filter(Boolean) : [],
+        instructions: d.instructions ?? null,
+        tags: null as string[] | null,
+        createdBy: d.createdBy ?? 0,
+        createdAt: d.createdAt ?? new Date(),
+        updatedAt: d.updatedAt ?? new Date(),
+      };
+    }
+
+    // Fall back to legacy drillDetails table
     const result = await db.select().from(drillDetails).where(eq(drillDetails.drillId, drillId));
     if (result[0]) return result[0];
-
-    // Auto-seed from customDrills if no detail record exists yet
-    const custom = await db.select().from(customDrills).where(eq(customDrills.drillId, drillId));
-    if (custom[0]) {
-      const cd = custom[0];
-      const [inserted] = await db.insert(drillDetails).values({
-        drillId: cd.drillId,
-        skillSet: cd.category,
-        difficulty: cd.difficulty,
-        athletes: 'All Ages',
-        time: cd.duration,
-        equipment: 'Bat, Tee (optional)',
-        goal: 'Improve mechanics and develop consistent habits through focused repetition.',
-        description: [cd.name + ' — click Edit to add a description.'],
-        commonMistakes: [],
-        progressions: [],
-        createdBy: cd.createdBy,
-      }).returning();
-      return inserted ?? null;
-    }
 
     return null;
   } catch (error) {
@@ -472,6 +535,13 @@ export async function saveDrillInstructions(drillId: string, instructions: strin
   const db = await getDb();
   if (!db) return false;
   try {
+    // Try unified drills table first
+    const drillRow = await db.select().from(drills).where(eq(drills.drillId, drillId)).limit(1);
+    if (drillRow.length > 0) {
+      await db.update(drills).set({ instructions, updatedAt: new Date() }).where(eq(drills.drillId, drillId));
+      return true;
+    }
+    // Fall back to legacy drillDetails table
     const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, drillId));
     if (existing.length > 0) {
       await db.update(drillDetails).set({ instructions, updatedAt: new Date() }).where(eq(drillDetails.drillId, drillId));
@@ -493,6 +563,13 @@ export async function saveDrillGoal(drillId: string, goal: string, userId: numbe
   const db = await getDb();
   if (!db) return false;
   try {
+    // Try unified drills table first
+    const drillRow = await db.select().from(drills).where(eq(drills.drillId, drillId)).limit(1);
+    if (drillRow.length > 0) {
+      await db.update(drills).set({ goal, updatedAt: new Date() }).where(eq(drills.drillId, drillId));
+      return true;
+    }
+    // Fall back to legacy drillDetails table
     const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, drillId));
     if (existing.length > 0) {
       await db.update(drillDetails).set({ goal, updatedAt: new Date() }).where(eq(drillDetails.drillId, drillId));
@@ -710,35 +787,28 @@ export async function createNewDrill(
     .substring(0, 80)
     + "-" + Date.now();
 
-  const [created] = await db.insert(customDrills).values({
+  // Use next available id
+  const maxIdResult = await db.select({ maxId: sql<number>`coalesce(max(id), 0)` }).from(drills);
+  const nextId = (maxIdResult[0]?.maxId ?? 0) + 1;
+
+  const [created] = await db.insert(drills).values({
+    id: nextId,
     drillId,
     name: input.name,
     difficulty: input.difficulty,
     category: input.category,
-    duration: input.duration,
-    purpose: input.purpose || null,
-    bestFor: input.bestFor || null,
-    equipment: input.equipment || null,
-    athletes: input.athletes || null,
-    description: input.description?.length ? input.description : null,
-    videoUrl: input.videoUrl || null,
-    drillType: input.drillType || "Tee Work",
-    drillTypeRaw: input.drillTypeRaw || null,
     skillSet: input.skillSet || "Hitting",
-    ageLevel: input.ageLevel?.length ? input.ageLevel : null,
-    tags: input.tags?.length ? input.tags : null,
-    problem: input.problem?.length ? input.problem : null,
-    goalTags: input.goalTags?.length ? input.goalTags : null,
-    whatThisFixes: input.whatThisFixes?.length ? input.whatThisFixes : null,
-    whatToFeel: input.whatToFeel?.length ? input.whatToFeel : null,
-    commonMistakes: input.commonMistakes?.length ? input.commonMistakes : null,
-    coachCue: input.coachCue || null,
-    watchFor: input.watchFor || null,
-    nextSteps: input.nextSteps?.length ? input.nextSteps : null,
+    goal: input.goal || null,
+    instructions: input.instructions || (input.description?.length ? input.description.join("\n") : null),
+    commonMistakes: input.commonMistakes?.length ? input.commonMistakes.join("\n") : null,
+    progressions: null,
+    problemsFix: input.whatThisFixes?.length ? input.whatThisFixes.join("\n") : (input.problem?.length ? input.problem.join("\n") : null),
+    coaching_cues: input.coachCue || null,
+    isHidden: 0,
     createdBy,
   }).returning();
 
-  // If a video URL was provided, save it to drillVideos
+  // Save video to drillVideos table (videos stay separate)
   if (input.videoUrl) {
     await db.insert(drillVideos).values({
       drillId,
@@ -757,8 +827,41 @@ export async function getCustomDrills() {
   const db = await getDb();
   if (!db) return [];
   try {
-    return await db.select().from(customDrills).orderBy(customDrills.name);
-  } catch {
+    // Read from unified drills table, map to the shape components expect
+    const rows = await db.select().from(drills)
+      .where(or(eq(drills.isHidden, 0), isNull(drills.isHidden)));
+    return rows.map((d) => ({
+      id: Number(d.id),
+      drillId: d.drillId ?? "",
+      name: d.name ?? "",
+      difficulty: d.difficulty ?? "Medium",
+      category: d.category ?? "Hitting",
+      duration: "Varies",
+      purpose: null as string | null,
+      bestFor: null as string | null,
+      equipment: null as string | null,
+      athletes: null as string | null,
+      description: d.instructions ? [d.instructions] : null,
+      videoUrl: null as string | null,
+      drillType: "Tee Work",
+      drillTypeRaw: null as string | null,
+      skillSet: d.skillSet ?? "Hitting",
+      ageLevel: null as string[] | null,
+      tags: null as string[] | null,
+      problem: d.problemsFix ? [d.problemsFix] : null,
+      goalTags: null as string[] | null,
+      whatThisFixes: d.problemsFix ? [d.problemsFix] : null,
+      whatToFeel: null as string[] | null,
+      commonMistakes: d.commonMistakes ? d.commonMistakes.split("\n").filter(Boolean) : null,
+      coachCue: d.coaching_cues ?? null,
+      watchFor: null as string | null,
+      nextSteps: null as string[] | null,
+      createdBy: d.createdBy ?? 0,
+      createdAt: d.createdAt ?? new Date(),
+      updatedAt: d.updatedAt ?? new Date(),
+    }));
+  } catch (error) {
+    console.error("[Database] Failed to get drills:", error);
     return [];
   }
 }

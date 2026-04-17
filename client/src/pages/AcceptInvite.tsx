@@ -2,80 +2,79 @@ import { useState, useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { getLoginUrl } from "@/const";
 
 export default function AcceptInvite() {
   const [, params] = useRoute("/accept-invite/:token");
   const [, setLocation] = useLocation();
   const token = params?.token;
 
-  const { user, loading: authLoading, isAuthenticated } = useAuth();
-  const [autoAccepting, setAutoAccepting] = useState(false);
+  const { refresh } = useAuth();
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Fetch invite details
   const { data: inviteData, isLoading: isLoadingInvite, error: inviteError } = trpc.invites.getInviteByToken.useQuery(
     { token: token || "" },
     { enabled: !!token }
   );
 
-  // Accept invite mutation
-  const acceptInviteMutation = trpc.invites.acceptInvite.useMutation({
-    onSuccess: () => {
-      toast.success("Account activated! Redirecting to athlete portal...");
-      setTimeout(() => {
-        setLocation("/athlete-portal");
-      }, 1500);
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to activate account");
-      setAutoAccepting(false);
-    },
-  });
-
-  // Auto-accept invite after user logs in
   useEffect(() => {
-    console.log('[AcceptInvite] Checking conditions:', { isAuthenticated, hasUser: !!user, token, autoAccepting, isPending: acceptInviteMutation.isPending });
-    if (isAuthenticated && user && token && !autoAccepting && !acceptInviteMutation.isPending) {
-      console.log('[AcceptInvite] Calling acceptInvite mutation');
-      setAutoAccepting(true);
-      acceptInviteMutation.mutate({ token });
+    if (!token || isLoadingInvite || !inviteData) return;
+
+    if (inviteError || !inviteData.valid) {
+      setStatus("error");
+      setErrorMsg(inviteError?.message || "This invite is invalid or has expired.");
+      return;
     }
-  }, [isAuthenticated, user, token, autoAccepting, acceptInviteMutation]);
 
-  if (isLoadingInvite || authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">
-              {authLoading ? "Checking your login status..." : "Validating your invite..."}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+    async function acceptInvite() {
+      try {
+        const res = await fetch("/api/auth/accept-invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+          credentials: "include",
+        });
 
-  if (inviteError || !inviteData?.valid) {
+        const data = await res.json();
+
+        if (!res.ok) {
+          setStatus("error");
+          setErrorMsg(data.error || "Failed to activate account");
+          return;
+        }
+
+        await refresh();
+        setStatus("success");
+        toast.success("Account activated! Redirecting...");
+        setTimeout(() => {
+          setLocation("/athlete-portal");
+        }, 1500);
+      } catch (err: any) {
+        setStatus("error");
+        setErrorMsg(err.message || "Something went wrong");
+      }
+    }
+
+    acceptInvite();
+  }, [token, inviteData, inviteError, isLoadingInvite]);
+
+  if (status === "error") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
         <Card className="w-full max-w-md border-destructive">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-5 w-5" />
-              Invalid Invite
+              Invite Error
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {inviteError?.message || "This invite is invalid or has expired. Please contact your coach for a new invite."}
-            </p>
+            <p className="text-sm text-muted-foreground">{errorMsg}</p>
             <Button onClick={() => setLocation("/")} className="w-full">
               Return to Home
             </Button>
@@ -85,56 +84,17 @@ export default function AcceptInvite() {
     );
   }
 
-  // If user is not authenticated, show login prompt
-  if (!isAuthenticated) {
+  if (status === "success") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-2xl">Activate Your Account</CardTitle>
-            <CardDescription>Sign in to activate your athlete account</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Invite Details */}
-            <div className="space-y-3 p-4 bg-muted rounded-lg">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Email</span>
-                <span className="font-medium">{inviteData?.email}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Expires</span>
-                <span className="text-sm">
-                  {inviteData?.expiresAt ? new Date(inviteData.expiresAt).toLocaleDateString() : 'N/A'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <Badge variant="secondary">
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Valid
-                </Badge>
-              </div>
-            </div>
-
-            {/* Login Instructions */}
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Create your account or sign in with the email that received this invite. Your account will be automatically activated.
-              </p>
-              <Button
-                onClick={() => {
-                  window.location.href = `${getLoginUrl()}?token=${encodeURIComponent(token || '')}`;
-                }}
-                className="w-full"
-                size="lg"
-              >
-                Create Account / Sign In
-              </Button>
-            </div>
-
-            {/* Help Text */}
-            <p className="text-xs text-center text-muted-foreground">
-              Make sure to use the same email address that received this invite.
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
+            <h2 className="text-xl font-bold mb-2">Account Activated!</h2>
+            <p className="text-muted-foreground text-center">
+              Your default password is <strong>player123</strong>
+              <br />
+              <span className="text-xs">You can change it in your profile settings.</span>
             </p>
           </CardContent>
         </Card>
@@ -142,27 +102,15 @@ export default function AcceptInvite() {
     );
   }
 
-  // If user is authenticated and invite is being accepted
-  if (autoAccepting || acceptInviteMutation.isPending) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Activating your account...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Fallback - should not reach here
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Processing...</p>
+          <p className="text-muted-foreground">Activating your account...</p>
+          {inviteData?.email && (
+            <p className="text-sm text-muted-foreground mt-2">{inviteData.email}</p>
+          )}
         </CardContent>
       </Card>
     </div>

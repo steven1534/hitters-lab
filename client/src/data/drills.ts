@@ -1,5 +1,5 @@
 /**
- * Coach Steve's Hitter's Lab — Drill Library
+ * Coach Steve's Hitters Lab — Drill Library
  * Adapted from Manus drillsData.ts with backward-compatible field mapping
  * Total drills: 105 (hitting-only, enriched with coaching content)
  */

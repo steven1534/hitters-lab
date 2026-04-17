@@ -1,5 +1,5 @@
 /**
- * Coach Steve's Hitter's Lab — Drill Library
+ * Coach Steve's Hitters Lab — Drill Library
  * AUTO-GENERATED from drillsupdated.xlsx — DO NOT EDIT MANUALLY
  * Total drills: 105
  *

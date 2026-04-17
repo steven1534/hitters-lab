@@ -321,7 +321,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   if (!response.ok) {
     const errorText = await response.text().catch(() => response.statusText);
     if (response.status === 401) {
-      throw new Error("OpenAI API key is invalid or expired. Please update OPENAI_API_KEY in Railway variables.");
+      throw new Error("OpenAI API key is invalid or expired. Please update the OPENAI_API_KEY environment variable.");
     }
     if (response.status === 429) {
       throw new Error("OpenAI rate limit or quota exceeded. Check your OpenAI account billing at platform.openai.com.");

@@ -1,4 +1,4 @@
-import { boolean, integer, json, text, pgEnum, pgTable, varchar, timestamp, serial } from "drizzle-orm/pg-core";
+import { bigint, boolean, integer, json, text, pgEnum, pgTable, varchar, timestamp, serial } from "drizzle-orm/pg-core";
 
 // ============================================================
 // Enums
@@ -19,6 +19,32 @@ export const quizDifficultyEnum = pgEnum("quiz_difficulty", ["beginner", "interm
 export const quizTypeEnum = pgEnum("quiz_type", ["standard", "adaptive"]);
 export const videoAnalysisStatusEnum = pgEnum("video_analysis_status", ["pending", "analyzing", "complete", "failed"]);
 export const messageStatusEnum = pgEnum("message_status", ["sent", "delivered", "read"]);
+
+// ============================================================
+// Drills (unified — single source of truth in Supabase)
+// ============================================================
+export const drills = pgTable("drills", {
+  id: bigint("id", { mode: "number" }).primaryKey(),
+  drillId: text("drillId").unique(),
+  name: text("name"),
+  skillSet: text("skillSet"),
+  difficulty: text("difficulty"),
+  goal: text("goal"),
+  commonMistakes: text("commonMistakes"),
+  progressions: text("progressions"),
+  createdBy: integer("createdBy"),
+  createdAt: timestamp("createdAt", { withTimezone: true }),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }),
+  instructions: text("instructions"),
+  problemsFix: text("problemsFix"),
+  isHidden: integer("isHidden").default(0),
+  category: text("category"),
+  coaching_cues: text("coaching_cues"),
+  videoUrl: text("videoUrl"),
+});
+
+export type Drill = typeof drills.$inferSelect;
+export type InsertDrill = typeof drills.$inferInsert;
 
 // ============================================================
 // Users
