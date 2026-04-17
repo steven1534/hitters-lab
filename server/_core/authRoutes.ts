@@ -176,27 +176,38 @@ export function registerAuthRoutes(app: Express) {
       let user = await db.getUserByEmail(normalizedEmail);
 
       if (!user) {
-        const passwordHash = await hashPassword("player123");
-        const name = (invite as any).name || normalizedEmail.split("@")[0];
-        const role = invite.role === "coach" ? "coach" : "athlete";
+        try {
+          const passwordHash = await hashPassword("player123");
+          const name = (invite as any).name || normalizedEmail.split("@")[0];
+          const role = invite.role === "coach" ? "coach" : "athlete";
 
-        const userId = await db.createUser({
-          email: normalizedEmail,
-          passwordHash,
-          name,
-          role: role as any,
-          isActiveClient: 1,
-          emailVerified: 1,
-          loginMethod: "email",
-          lastSignedIn: new Date(),
-        });
+          const userId = await db.createUser({
+            email: normalizedEmail,
+            passwordHash,
+            name,
+            role: role as any,
+            isActiveClient: 1,
+            emailVerified: 1,
+            loginMethod: "email",
+            lastSignedIn: new Date(),
+          });
 
-        user = await db.getUserById(userId);
+          user = await db.getUserById(userId);
+          console.log(`[Auth] Auto-created account for ${normalizedEmail} with default password`);
+        } catch (createErr: any) {
+          // Handle duplicate email race condition
+          if (createErr.message?.includes("unique") || createErr.code === "23505") {
+            console.log(`[Auth] User ${normalizedEmail} already exists (race condition), fetching existing`);
+            user = await db.getUserByEmail(normalizedEmail);
+          } else {
+            throw createErr;
+          }
+        }
+
         if (!user) {
           res.status(500).json({ error: "Failed to create account" });
           return;
         }
-        console.log(`[Auth] Auto-created account for ${normalizedEmail} with default password`);
       }
 
       await inviteDb.acceptInvite(token, user.id);
@@ -211,7 +222,10 @@ export function registerAuthRoutes(app: Express) {
       });
     } catch (err: any) {
       console.error("[Auth] Accept-invite error:", err);
-      res.status(500).json({ error: err.message || "Failed to accept invite" });
+      const friendlyMsg = err.message?.includes("unique") || err.code === "23505"
+        ? "An account with this email already exists. Please log in instead."
+        : "Failed to accept invite. Please try again or contact your coach.";
+      res.status(500).json({ error: friendlyMsg });
     }
   });
 
