@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { ENV } from "./_core/env";
 import * as db from "./db";
 import * as drillAssignmentDb from "./drillAssignments";
 import * as drillPageLayoutDb from "./drillPageLayouts";
@@ -175,7 +176,7 @@ export const appRouter = router({
             const emailResult = await sendEmail({
               athleteEmail: user.email,
               athleteName: user.name || 'Athlete',
-              portalUrl: 'https://app.coachstevebaseball.com/athlete-portal',
+              portalUrl: `${ENV.appUrl}/athlete-portal`,
             });
             if (emailResult.success) {
               await db.markWelcomeEmailSent(input.userId);
@@ -235,7 +236,7 @@ export const appRouter = router({
         const result = await sendEmail({
           athleteEmail: user.email,
           athleteName: user.name || 'Athlete',
-          portalUrl: 'https://app.coachstevebaseball.com/athlete-portal',
+          portalUrl: `${ENV.appUrl}/athlete-portal`,
         });
         if (result.success) {
           await db.markWelcomeEmailSent(input.userId);

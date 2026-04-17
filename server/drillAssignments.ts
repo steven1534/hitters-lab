@@ -2,6 +2,7 @@ import { eq, and, or, ne, isNull, inArray, desc, lte, gte, sql } from "drizzle-o
 import { drillAssignments, assignmentProgress, InsertDrillAssignment, InsertAssignmentProgress, users, notifications, invites } from "../drizzle/schema";
 import { getDb } from "./db";
 import { sendDrillAssignmentEmail } from "./email";
+import { ENV } from "./_core/env";
 
 /**
  * Assign a drill to a user or an invited athlete (pre-assignment)
@@ -51,7 +52,7 @@ export async function assignDrill(
 
   // Send email notification
   if (email) {
-    const portalUrl = `https://app.coachstevebaseball.com/athlete-portal`;
+    const portalUrl = `${ENV.appUrl}/athlete-portal`;
     await sendDrillAssignmentEmail({
       athleteEmail: email,
       athleteName: name || "Athlete",

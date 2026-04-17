@@ -1,6 +1,7 @@
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 import { athleteActivity, coachAlertPreferences, notifications, users, InsertAthleteActivity } from "../drizzle/schema";
 import { getDb } from "./db";
+import { ENV } from "./_core/env";
 import { sendActivityAlertEmail } from "./email";
 import { queueActivityAlert } from "./emailBatching";
 
@@ -111,7 +112,7 @@ export async function logActivity(
           }
 
           if (shouldNotifyEmail && coach.email) {
-            const baseUrl = process.env.VITE_APP_URL || "https://app.coachstevebaseball.com";
+            const baseUrl = ENV.appUrl;
             await queueActivityAlert(
               coach.id,
               athleteId,

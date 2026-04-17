@@ -12,6 +12,7 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { ENV } from "./_core/env";
 import { getDb } from "./db";
 import { videoAnalysis } from "../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
@@ -285,7 +286,7 @@ export const videoAnalysisRouter = router({
           coachName: ctx.user.name || "Coach",
           feedback: record.coachFeedbackText || "Feedback is available in your portal.",
           drillName: record.title || "Swing Analysis",
-          portalUrl: `${process.env.APP_URL || "https://app.coachstevebaseball.com"}/athlete-portal`,
+          portalUrl: `${ENV.appUrl}/athlete-portal`,
         });
       } catch (error) {
         console.error("[VideoAnalysis] Email send failed:", error);

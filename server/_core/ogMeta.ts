@@ -14,7 +14,7 @@ import path from "path";
 import * as db from "../db";
 import * as drillCatalogOverridesDb from "../drillCatalogOverrides";
 
-const APP_URL = process.env.APP_URL ?? "https://app.coachstevebaseball.com";
+const APP_URL = process.env.APP_URL ?? "http://localhost:5000";
 
 // YouTube ID extraction — handles all URL variants
 const YT_ID_RE = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/i;

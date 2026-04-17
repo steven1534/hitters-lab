@@ -185,7 +185,7 @@ export function exportHtmlToPdf({
   <div class="pdf-body">${html}</div>
 
   <div class="pdf-footer">
-    <span>Coach Steve Baseball · app.coachstevebaseball.com</span>
+    <span>Coach Steve Baseball · hitters-lab.onrender.com</span>
     <span>Generated ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
   </div>
 
