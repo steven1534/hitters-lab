@@ -14,9 +14,10 @@ import {
   Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
   BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail, Bell,
   ExternalLink, UserCog, Inbox, GitCompare, ClipboardCheck, Wand2, Trophy,
+  Eye, EyeOff, Database,
 } from "lucide-react";
 import { Link } from "wouter";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAllDrills } from "@/hooks/useAllDrills";
 import { BulkInstructionImport } from "@/components/BulkInstructionImport";
@@ -559,8 +560,8 @@ export default function CoachDashboard() {
           <span>Bulk Import</span>
         </button>
         <button
-          onClick={() => navigate("catalog-overrides")}
-          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all ${activeTab === "catalog-overrides" ? "bg-[#DC143C]/15 text-white border border-[#DC143C]/25" : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"}`}
+          onClick={() => navigate("drill-library")}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all ${activeTab === "drill-library" ? "bg-[#DC143C]/15 text-white border border-[#DC143C]/25" : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"}`}
         >
           <Table2 className="w-4 h-4 shrink-0" />
           <span>Catalog overrides</span>
@@ -764,7 +765,8 @@ export default function CoachDashboard() {
 
             {activeTab === "catalog-overrides" && (
               <div className="max-w-3xl mx-auto">
-                <DrillCatalogOverridesEditor />
+                <p className="text-muted-foreground text-sm mb-4">Catalog overrides have moved to the Drill Library tab.</p>
+                <Button onClick={() => navigate("drill-library")}>Go to Drill Library</Button>
               </div>
             )}
 
@@ -1222,36 +1224,94 @@ function WeeklyChallengesTab() {
 // ── Drill Library Tab (Coach) ────────────────────────────────
 function DrillLibraryTab() {
   const allDrills = useAllDrills();
+  const { data: overrides = [] } = trpc.drillCatalog.getAll.useQuery();
+  const utils = trpc.useUtils();
   const [search, setSearch] = useState("");
-  const [editingDrillId, setEditingDrillId] = useState<string | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
+  const [overrideOpen, setOverrideOpen] = useState(false);
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const hiddenIds = useMemo(() => {
+    const set = new Set<string>();
+    overrides.forEach((o: any) => { if (o.hiddenFromDirectory === 1) set.add(o.drillId); });
+    return set;
+  }, [overrides]);
+
+  const hideMutation = trpc.drillCatalog.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("Drill hidden");
+      utils.drillCatalog.getAll.invalidate();
+    },
+    onError: (e) => toast.error(e.message || "Failed to hide drill"),
+  });
+
+  const unhideMutation = trpc.drillCatalog.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("Drill restored");
+      utils.drillCatalog.getAll.invalidate();
+    },
+    onError: (e) => toast.error(e.message || "Failed to restore drill"),
+  });
+
+  const handleToggleHide = (drillId: string, currentlyHidden: boolean) => {
+    const existing = overrides.find((o: any) => o.drillId === drillId);
+    const mutation = currentlyHidden ? unhideMutation : hideMutation;
+    mutation.mutate({
+      drillId,
+      name: existing?.name ?? null,
+      difficulty: existing?.difficulty ?? null,
+      categories: existing?.categories ?? null,
+      duration: existing?.duration ?? null,
+      tags: existing?.tags ?? null,
+      externalUrl: existing?.externalUrl ?? null,
+      hiddenFromDirectory: currentlyHidden ? 0 : 1,
+    });
+  };
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return allDrills;
-    const q = search.toLowerCase();
-    return allDrills.filter((d: any) =>
-      d.name?.toLowerCase().includes(q) ||
-      d.categories?.some((c: string) => c.toLowerCase().includes(q)) ||
-      d.difficulty?.toLowerCase().includes(q)
-    );
-  }, [allDrills, search]);
+    let drills = allDrills;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      drills = drills.filter((d: any) =>
+        d.name?.toLowerCase().includes(q) ||
+        d.categories?.some((c: string) => c.toLowerCase().includes(q)) ||
+        d.difficulty?.toLowerCase().includes(q)
+      );
+    }
+    if (!showHidden) {
+      drills = drills.filter((d: any) => !hiddenIds.has(d.id));
+    }
+    return drills;
+  }, [allDrills, search, showHidden, hiddenIds]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <div>
           <h2 className="text-xl font-bold">Drill Library</h2>
-          <p className="text-sm text-muted-foreground">{allDrills.length} drills total</p>
+          <p className="text-sm text-muted-foreground">
+            {allDrills.length} total · {hiddenIds.size} hidden
+          </p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-2 w-full sm:w-auto items-center">
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search drills..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
+          <Button
+            variant={showHidden ? "default" : "outline"}
+            size="sm"
+            className="gap-1 shrink-0"
+            onClick={() => setShowHidden(!showHidden)}
+          >
+            <EyeOff className="h-3.5 w-3.5" />
+            {showHidden ? "Showing hidden" : "Show hidden"}
+          </Button>
         </div>
       </div>
 
       <div className="border rounded-lg overflow-hidden">
-        <div className="max-h-[600px] overflow-y-auto">
+        <div ref={tableRef} className="max-h-[600px] overflow-y-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 sticky top-0">
               <tr>
@@ -1263,31 +1323,45 @@ function DrillLibraryTab() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filtered.slice(0, 100).map((drill: any) => (
-                <tr key={drill.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3">
-                    <span className="font-medium">{drill.name}</span>
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <div className="flex gap-1 flex-wrap">
-                      {drill.categories?.slice(0, 2).map((c: string) => (
-                        <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <Badge variant="outline" className="text-xs">{drill.difficulty}</Badge>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">{drill.duration}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/drill/${drill.id}`}>
-                      <Button variant="ghost" size="sm" className="h-8 gap-1">
-                        <Edit3 className="h-3 w-3" />View
+              {filtered.slice(0, 100).map((drill: any) => {
+                const isHidden = hiddenIds.has(drill.id);
+                return (
+                  <tr key={drill.id} className={`hover:bg-muted/30 transition-colors ${isHidden ? "opacity-50" : ""}`}>
+                    <td className="px-4 py-3">
+                      <span className="font-medium">{drill.name}</span>
+                      {isHidden && <Badge variant="outline" className="ml-2 text-[10px] text-yellow-500 border-yellow-500/30">Hidden</Badge>}
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <div className="flex gap-1 flex-wrap">
+                        {drill.categories?.slice(0, 2).map((c: string) => (
+                          <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <Badge variant="outline" className="text-xs">{drill.difficulty}</Badge>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">{drill.duration}</td>
+                    <td className="px-4 py-3 text-right space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        title={isHidden ? "Restore drill" : "Hide drill"}
+                        onClick={() => handleToggleHide(drill.id, isHidden)}
+                        disabled={hideMutation.isPending || unhideMutation.isPending}
+                      >
+                        {isHidden ? <Eye className="h-3.5 w-3.5 text-yellow-500" /> : <EyeOff className="h-3.5 w-3.5" />}
                       </Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+                      <Link href={`/drill/${drill.id}`}>
+                        <Button variant="ghost" size="sm" className="h-8 gap-1">
+                          <Edit3 className="h-3 w-3" />View
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           {filtered.length === 0 && (
@@ -1299,18 +1373,27 @@ function DrillLibraryTab() {
         </div>
       </div>
 
-      {/* Catalog Overrides for editing drill metadata */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Edit Drill Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Use catalog overrides to customize drill names, difficulty, categories, and more without modifying the source data.
-          </p>
-          <DrillCatalogOverridesEditor />
-        </CardContent>
-      </Card>
+      {/* Inline Catalog Overrides — collapsible to preserve scroll state */}
+      <div className="border rounded-lg overflow-hidden">
+        <button
+          className="w-full flex items-center justify-between px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+          onClick={() => setOverrideOpen(!overrideOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <Database className="h-4 w-4 text-[#DC143C]" />
+            <span className="font-medium text-sm">Edit Drill Details (Catalog Overrides)</span>
+          </div>
+          <ChevronRight className={`h-4 w-4 transition-transform ${overrideOpen ? "rotate-90" : ""}`} />
+        </button>
+        {overrideOpen && (
+          <div className="p-4 border-t">
+            <p className="text-sm text-muted-foreground mb-4">
+              Override names, difficulty, categories, and coaching fields without modifying source data.
+            </p>
+            <DrillCatalogOverridesEditor />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

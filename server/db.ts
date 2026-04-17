@@ -77,6 +77,49 @@ export async function getDb() {
     ]);
     _db = db;
     console.log("[Database] Connected to Supabase");
+
+    // Ensure critical tables exist (idempotent — safe to run every connect)
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "drillCatalogOverrides" (
+          "drillId" varchar(255) PRIMARY KEY NOT NULL,
+          "name" varchar(500),
+          "difficulty" varchar(50),
+          "categories" json,
+          "duration" varchar(50),
+          "tags" json,
+          "externalUrl" text,
+          "hiddenFromDirectory" integer DEFAULT 0 NOT NULL,
+          "purpose" text,
+          "bestFor" text,
+          "equipment" text,
+          "coachCue" text,
+          "watchFor" text,
+          "whatThisFixes" json,
+          "whatToFeel" json,
+          "commonMistakes" json,
+          "updatedBy" integer NOT NULL,
+          "createdAt" timestamp DEFAULT now() NOT NULL,
+          "updatedAt" timestamp DEFAULT now() NOT NULL
+        )
+      `);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "weeklyChallenges" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "title" varchar(255) NOT NULL,
+          "description" text,
+          "targetCount" integer DEFAULT 5 NOT NULL,
+          "drillCategory" varchar(100),
+          "startsAt" timestamp NOT NULL,
+          "endsAt" timestamp NOT NULL,
+          "createdByUserId" integer NOT NULL,
+          "createdAt" timestamp DEFAULT now() NOT NULL
+        )
+      `);
+      console.log("[Database] Tables ensured");
+    } catch (tableErr) {
+      console.warn("[Database] Table ensure warning:", tableErr);
+    }
   } catch (error) {
     console.warn("[Database] Failed to connect:", error);
     resetDb();
