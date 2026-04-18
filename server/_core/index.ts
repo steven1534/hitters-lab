@@ -1,4 +1,8 @@
 import "dotenv/config";
+// Sentry must be initialised before any other require so its integrations
+// can patch Node internals early. Pure no-op if SENTRY_DSN is unset.
+import { initSentryNode, Sentry, sentryReady } from "./sentry";
+initSentryNode();
 import express from "express";
 import { createServer } from "http";
 import net from "net";
@@ -73,6 +77,23 @@ async function startServer() {
       }
     });
     next();
+  });
+
+  // ── Health check ─────────────────────────────────────────────
+  // Small, unauthenticated endpoint for Render health checks and uptime pings.
+  // Returns the current deploy's commit SHA when Render sets RENDER_GIT_COMMIT.
+  app.get("/api/health", (_req, res) => {
+    res.json({
+      ok: true,
+      commit:
+        process.env.RENDER_GIT_COMMIT ||
+        process.env.GIT_COMMIT ||
+        null,
+      env: process.env.NODE_ENV || "production",
+      sentry: sentryReady(),
+      uptime: Math.round(process.uptime()),
+      timestamp: new Date().toISOString(),
+    });
   });
 
   // Email/password auth routes
@@ -151,6 +172,9 @@ async function startServer() {
       createContext,
       onError({ error, path }) {
         console.error(`[tRPC Error] ${path ?? "unknown"}:`, error.message);
+        if (sentryReady()) {
+          Sentry.captureException(error, { tags: { trpc_path: path ?? "unknown" } });
+        }
       },
     })
   );
@@ -160,6 +184,17 @@ async function startServer() {
   } else {
     serveStatic(app);
   }
+
+  // Express error handler — last resort, reports to Sentry if configured.
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error("[Express Error]", err);
+    if (sentryReady()) {
+      Sentry.captureException(err);
+    }
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
   // In production, bind to the PORT env var provided by the host
   // In development, scan for an available port
