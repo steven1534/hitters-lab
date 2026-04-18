@@ -77,58 +77,6 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // ── Impersonation (admin only) ──────────────────────────
-    impersonate: protectedProcedure
-      .input(z.object({ userId: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        const target = await db.getUserById(input.userId);
-        if (!target) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-        }
-        const { createSessionToken } = await import("./_core/auth");
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        const longOptions = { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 };
-        // Save the real admin session in a separate cookie
-        const { parse: parseCookies } = await import("cookie");
-        const cookies = parseCookies(ctx.req.headers.cookie ?? "");
-        const currentToken = cookies[COOKIE_NAME] ?? "";
-        ctx.res.cookie(COOKIE_NAME + "_real", currentToken, longOptions);
-        // Set the impersonation session
-        const impersonateToken = await createSessionToken(target.id, target.email!);
-        ctx.res.cookie(COOKIE_NAME, impersonateToken, longOptions);
-        return { success: true, user: { id: target.id, email: target.email, name: target.name, role: target.role } };
-      }),
-
-    stopImpersonating: protectedProcedure.mutation(async ({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      const longOptions = { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 };
-      const { parse: parseCookies } = await import("cookie");
-      const cookies = parseCookies(ctx.req.headers.cookie ?? "");
-      const realToken = cookies[COOKIE_NAME + "_real"];
-      if (!realToken) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Not currently impersonating" });
-      }
-      // Restore real admin session
-      ctx.res.cookie(COOKIE_NAME, realToken, longOptions);
-      ctx.res.clearCookie(COOKIE_NAME + "_real", { ...cookieOptions, maxAge: -1 });
-      return { success: true };
-    }),
-
-    isImpersonating: publicProcedure.query(async ({ ctx }) => {
-      const { parse: parseCookies } = await import("cookie");
-      const cookies = parseCookies(ctx.req.headers.cookie ?? "");
-      const realToken = cookies[COOKIE_NAME + "_real"];
-      if (!realToken) return { impersonating: false, realUser: null };
-      const { verifySessionToken } = await import("./_core/auth");
-      const session = await verifySessionToken(realToken);
-      if (!session) return { impersonating: false, realUser: null };
-      const realUser = await db.getUserById(session.userId);
-      if (!realUser || realUser.role !== "admin") return { impersonating: false, realUser: null };
-      return { impersonating: true, realUser: { id: realUser.id, email: realUser.email, name: realUser.name, role: realUser.role } };
-    }),
   }),
 
   // Admin router for managing client access

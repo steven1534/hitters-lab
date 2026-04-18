@@ -29,7 +29,6 @@ import { PlayerReportsTab } from "@/components/PlayerReportsTab";
 import { BlastMetricsTab } from "@/components/BlastMetricsTab";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { InlineEdit } from "@/components/InlineEdit";
-import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AddNewDrill } from "@/components/AddNewDrill";
 import { AccountSettings } from "@/components/AccountSettings";
 import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
@@ -507,7 +506,6 @@ export default function CoachDashboard() {
 
   return (
     <div className="coach-dark min-h-screen flex flex-col">
-      <ImpersonationBanner />
 
       {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0a0a0a] border-b border-white/[0.06] sticky top-0 z-40">

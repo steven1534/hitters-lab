@@ -18,14 +18,12 @@ import UserManagement from "./pages/UserManagement";
 import DrillsDirectory from "./pages/DrillsDirectory";
 import Pathways from "./pages/Pathways";
 import MyProgress from "./pages/MyProgress";
-import ParentDashboard from "./pages/ParentDashboard";
 import MyProfile from "./pages/MyProfile";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ToastContainer } from "./components/ToastContainer";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
-import { ImpersonationBanner } from "./components/ImpersonationBanner";
 import { useEffect } from "react";
 
 // Register service worker
@@ -93,13 +91,6 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
-      {/* Protected Routes - Parent Dashboard */}
-      <Route path={"/parent-dashboard"}>
-        <ProtectedRoute requiredRole="parent">
-          <ParentDashboard />
-        </ProtectedRoute>
-      </Route>
-      
       {/* Protected Routes - Athlete Only */}
       <Route path={"/athlete-portal"}>
         <ProtectedRoute requiredRole="athlete">
@@ -141,7 +132,6 @@ function App() {
           // switchable
         >
           <TooltipProvider>
-            <ImpersonationBanner />
             <Toaster />
             <ToastContainer />
             <Router />
