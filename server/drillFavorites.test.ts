@@ -48,7 +48,7 @@ describeIfDb("Drill Favorites", () => {
   });
 
   it("should add a drill to favorites", async () => {
-    const drillId = 1;
+    const drillId = "drill-1";
     const result = await addFavorite(testUserId, drillId);
 
     expect(result).toBe(true);
@@ -59,7 +59,7 @@ describeIfDb("Drill Favorites", () => {
   });
 
   it("should not duplicate favorites when adding same drill twice", async () => {
-    const drillId = 2;
+    const drillId = "drill-2";
     
     await addFavorite(testUserId, drillId);
     await addFavorite(testUserId, drillId);
@@ -70,7 +70,7 @@ describeIfDb("Drill Favorites", () => {
   });
 
   it("should remove a drill from favorites", async () => {
-    const drillId = 3;
+    const drillId = "drill-3";
     
     await addFavorite(testUserId, drillId);
     expect(await isFavorited(testUserId, drillId)).toBe(true);
@@ -80,7 +80,7 @@ describeIfDb("Drill Favorites", () => {
   });
 
   it("should toggle favorite status", async () => {
-    const drillId = 4;
+    const drillId = "drill-4";
 
     // First toggle: should add
     const result1 = await toggleFavorite(testUserId, drillId);
@@ -94,7 +94,7 @@ describeIfDb("Drill Favorites", () => {
   });
 
   it("should get all favorites for a user", async () => {
-    const drillIds = [5, 6, 7];
+    const drillIds = ["drill-5", "drill-6", "drill-7"];
     
     for (const drillId of drillIds) {
       await addFavorite(testUserId, drillId);
@@ -108,7 +108,7 @@ describeIfDb("Drill Favorites", () => {
   });
 
   it("should check if a drill is favorited", async () => {
-    const drillId = 8;
+    const drillId = "drill-8";
 
     expect(await isFavorited(testUserId, drillId)).toBe(false);
     
@@ -119,9 +119,9 @@ describeIfDb("Drill Favorites", () => {
   it("should get favorite count for a user", async () => {
     expect(await getFavoriteCount(testUserId)).toBe(0);
 
-    await addFavorite(testUserId, 9);
-    await addFavorite(testUserId, 10);
-    await addFavorite(testUserId, 11);
+    await addFavorite(testUserId, "drill-9");
+    await addFavorite(testUserId, "drill-10");
+    await addFavorite(testUserId, "drill-11");
 
     expect(await getFavoriteCount(testUserId)).toBe(3);
   });

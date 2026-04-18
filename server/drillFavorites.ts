@@ -1,16 +1,16 @@
 import { eq, and, desc } from "drizzle-orm";
-import { drillFavorites, InsertDrillFavorite } from "../drizzle/schema";
+import { drillFavorites, type InsertDrillFavorite } from "../drizzle/schema";
 import { getDb } from "./db";
 
 /**
- * Add a drill to user's favorites
+ * Add a drill to user's favorites. drillId is a string to match the drill
+ * catalog (static drill IDs like "belly-button-tee" and custom drill IDs).
  */
-export async function addFavorite(userId: number, drillId: number): Promise<boolean> {
+export async function addFavorite(userId: number, drillId: string): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
   try {
-    // Check if already favorited
     const existing = await db.select()
       .from(drillFavorites)
       .where(
@@ -21,18 +21,9 @@ export async function addFavorite(userId: number, drillId: number): Promise<bool
       )
       .limit(1);
 
-    if (existing.length > 0) {
-      // Already favorited
-      return true;
-    }
+    if (existing.length > 0) return true;
 
-    // Add to favorites
-    await db.insert(drillFavorites).values({
-      userId,
-      drillId,
-    });
-
-    console.log(`[Favorites] User ${userId} favorited drill ${drillId}`);
+    await db.insert(drillFavorites).values({ userId, drillId } satisfies InsertDrillFavorite);
     return true;
   } catch (error) {
     console.error("[Favorites] Failed to add favorite:", error);
@@ -40,10 +31,7 @@ export async function addFavorite(userId: number, drillId: number): Promise<bool
   }
 }
 
-/**
- * Remove a drill from user's favorites
- */
-export async function removeFavorite(userId: number, drillId: number): Promise<boolean> {
+export async function removeFavorite(userId: number, drillId: string): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
@@ -55,8 +43,6 @@ export async function removeFavorite(userId: number, drillId: number): Promise<b
           eq(drillFavorites.drillId, drillId)
         )
       );
-
-    console.log(`[Favorites] User ${userId} unfavorited drill ${drillId}`);
     return true;
   } catch (error) {
     console.error("[Favorites] Failed to remove favorite:", error);
@@ -64,15 +50,11 @@ export async function removeFavorite(userId: number, drillId: number): Promise<b
   }
 }
 
-/**
- * Toggle favorite status for a drill
- */
-export async function toggleFavorite(userId: number, drillId: number): Promise<{ isFavorited: boolean }> {
+export async function toggleFavorite(userId: number, drillId: string): Promise<{ isFavorited: boolean }> {
   const db = await getDb();
   if (!db) return { isFavorited: false };
 
   try {
-    // Check if already favorited
     const existing = await db.select()
       .from(drillFavorites)
       .where(
@@ -84,24 +66,18 @@ export async function toggleFavorite(userId: number, drillId: number): Promise<{
       .limit(1);
 
     if (existing.length > 0) {
-      // Remove from favorites
       await removeFavorite(userId, drillId);
       return { isFavorited: false };
-    } else {
-      // Add to favorites
-      await addFavorite(userId, drillId);
-      return { isFavorited: true };
     }
+    await addFavorite(userId, drillId);
+    return { isFavorited: true };
   } catch (error) {
     console.error("[Favorites] Failed to toggle favorite:", error);
     return { isFavorited: false };
   }
 }
 
-/**
- * Get all favorite drill IDs for a user
- */
-export async function getUserFavorites(userId: number): Promise<number[]> {
+export async function getUserFavorites(userId: number): Promise<string[]> {
   const db = await getDb();
   if (!db) return [];
 
@@ -118,10 +94,7 @@ export async function getUserFavorites(userId: number): Promise<number[]> {
   }
 }
 
-/**
- * Check if a specific drill is favorited by user
- */
-export async function isFavorited(userId: number, drillId: number): Promise<boolean> {
+export async function isFavorited(userId: number, drillId: string): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
@@ -143,9 +116,6 @@ export async function isFavorited(userId: number, drillId: number): Promise<bool
   }
 }
 
-/**
- * Get favorite count for a user
- */
 export async function getFavoriteCount(userId: number): Promise<number> {
   const db = await getDb();
   if (!db) return 0;

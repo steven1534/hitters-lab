@@ -184,15 +184,11 @@ export default function DrillDetail() {
   });
   const isFavorited = useMemo(() => {
     if (!favoritesData?.drillIds || !id) return false;
-    const numericId = parseInt(id);
-    return (
-      favoritesData.drillIds.includes(numericId) ||
-      favoritesData.drillIds.includes(id as any)
-    );
+    return favoritesData.drillIds.includes(id);
   }, [favoritesData?.drillIds, id]);
   const handleToggleFavorite = () => {
     if (!id) return;
-    toggleFavoriteMutation.mutate({ drillId: parseInt(id) || 0 });
+    toggleFavoriteMutation.mutate({ drillId: id });
   };
 
   // Log drill completion

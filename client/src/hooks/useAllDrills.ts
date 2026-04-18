@@ -42,10 +42,17 @@ export interface UnifiedDrill {
  * with built-in drills rather than appended at the end.
  */
 export function useAllDrills(): UnifiedDrill[] {
-  const { data: customDrills = [] } = trpc.drillDetails.getCustomDrills.useQuery();
-  const { data: catalogOverrides = [] } = trpc.drillCatalog.getAll.useQuery();
+  return useAllDrillsWithStatus().drills;
+}
 
-  return useMemo(() => {
+export function useAllDrillsWithStatus(): { drills: UnifiedDrill[]; isLoading: boolean } {
+  const customQuery = trpc.drillDetails.getCustomDrills.useQuery();
+  const catalogQuery = trpc.drillCatalog.getAll.useQuery();
+  const customDrills = customQuery.data ?? [];
+  const catalogOverrides = catalogQuery.data ?? [];
+  const isLoading = customQuery.isLoading || catalogQuery.isLoading;
+
+  const drills = useMemo(() => {
     const overrideMap = new Map(catalogOverrides.map((o) => [o.drillId, o]));
 
     const staticBases: UnifiedDrill[] = drillsData.map((d) => ({
@@ -121,4 +128,6 @@ export function useAllDrills(): UnifiedDrill[] {
       a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
     );
   }, [customDrills, catalogOverrides]);
+
+  return { drills, isLoading };
 }

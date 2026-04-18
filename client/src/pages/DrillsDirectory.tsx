@@ -1,12 +1,28 @@
 import { useState, useMemo } from "react";
 import { Link } from "wouter";
-import { Search, SlidersHorizontal, Star, ChevronDown, X, Wrench, TrendingUp, Route, Baby, Home as HomeIcon, ClipboardList } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  Star,
+  ChevronDown,
+  X,
+  Wrench,
+  TrendingUp,
+  Route,
+  Baby,
+  Home as HomeIcon,
+  ClipboardList,
+  ArrowUpDown,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SiteNav from "@/components/SiteNav";
 import DrillCard from "@/components/DrillCard";
-import { useAllDrills } from "@/hooks/useAllDrills";
+import { DrillCardSkeleton } from "@/components/DrillCardSkeleton";
+import { useAllDrillsWithStatus } from "@/hooks/useAllDrills";
 import { filterOptions, drillTypeOptions } from "@/data/drills";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const INTENT_CARDS = [
   { icon: Wrench, label: "Fix a Flaw", sub: "Target a mechanical issue", filter: "problem", color: "from-red-500/20 to-red-600/10 border-red-500/20 hover:border-red-500/40", iconColor: "text-red-400" },
@@ -18,6 +34,24 @@ const INTENT_CARDS = [
 ] as const;
 
 const DRILL_TYPE_FLAT = drillTypeOptions.flatMap((g) => g.options);
+
+type SortKey = "name-asc" | "name-desc" | "difficulty" | "favorites";
+
+const SORT_LABELS: Record<SortKey, string> = {
+  "name-asc": "Name (A–Z)",
+  "name-desc": "Name (Z–A)",
+  difficulty: "Difficulty",
+  favorites: "Favorites first",
+};
+
+const DIFFICULTY_ORDER: Record<string, number> = {
+  easy: 0,
+  foundation: 0,
+  medium: 1,
+  intermediate: 1,
+  hard: 2,
+  advanced: 2,
+};
 
 interface FilterSectionProps {
   title: string;
@@ -66,10 +100,15 @@ function CheckboxItem({
 }
 
 export default function DrillsDirectory() {
-  const allDrills = useAllDrills();
+  const { drills: allDrills, isLoading } = useAllDrillsWithStatus();
+  const { user } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showSidebar, setShowSidebar] = useState(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("name-asc");
+  const [sortOpen, setSortOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedProblems, setSelectedProblems] = useState<Set<string>>(new Set());
@@ -85,6 +124,25 @@ export default function DrillsDirectory() {
   });
 
   const DRILLS_PER_PAGE = 21;
+
+  // Favorites — only fetched when user is signed in
+  const trpcUtils = trpc.useUtils();
+  const { data: favoritesData } = trpc.favorites.getAll.useQuery(undefined, {
+    enabled: !!user?.id,
+  });
+  const favoriteIds = useMemo(
+    () => new Set(favoritesData?.drillIds ?? []),
+    [favoritesData?.drillIds]
+  );
+  const toggleFavoriteMutation = trpc.favorites.toggle.useMutation({
+    onSuccess: () => {
+      trpcUtils.favorites.getAll.invalidate();
+    },
+  });
+  const handleToggleFavorite = (drillId: string) => {
+    if (!user?.id) return;
+    toggleFavoriteMutation.mutate({ drillId });
+  };
 
   const toggleSection = (key: keyof typeof openSections) =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -104,20 +162,58 @@ export default function DrillsDirectory() {
   };
 
   const filteredDrills = useMemo(() => {
-    return allDrills.filter((drill) => {
-      if (searchQuery && !drill.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = allDrills.filter((drill) => {
+      if (showOnlyFavorites && !favoriteIds.has(drill.id)) return false;
+      if (q) {
+        // Broaden search: name, purpose, bestFor, coachCue, drillType, tags, goal, problem
+        const haystacks: string[] = [
+          drill.name,
+          drill.purpose ?? "",
+          drill.bestFor ?? "",
+          drill.coachCue ?? "",
+          drill.drillType ?? "",
+          ...(drill.tags ?? []),
+          ...(drill.goal ?? []),
+          ...(drill.problem ?? []),
+        ];
+        if (!haystacks.some((h) => h.toLowerCase().includes(q))) return false;
+      }
       if (selectedProblems.size > 0 && !(drill.problem ?? []).some((p) => selectedProblems.has(p))) return false;
       if (selectedGoals.size > 0 && !(drill.goal ?? []).some((g) => selectedGoals.has(g))) return false;
       if (selectedDrillTypes.size > 0 && !selectedDrillTypes.has(drill.drillType ?? "")) return false;
       if (selectedAgeLevels.size > 0 && !(drill.ageLevel ?? []).some((a) => selectedAgeLevels.has(a))) return false;
       return true;
     });
-  }, [allDrills, searchQuery, selectedProblems, selectedGoals, selectedDrillTypes, selectedAgeLevels]);
 
-  const totalPages = Math.ceil(filteredDrills.length / DRILLS_PER_PAGE);
+    const sorted = [...filtered];
+    if (sortKey === "name-asc") {
+      sorted.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    } else if (sortKey === "name-desc") {
+      sorted.sort((a, b) => b.name.localeCompare(a.name, undefined, { sensitivity: "base" }));
+    } else if (sortKey === "difficulty") {
+      sorted.sort((a, b) => {
+        const rankA = DIFFICULTY_ORDER[(a.difficulty ?? "").toLowerCase()] ?? 1;
+        const rankB = DIFFICULTY_ORDER[(b.difficulty ?? "").toLowerCase()] ?? 1;
+        if (rankA !== rankB) return rankA - rankB;
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      });
+    } else if (sortKey === "favorites") {
+      sorted.sort((a, b) => {
+        const aFav = favoriteIds.has(a.id) ? 0 : 1;
+        const bFav = favoriteIds.has(b.id) ? 0 : 1;
+        if (aFav !== bFav) return aFav - bFav;
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      });
+    }
+    return sorted;
+  }, [allDrills, searchQuery, selectedProblems, selectedGoals, selectedDrillTypes, selectedAgeLevels, showOnlyFavorites, favoriteIds, sortKey]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredDrills.length / DRILLS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
   const paginatedDrills = filteredDrills.slice(
-    (currentPage - 1) * DRILLS_PER_PAGE,
-    currentPage * DRILLS_PER_PAGE
+    (safePage - 1) * DRILLS_PER_PAGE,
+    safePage * DRILLS_PER_PAGE
   );
 
   const hasFilters =
@@ -125,7 +221,8 @@ export default function DrillsDirectory() {
     selectedProblems.size > 0 ||
     selectedGoals.size > 0 ||
     selectedDrillTypes.size > 0 ||
-    selectedAgeLevels.size > 0;
+    selectedAgeLevels.size > 0 ||
+    showOnlyFavorites;
 
   const clearAll = () => {
     setSearchQuery("");
@@ -133,6 +230,7 @@ export default function DrillsDirectory() {
     setSelectedGoals(new Set());
     setSelectedDrillTypes(new Set());
     setSelectedAgeLevels(new Set());
+    setShowOnlyFavorites(false);
     setCurrentPage(1);
   };
 
@@ -151,13 +249,71 @@ export default function DrillsDirectory() {
     }
   };
 
+  const filterPanel = (
+    <>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="flex items-center gap-1.5 font-heading text-[0.65rem] font-bold uppercase tracking-[0.12em] text-gold">
+          <SlidersHorizontal className="h-3 w-3" />Refine Drills
+        </h3>
+        {hasFilters && (
+          <button onClick={clearAll} className="flex items-center gap-1 text-[0.6rem] text-gold hover:text-gold-dim transition-colors">
+            <X className="h-3 w-3" />Clear
+          </button>
+        )}
+      </div>
+
+      <FilterSection title="Problem" open={openSections.problem} onToggle={() => toggleSection("problem")}>
+        {filterOptions.problem.map((opt) => (
+          <CheckboxItem
+            key={opt.value}
+            label={opt.label}
+            checked={selectedProblems.has(opt.value)}
+            onChange={(c) => toggleSetItem(selectedProblems, setSelectedProblems, opt.value, c)}
+          />
+        ))}
+      </FilterSection>
+
+      <FilterSection title="Goal" open={openSections.goal} onToggle={() => toggleSection("goal")}>
+        {filterOptions.goal.map((opt) => (
+          <CheckboxItem
+            key={opt.value}
+            label={opt.label}
+            checked={selectedGoals.has(opt.value)}
+            onChange={(c) => toggleSetItem(selectedGoals, setSelectedGoals, opt.value, c)}
+          />
+        ))}
+      </FilterSection>
+
+      <FilterSection title="Drill Type" open={openSections.drillType} onToggle={() => toggleSection("drillType")}>
+        {DRILL_TYPE_FLAT.map((opt) => (
+          <CheckboxItem
+            key={opt.value}
+            label={opt.label}
+            checked={selectedDrillTypes.has(opt.value)}
+            onChange={(c) => toggleSetItem(selectedDrillTypes, setSelectedDrillTypes, opt.value, c)}
+          />
+        ))}
+      </FilterSection>
+
+      <FilterSection title="Age / Level" open={openSections.ageLevel} onToggle={() => toggleSection("ageLevel")}>
+        {filterOptions.ageLevel.map((opt) => (
+          <CheckboxItem
+            key={opt.value}
+            label={opt.label}
+            checked={selectedAgeLevels.has(opt.value)}
+            onChange={(c) => toggleSetItem(selectedAgeLevels, setSelectedAgeLevels, opt.value, c)}
+          />
+        ))}
+      </FilterSection>
+    </>
+  );
+
   return (
     <div className="film-room min-h-screen bg-background pt-14">
       <SiteNav />
 
       {/* Hero — Cinematic Film Room */}
       <header className="relative overflow-hidden border-b border-film-border">
-        {/* Cinematic layered background — batting cage atmosphere */}
         <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.14_0.020_40)] via-[oklch(0.11_0.008_260)] to-[oklch(0.08_0.006_250)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_30%,oklch(0.22_0.04_55/0.25),transparent_70%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.58_0.16_145/0.04),transparent_50%)]" />
@@ -165,7 +321,6 @@ export default function DrillsDirectory() {
         <div className="absolute inset-0 noise-overlay" />
 
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-20">
-          {/* Eyebrow with gold accent line */}
           <div className="flex items-center gap-3 mb-5 animate-fade-up">
             <div className="h-px w-8 bg-gold/60" />
             <p className="font-heading text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold">
@@ -187,7 +342,6 @@ export default function DrillsDirectory() {
             better game transfer.
           </p>
 
-          {/* Search */}
           <div className="relative mt-7 max-w-lg animate-fade-up stagger-4">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-film-muted pointer-events-none" />
             <Input
@@ -240,7 +394,7 @@ export default function DrillsDirectory() {
 
       {/* Drill header bar */}
       <div className="border-b border-film-border bg-[oklch(0.115_0.006_260)]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
           <div>
             <p className="font-heading text-[0.55rem] font-bold uppercase tracking-[0.18em] text-gold mb-1">
               Build your session with intent
@@ -249,15 +403,77 @@ export default function DrillsDirectory() {
               Hitting Drills
             </h2>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-1.5 rounded-lg border border-film-border px-3.5 py-2 font-heading text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-film-muted transition-all duration-200 hover:border-gold/30 hover:text-gold hover:bg-gold/5">
-              <Star className="h-3.5 w-3.5" />My Drills
-            </button>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {user?.id && (
+              <button
+                onClick={() => {
+                  setShowOnlyFavorites((prev) => !prev);
+                  setCurrentPage(1);
+                }}
+                aria-pressed={showOnlyFavorites}
+                className={`flex items-center gap-1.5 rounded-lg border px-3.5 py-2 font-heading text-[0.6rem] font-semibold uppercase tracking-[0.1em] transition-all duration-200 ${
+                  showOnlyFavorites
+                    ? "border-gold/40 bg-gold/10 text-gold"
+                    : "border-film-border text-film-muted hover:border-gold/30 hover:text-gold hover:bg-gold/5"
+                }`}
+              >
+                <Star className="h-3.5 w-3.5" fill={showOnlyFavorites ? "currentColor" : "none"} />My Drills
+                {favoriteIds.size > 0 && (
+                  <span className="ml-1 text-[0.55rem] font-bold">({favoriteIds.size})</span>
+                )}
+              </button>
+            )}
+
+            {/* Sort */}
+            <div className="relative">
+              <button
+                onClick={() => setSortOpen((v) => !v)}
+                className="flex items-center gap-1.5 rounded-lg border border-film-border px-3.5 py-2 font-heading text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-film-muted transition-all duration-200 hover:border-gold/30 hover:text-gold hover:bg-gold/5"
+              >
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                {SORT_LABELS[sortKey]}
+              </button>
+              {sortOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setSortOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full z-20 mt-1 w-48 rounded-lg border border-film-border bg-[oklch(0.13_0.006_260)] py-1 shadow-lg">
+                    {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setSortKey(key);
+                          setSortOpen(false);
+                        }}
+                        className={`block w-full px-3 py-2 text-left font-heading text-[0.65rem] font-semibold uppercase tracking-[0.08em] transition-colors ${
+                          sortKey === key
+                            ? "bg-gold/10 text-gold"
+                            : "text-film-muted hover:bg-white/[0.04] hover:text-film-fg"
+                        }`}
+                      >
+                        {SORT_LABELS[key]}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             <span className="font-heading text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-film-muted bg-white/[0.04] px-3 py-2 rounded-lg">
               {filteredDrills.length} Drills
             </span>
+
+            {/* Mobile: open drawer. Desktop: toggle sidebar */}
             <button
-              onClick={() => setShowSidebar(!showSidebar)}
+              onClick={() => {
+                if (typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches) {
+                  setMobileFiltersOpen(true);
+                } else {
+                  setShowSidebar((v) => !v);
+                }
+              }}
               className={`flex items-center gap-1.5 rounded-lg border px-3.5 py-2 font-heading text-[0.6rem] font-semibold uppercase tracking-[0.1em] transition-all duration-200 ${
                 showSidebar
                   ? "border-gold/30 bg-gold/10 text-gold"
@@ -270,77 +486,67 @@ export default function DrillsDirectory() {
         </div>
       </div>
 
+      {/* Mobile filter drawer */}
+      {mobileFiltersOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-[85%] max-w-sm overflow-y-auto border-l border-film-border bg-[oklch(0.11_0.006_260)] p-4 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-heading text-[0.75rem] font-bold uppercase tracking-[0.12em] text-film-fg">
+                Filters
+              </h2>
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="rounded-md p-1 text-film-muted hover:bg-white/[0.06] hover:text-film-fg"
+                aria-label="Close filters"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            {filterPanel}
+            <Button
+              onClick={() => setMobileFiltersOpen(false)}
+              className="mt-4 w-full bg-gold text-canvas hover:bg-gold-dim font-heading text-[0.72rem] font-bold uppercase tracking-[0.1em] rounded-lg h-10"
+            >
+              Show {filteredDrills.length} drills
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Main: sidebar + grid */}
       <main className="mx-auto flex max-w-7xl gap-6 px-4 py-8 sm:px-6">
-        {/* Sidebar */}
+        {/* Sidebar — desktop only */}
         {showSidebar && (
           <aside className="hidden w-56 shrink-0 lg:block">
             <div className="sticky top-16 rounded-lg border border-film-border/60 bg-[oklch(0.13_0.006_260)] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="flex items-center gap-1.5 font-heading text-[0.65rem] font-bold uppercase tracking-[0.12em] text-gold">
-                  <SlidersHorizontal className="h-3 w-3" />Refine Drills
-                </h3>
-                {hasFilters && (
-                  <button onClick={clearAll} className="flex items-center gap-1 text-[0.6rem] text-gold hover:text-gold-dim transition-colors">
-                    <X className="h-3 w-3" />Clear
-                  </button>
-                )}
-              </div>
-
-              <FilterSection title="Problem" open={openSections.problem} onToggle={() => toggleSection("problem")}>
-                {filterOptions.problem.map((opt) => (
-                  <CheckboxItem
-                    key={opt.value}
-                    label={opt.label}
-                    checked={selectedProblems.has(opt.value)}
-                    onChange={(c) => toggleSetItem(selectedProblems, setSelectedProblems, opt.value, c)}
-                  />
-                ))}
-              </FilterSection>
-
-              <FilterSection title="Goal" open={openSections.goal} onToggle={() => toggleSection("goal")}>
-                {filterOptions.goal.map((opt) => (
-                  <CheckboxItem
-                    key={opt.value}
-                    label={opt.label}
-                    checked={selectedGoals.has(opt.value)}
-                    onChange={(c) => toggleSetItem(selectedGoals, setSelectedGoals, opt.value, c)}
-                  />
-                ))}
-              </FilterSection>
-
-              <FilterSection title="Drill Type" open={openSections.drillType} onToggle={() => toggleSection("drillType")}>
-                {DRILL_TYPE_FLAT.map((opt) => (
-                  <CheckboxItem
-                    key={opt.value}
-                    label={opt.label}
-                    checked={selectedDrillTypes.has(opt.value)}
-                    onChange={(c) => toggleSetItem(selectedDrillTypes, setSelectedDrillTypes, opt.value, c)}
-                  />
-                ))}
-              </FilterSection>
-
-              <FilterSection title="Age / Level" open={openSections.ageLevel} onToggle={() => toggleSection("ageLevel")}>
-                {filterOptions.ageLevel.map((opt) => (
-                  <CheckboxItem
-                    key={opt.value}
-                    label={opt.label}
-                    checked={selectedAgeLevels.has(opt.value)}
-                    onChange={(c) => toggleSetItem(selectedAgeLevels, setSelectedAgeLevels, opt.value, c)}
-                  />
-                ))}
-              </FilterSection>
+              {filterPanel}
             </div>
           </aside>
         )}
 
         {/* Drill grid */}
         <div className="flex-1 min-w-0">
-          {paginatedDrills.length > 0 ? (
+          {isLoading ? (
+            <div className={`grid gap-5 ${showSidebar ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"}`}>
+              {Array.from({ length: 9 }).map((_, i) => (
+                <DrillCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : paginatedDrills.length > 0 ? (
             <>
               <div className={`grid gap-5 ${showSidebar ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"}`}>
                 {paginatedDrills.map((drill, idx) => (
-                  <DrillCard key={drill.id} drill={drill} animationDelay={idx * 40} />
+                  <DrillCard
+                    key={drill.id}
+                    drill={drill}
+                    animationDelay={idx * 40}
+                    isFavorited={favoriteIds.has(drill.id)}
+                    onToggleFavorite={user?.id ? handleToggleFavorite : undefined}
+                  />
                 ))}
               </div>
 
@@ -348,15 +554,15 @@ export default function DrillsDirectory() {
               {totalPages > 1 && (
                 <div className="mt-12 flex flex-col items-center gap-3">
                   <span className="text-[0.72rem] text-film-muted">
-                    Page {currentPage} of {totalPages} &middot; {filteredDrills.length} Drills
+                    Page {safePage} of {totalPages} &middot; {filteredDrills.length} Drills
                   </span>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap justify-center gap-1.5">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                       <button
                         key={p}
                         onClick={() => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                         className={`h-8 w-8 rounded-lg font-heading text-[0.7rem] font-bold transition-all duration-200 ${
-                          p === currentPage
+                          p === safePage
                             ? "bg-gold text-canvas shadow-md shadow-gold/20"
                             : "text-film-muted hover:text-film-fg hover:bg-white/[0.06] border border-transparent hover:border-film-border"
                         }`}
@@ -373,9 +579,13 @@ export default function DrillsDirectory() {
               <div className="h-16 w-16 rounded-2xl bg-white/[0.04] border border-film-border flex items-center justify-center mb-5">
                 <Search className="h-7 w-7 text-film-muted" />
               </div>
-              <h3 className="font-heading text-xl font-bold text-film-fg">No drills found</h3>
+              <h3 className="font-heading text-xl font-bold text-film-fg">
+                {showOnlyFavorites ? "No saved drills yet" : "No drills found"}
+              </h3>
               <p className="mt-2 max-w-sm text-[0.82rem] text-film-muted leading-relaxed">
-                Try adjusting your filters or clearing your search to see all available drills.
+                {showOnlyFavorites
+                  ? "Star drills from the list or the drill detail page to build your personal set."
+                  : "Try adjusting your filters or clearing your search to see all available drills."}
               </p>
               <Button
                 onClick={clearAll}
