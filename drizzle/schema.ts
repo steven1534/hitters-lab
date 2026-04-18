@@ -312,7 +312,7 @@ export type InsertCoachNote = typeof coachNotes.$inferInsert;
 export const drillFavorites = pgTable("drillFavorites", {
   id: serial("id").primaryKey(),
   userId: integer("userId").notNull(),
-  drillId: integer("drillId").notNull(),
+  drillId: text("drillId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

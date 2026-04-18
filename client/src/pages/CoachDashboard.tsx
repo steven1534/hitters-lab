@@ -5,6 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { 
@@ -15,6 +26,7 @@ import {
   BookOpen, Menu, X as XIcon, UserPlus, Mail,
   UserCog, Inbox,
   Eye, EyeOff, Database,
+  StickyNote,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useMemo, useRef } from "react";
@@ -262,6 +274,9 @@ export default function CoachDashboard() {
   const [crossNavAthleteId, setCrossNavAthleteId] = useState<number | undefined>(undefined);
   const [showProgressReport, setShowProgressReport] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [assignmentNotes, setAssignmentNotes] = useState("");
+  const [showNotesField, setShowNotesField] = useState(false);
+  const [pendingUnassignId, setPendingUnassignId] = useState<number | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -312,9 +327,35 @@ export default function CoachDashboard() {
     enabled: user?.role === "admin",
   });
 
-  const assignDrillMutation = trpc.drillAssignments.assignDrill.useMutation();
-  const unassignDrillMutation = trpc.drillAssignments.unassignDrill.useMutation();
-  const updateStatusMutation = trpc.drillAssignments.updateStatus.useMutation();
+  const invalidateAssignments = () => {
+    utils.drillAssignments.getAllAssignments.invalidate();
+  };
+
+  const assignDrillMutation = trpc.drillAssignments.assignDrill.useMutation({
+    onSuccess: () => {
+      invalidateAssignments();
+    },
+    onError: (err) => {
+      toast.error("Could not assign drill", { description: err.message });
+    },
+  });
+  const unassignDrillMutation = trpc.drillAssignments.unassignDrill.useMutation({
+    onSuccess: () => {
+      invalidateAssignments();
+      toast.success("Assignment removed");
+    },
+    onError: (err) => {
+      toast.error("Could not remove assignment", { description: err.message });
+    },
+  });
+  const updateStatusMutation = trpc.drillAssignments.updateStatus.useMutation({
+    onSuccess: () => {
+      invalidateAssignments();
+    },
+    onError: (err) => {
+      toast.error("Could not update status", { description: err.message });
+    },
+  });
 
   const allDrills = useAllDrills();
 
@@ -342,39 +383,49 @@ export default function CoachDashboard() {
 
   const handleAssignDrill = async () => {
     if (!selectedUser || !selectedDrill) return;
+    const notes = assignmentNotes.trim() || undefined;
     try {
       if (selectedUser.startsWith('invite-')) {
         const inviteId = parseInt(selectedUser.replace('invite-', ''));
         await assignDrillMutation.mutateAsync({
           inviteId, drillId: selectedDrill.id, drillName: selectedDrill.name,
           difficulty: selectedDrill.difficulty, duration: selectedDrill.duration,
+          notes,
         });
       } else {
         const userId = parseInt(selectedUser.replace('user-', ''));
         await assignDrillMutation.mutateAsync({
           userId, drillId: selectedDrill.id, drillName: selectedDrill.name,
           difficulty: selectedDrill.difficulty, duration: selectedDrill.duration,
+          notes,
         });
       }
+      toast.success(`Assigned "${selectedDrill.name}"`, {
+        description: notes ? "Notes included." : undefined,
+      });
       setSelectedDrill(null);
       setSearchDrill("");
+      setAssignmentNotes("");
     } catch (error) {
       console.error("Failed to assign drill:", error);
     }
   };
 
-  const handleUnassignDrill = async (assignmentId: number) => {
+  const handleConfirmUnassign = async () => {
+    if (pendingUnassignId == null) return;
     try {
-      await unassignDrillMutation.mutateAsync({ assignmentId });
-      await utils.drillAssignments.getAllAssignments.invalidate();
+      await unassignDrillMutation.mutateAsync({ assignmentId: pendingUnassignId });
     } catch (error) {
       console.error("Failed to unassign drill:", error);
+    } finally {
+      setPendingUnassignId(null);
     }
   };
 
   const handleStatusUpdate = async (assignmentId: number, status: "assigned" | "in-progress" | "completed") => {
     try {
       await updateStatusMutation.mutateAsync({ assignmentId, status });
+      toast.success(`Marked ${status.replace('-', ' ')}`);
     } catch (error) {
       console.error("Failed to update status:", error);
     }
@@ -689,14 +740,54 @@ export default function CoachDashboard() {
                       )}
 
                       {selectedDrill && (
-                        <div className="bg-gradient-to-br from-[#DC143C]/10 to-purple-500/10 border border-[#DC143C]/20 p-4 rounded-xl">
-                          <div className="font-semibold text-sm mb-2">{selectedDrill.name}</div>
-                          <div className="flex gap-1.5 flex-wrap mb-3">
-                            <Badge variant="outline" className="text-[10px] border-[#DC143C]/30 text-[#DC143C]">{selectedDrill.difficulty}</Badge>
-                            {selectedDrill.categories.map(cat => (
-                              <Badge key={cat} variant="secondary" className="text-[10px]">{cat}</Badge>
-                            ))}
+                        <div className="bg-gradient-to-br from-[#DC143C]/10 to-purple-500/10 border border-[#DC143C]/20 p-4 rounded-xl space-y-3">
+                          <div>
+                            <div className="font-semibold text-sm mb-2">{selectedDrill.name}</div>
+                            <div className="flex gap-1.5 flex-wrap">
+                              <Badge variant="outline" className="text-[10px] border-[#DC143C]/30 text-[#DC143C]">{selectedDrill.difficulty}</Badge>
+                              {selectedDrill.categories.map(cat => (
+                                <Badge key={cat} variant="secondary" className="text-[10px]">{cat}</Badge>
+                              ))}
+                            </div>
                           </div>
+
+                          {showNotesField ? (
+                            <div>
+                              <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center justify-between">
+                                <span className="flex items-center gap-1.5"><StickyNote className="h-3 w-3" /> Coach Notes (optional)</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setShowNotesField(false);
+                                    setAssignmentNotes("");
+                                  }}
+                                  className="text-[10px] text-muted-foreground hover:text-foreground transition-colors normal-case tracking-normal"
+                                >
+                                  Remove
+                                </button>
+                              </Label>
+                              <Textarea
+                                value={assignmentNotes}
+                                onChange={(e) => setAssignmentNotes(e.target.value)}
+                                placeholder="e.g. Focus on the load timing this week. 3 sets of 10."
+                                rows={3}
+                                className="text-xs bg-white/[0.04] border-white/[0.08] resize-none"
+                                maxLength={500}
+                              />
+                              <div className="mt-1 text-[10px] text-muted-foreground text-right">
+                                {assignmentNotes.length}/500
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setShowNotesField(true)}
+                              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-white/[0.12] bg-white/[0.02] px-3 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:border-white/[0.2] hover:bg-white/[0.04] hover:text-foreground"
+                            >
+                              <StickyNote className="h-3 w-3" /> Add note for athlete
+                            </button>
+                          )}
+
                           <Button
                             onClick={handleAssignDrill}
                             disabled={assignDrillMutation.isPending}
@@ -788,9 +879,10 @@ export default function CoachDashboard() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleUnassignDrill(assignment.id)}
+                                    onClick={() => setPendingUnassignId(assignment.id)}
                                     disabled={unassignDrillMutation.isPending}
                                     className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 h-8"
+                                    aria-label={`Unassign ${assignment.drillName}`}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
@@ -825,6 +917,32 @@ export default function CoachDashboard() {
           </main>
         </div>
       </div>
+
+      {/* Unassign confirmation */}
+      <AlertDialog
+        open={pendingUnassignId != null}
+        onOpenChange={(open) => {
+          if (!open) setPendingUnassignId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this assignment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The athlete will no longer see this drill in their list. Their progress log is kept.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmUnassign}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

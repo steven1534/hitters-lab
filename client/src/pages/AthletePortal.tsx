@@ -13,6 +13,7 @@ import { Link } from "wouter";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { getCategoryConfig } from "@/lib/categoryColors";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 import { CompletionModal } from "@/components/CompletionModal";
 import { DrillCoachFocus, DrillQuickNotes } from "@/components/DrillActionComponents";
 import { AthletePortalSkeleton } from "@/components/Skeleton";
@@ -149,6 +150,9 @@ export default function AthletePortal() {
   const toggleFavorite = trpc.favorites.toggle.useMutation({ onSuccess: () => utils.favorites.getAll.invalidate() });
   const updateStatusMutation = trpc.drillAssignments.updateStatus.useMutation({
     onSuccess: () => utils.drillAssignments.getUserAssignments.invalidate(),
+    onError: (err) => {
+      toast.error("Could not save progress", { description: err.message });
+    },
   });
   const progressStats = useMemo(() => {
     const total = userAssignments.length;
@@ -176,6 +180,13 @@ export default function AthletePortal() {
       await updateStatusMutation.mutateAsync({ assignmentId, status: newStatus });
       if (selectedAssignment?.id === assignmentId) {
         setSelectedAssignment({ ...selectedAssignment, status: newStatus });
+      }
+      if (newStatus === "completed") {
+        toast.success("Nice work — drill marked complete");
+      } else if (newStatus === "in-progress") {
+        toast.success("Marked in progress");
+      } else {
+        toast.success("Status updated");
       }
     } catch (error) {
       console.error("Failed to update status:", error);

@@ -1,3 +1,4 @@
+import { sanitizeReportHtml } from "@/lib/sanitizeHtml";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -255,7 +256,7 @@ export function TiptapRenderer({ content }: { content: string }) {
     return (
       <div
         className="prose prose-invert prose-sm max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeReportHtml(content) }}
       />
     );
   }
