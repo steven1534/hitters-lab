@@ -38,19 +38,10 @@ interface CoachNote {
   createdAt: Date;
 }
 
-interface WeeklyGoal {
-  id: number;
-  targetDrillCount: number;
-  notes: string | null;
-  weekStartDate: Date;
-  weekEndDate: Date;
-}
-
 export function exportProgressReportToPDF(
   athleteName: string,
   progressData: ProgressData,
-  coachNotes?: CoachNote[],
-  weeklyGoals?: WeeklyGoal[]
+  coachNotes?: CoachNote[]
 ) {
   const doc = new jsPDF();
   let yPosition = 20;
@@ -125,34 +116,6 @@ export function exportProgressReportToPDF(
       body: progressData.activity.recentCompletions.map(drill => [
         drill.drillName,
         drill.completedAt ? new Date(drill.completedAt).toLocaleDateString() : "N/A",
-      ]),
-      theme: "striped",
-      headStyles: { fillColor: [30, 58, 138] },
-    });
-
-    yPosition = (doc as any).lastAutoTable.finalY + 15;
-  }
-
-  // Weekly Goals Section
-  if (weeklyGoals && weeklyGoals.length > 0) {
-    // Add new page if needed
-    if (yPosition > 250) {
-      doc.addPage();
-      yPosition = 20;
-    }
-
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Weekly Goals", 20, yPosition);
-    yPosition += 10;
-
-    autoTable(doc, {
-      startY: yPosition,
-      head: [["Week", "Target Drills", "Notes"]],
-      body: weeklyGoals.map(goal => [
-        `${new Date(goal.weekStartDate).toLocaleDateString()} - ${new Date(goal.weekEndDate).toLocaleDateString()}`,
-        goal.targetDrillCount.toString(),
-        goal.notes || "No notes",
       ]),
       theme: "striped",
       headStyles: { fillColor: [30, 58, 138] },

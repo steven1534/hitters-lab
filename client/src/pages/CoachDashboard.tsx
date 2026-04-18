@@ -13,7 +13,7 @@ import {
   LayoutTemplate, Edit3, ArrowLeftRight, FileText, ChevronRight,
   Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
   BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail, Bell,
-  ExternalLink, UserCog, Inbox, GitCompare, ClipboardCheck, Wand2, Trophy,
+  ExternalLink, UserCog, Inbox, GitCompare, ClipboardCheck, Wand2,
   Eye, EyeOff, Database,
 } from "lucide-react";
 import { Link } from "wouter";
@@ -22,7 +22,6 @@ import { trpc } from "@/lib/trpc";
 import { useAllDrills } from "@/hooks/useAllDrills";
 import { BulkInstructionImport } from "@/components/BulkInstructionImport";
 import { BulkImportCustomDrills } from "@/components/BulkImportCustomDrills";
-import { BulkGoalUpload } from "@/components/BulkGoalUpload";
 import { AthleteProgressReport } from "@/components/AthleteProgressReport";
 import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOverview";
 import { AthleteTable } from "@/components/AthleteTable";
@@ -46,7 +45,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "account" | "challenges" | "user-management" | "submissions" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "account" | "user-management" | "submissions" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -64,7 +63,6 @@ const NAV_GROUPS = [
       { key: "assign" as ActiveTab, label: "Assign Drills", icon: Plus },
       { key: "drill-library" as ActiveTab, label: "Drill Library", icon: BookOpen },
       { key: "drill-videos" as ActiveTab, label: "Manage Videos", icon: Video },
-      { key: "challenges" as ActiveTab, label: "Weekly Challenges", icon: Trophy },
     ],
   },
   {
@@ -103,14 +101,12 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   overview: "Athlete Overview",
   assign: "Assign Drills",
   "bulk-import": "Bulk Import",
-  "bulk-goals": "Bulk Goals",
   "catalog-overrides": "Catalog Overrides",
   athletes: "Athletes Table",
   "player-reports": "Player Reports",
   "blast-metrics": "Blast Metrics",
   "drill-library": "Drill Library",
   "drill-videos": "Manage Videos",
-  challenges: "Weekly Challenges",
   "user-management": "User Management",
   submissions: "Submissions",
   account: "My Account",
@@ -276,7 +272,6 @@ export default function CoachDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
   // Cross-tab navigation: pre-select an athlete when switching tabs from Blast Metrics
   const [crossNavAthleteId, setCrossNavAthleteId] = useState<number | undefined>(undefined);
-  const [isBulkGoalOpen, setIsBulkGoalOpen] = useState(false);
   const [showProgressReport, setShowProgressReport] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -518,13 +513,6 @@ export default function CoachDashboard() {
       {/* Footer links */}
       <div className="px-2 mt-4 pt-4 border-t border-white/[0.06] space-y-0.5">
         <button
-          onClick={() => { setIsBulkGoalOpen(true); setSidebarOpen(false); }}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-all"
-        >
-          <Upload className="w-4 h-4 shrink-0" />
-          <span>Bulk Goals</span>
-        </button>
-        <button
           onClick={() => navigate("bulk-import")}
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all ${activeTab === "bulk-import" ? "bg-[#DC143C]/15 text-white border border-[#DC143C]/25" : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"}`}
         >
@@ -551,7 +539,6 @@ export default function CoachDashboard() {
   return (
     <div className="coach-dark min-h-screen flex flex-col">
       <ImpersonationBanner />
-      <BulkGoalUpload isOpen={isBulkGoalOpen} onClose={() => setIsBulkGoalOpen(false)} />
 
       {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0a0a0a] border-b border-white/[0.06] sticky top-0 z-40">
@@ -639,9 +626,6 @@ export default function CoachDashboard() {
                 }}
               />
             )}
-
-            {activeTab === "challenges" && <WeeklyChallengesTab />}
-
 
             {activeTab === "account" && <AccountSettings />}
 
@@ -882,7 +866,6 @@ export default function CoachDashboard() {
 function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void }) {
   const { data: users = [] } = trpc.admin.getAllUsers.useQuery();
   const { data: invites = [] } = trpc.invites.getAllInvites.useQuery();
-  const { data: challenge } = trpc.challenges.getCurrent.useQuery();
 
   const athletes = (users as any[]).filter((u: any) => u.role === "athlete" || u.role === "user");
   const activeAthletes = athletes.filter((u: any) => u.isActiveClient);
@@ -913,27 +896,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         })}
       </div>
 
-      {/* Active Challenge Banner */}
-      {challenge && (
-        <Card className="border-amber-500/20 bg-amber-500/5">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-              <Trophy className="h-5 w-5 text-amber-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-amber-600 font-medium uppercase tracking-wide">Active Challenge</p>
-              <p className="font-semibold truncate">{challenge.title}</p>
-              <p className="text-xs text-muted-foreground">
-                Ends {new Date(challenge.endsAt).toLocaleDateString()} · Target: {challenge.targetCount} drills
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => onNavigate("challenges")}>
-              Manage
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Quick Actions */}
       <Card>
         <CardHeader className="pb-3">
@@ -946,7 +908,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
               { label: "Player Reports", icon: BookOpen, tab: "player-reports" as ActiveTab },
               { label: "Blast Metrics", icon: BarChart3, tab: "blast-metrics" as ActiveTab },
               { label: "Submissions", icon: Inbox, tab: "submissions" as ActiveTab },
-              { label: "Challenges", icon: Trophy, tab: "challenges" as ActiveTab },
             ].map((action) => {
               const Icon = action.icon;
               return (
@@ -964,118 +925,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         </CardContent>
       </Card>
 
-    </div>
-  );
-}
-
-// ── Weekly Challenges Tab (Coach) ────────────────────────────
-function WeeklyChallengesTab() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [targetCount, setTargetCount] = useState("5");
-  const utils = trpc.useUtils();
-
-  const { data: challenges = [], isLoading } = trpc.challenges.getAll.useQuery();
-
-  const createMutation = trpc.challenges.create.useMutation({
-    onSuccess: () => {
-      utils.challenges.getAll.invalidate();
-      setTitle("");
-      setDescription("");
-      setTargetCount("5");
-      toast.success("Challenge created!");
-    },
-    onError: (err: any) => toast.error(err.message || "Failed to create challenge"),
-  });
-
-  const handleCreate = () => {
-    if (!title.trim()) return;
-    const now = new Date();
-    const startsAt = now.toISOString();
-    const endsAt = new Date(now.getTime() + 7 * 86400000).toISOString();
-    createMutation.mutate({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      targetCount: parseInt(targetCount) || 5,
-      startsAt,
-      endsAt,
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-amber-500" />
-            Create Weekly Challenge
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Challenge Title *</Label>
-            <Input
-              placeholder="e.g. Complete 5 bat path drills this week"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Description (optional)</Label>
-            <Input
-              placeholder="Extra details about the challenge..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Target (number of drills to complete)</Label>
-            <Input
-              type="number"
-              min={1}
-              value={targetCount}
-              onChange={(e) => setTargetCount(e.target.value)}
-            />
-          </div>
-          <Button onClick={handleCreate} disabled={!title.trim() || createMutation.isPending} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {createMutation.isPending ? "Creating..." : "Create Challenge (7-day window)"}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Past challenges list */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Challenge History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p className="text-muted-foreground text-sm">Loading...</p>
-          ) : challenges.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No challenges created yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {(challenges as any[]).map((c: any) => {
-                const isActive = new Date(c.startsAt) <= new Date() && new Date(c.endsAt) >= new Date();
-                return (
-                  <div key={c.id} className="flex items-center gap-3 p-3 rounded-lg border">
-                    <div className={`w-2 h-2 rounded-full ${isActive ? "bg-green-500 animate-pulse" : "bg-muted-foreground"}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{c.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(c.startsAt).toLocaleDateString()} – {new Date(c.endsAt).toLocaleDateString()}
-                        {" · Target: "}{c.targetCount} drills
-                      </p>
-                    </div>
-                    {isActive && <Badge variant="secondary" className="bg-green-500/10 text-green-600">Active</Badge>}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

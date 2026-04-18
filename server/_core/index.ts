@@ -8,7 +8,6 @@ import { registerAuthRoutes } from "./authRoutes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { startBatchProcessor } from "../emailBatching";
 import { storageDownload } from "../storage";
 import { uploadVideoFile } from "../videoStorage";
 import { authenticateRequest } from "./auth";
@@ -175,7 +174,6 @@ async function startServer() {
 
   server.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}/`);
-    startBatchProcessor();
   });
 }
 

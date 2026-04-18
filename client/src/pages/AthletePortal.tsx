@@ -361,9 +361,6 @@ function TrainingTab({
 
   return (
     <>
-      {/* Weekly Challenge Banner */}
-      <WeeklyChallengeBanner />
-
       {/* Up Next Hero */}
       {upNextDrill ? (
         <div className="glass-card rounded-2xl overflow-hidden border-glow animate-fade-in-up">
@@ -736,50 +733,6 @@ function CoachNotesTab() {
   return (
     <div className="space-y-6 animate-fade-in-up">
       <AthletePlayerReports />
-    </div>
-  );
-}
-
-// ─── Weekly Challenge Banner ─────────────────────────────────────────────────
-
-function WeeklyChallengeBanner() {
-  const { data: challengeData } = trpc.challenges.getMyProgress.useQuery();
-  if (!challengeData) return null;
-
-  const { challenge, completed } = challengeData;
-  const progress = Math.min(100, Math.round((completed / challenge.targetCount) * 100));
-  const isComplete = completed >= challenge.targetCount;
-  const daysLeft = Math.max(0, Math.ceil((new Date(challenge.endsAt).getTime() - Date.now()) / 86400000));
-
-  return (
-    <div className={`glass-card rounded-2xl p-5 border ${isComplete ? "border-emerald-500/30 bg-emerald-500/5" : "border-electric/20"} animate-fade-in-up`}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isComplete ? "bg-emerald-500/20" : "bg-electric/20"}`}>
-          <Trophy className={`w-5 h-5 ${isComplete ? "text-emerald-400" : "text-electric"}`} />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs font-medium text-electric uppercase tracking-wide">Weekly Challenge</p>
-          <h4 className="font-bold text-foreground text-sm">{challenge.title}</h4>
-        </div>
-        <Badge className="bg-white/10 text-muted-foreground border border-white/10 text-xs">{daysLeft}d left</Badge>
-      </div>
-      {challenge.description && (
-        <p className="text-xs text-muted-foreground mb-3">{challenge.description}</p>
-      )}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ${isComplete ? "bg-emerald-400" : "bg-electric"}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <span className={`text-sm font-bold ${isComplete ? "text-emerald-400" : "text-foreground"}`}>
-          {completed}/{challenge.targetCount}
-        </span>
-      </div>
-      {isComplete && (
-        <p className="text-xs text-emerald-400 font-medium mt-2 text-center">Challenge complete!</p>
-      )}
     </div>
   );
 }

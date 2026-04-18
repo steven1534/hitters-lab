@@ -18,7 +18,6 @@ import { blastMetricsRouter } from "./routers-blast-metrics";
 import { playerReportsRouter } from "./routers-player-reports";
 import { siteContentRouter } from "./routers-site-content";
 import { progressRouter } from "./routers-progress";
-import { challengesRouter } from "./routers-challenges";
 import * as drillCatalogOverridesDb from "./drillCatalogOverrides";
 import { storagePut } from "./storage";
 
@@ -30,7 +29,6 @@ export const appRouter = router({
   favorites: favoritesRouter,
   athleteProfiles: athleteProfilesRouter,
   progress: progressRouter,
-  challenges: challengesRouter,
   auth: router({
     me: publicProcedure.query(async (opts) => {
       if (!opts.ctx.user) return null;
@@ -232,14 +230,6 @@ export const appRouter = router({
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
         }
         return await db.bulkImportDrillDescriptions(input.drillsData);
-      }),
-    bulkImportGoals: protectedProcedure
-      .input(z.object({ goalsData: z.array(z.object({ drillName: z.string(), goal: z.string() })) }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await db.bulkImportDrillGoals(input.goalsData);
       }),
     resetUserPassword: protectedProcedure
       .input(z.object({ userId: z.number(), newPassword: z.string().min(8) }))
@@ -484,70 +474,6 @@ export const appRouter = router({
       }),
 
     // Weekly goals for athlete drill targets
-    getWeeklyGoals: protectedProcedure
-      .input(z.object({ athleteId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.getWeeklyGoals(input.athleteId);
-      }),
-
-    getCurrentWeekGoal: protectedProcedure
-      .input(z.object({ athleteId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.getCurrentWeekGoal(input.athleteId);
-      }),
-
-    createWeeklyGoal: protectedProcedure
-      .input(z.object({
-        athleteId: z.number(),
-        weekStartDate: z.date(),
-        weekEndDate: z.date(),
-        targetDrillCount: z.number(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.createWeeklyGoal({
-          athleteId: input.athleteId,
-          coachId: ctx.user.id,
-          weekStartDate: input.weekStartDate,
-          weekEndDate: input.weekEndDate,
-          targetDrillCount: input.targetDrillCount,
-          notes: input.notes,
-        });
-      }),
-
-    updateWeeklyGoal: protectedProcedure
-      .input(z.object({
-        goalId: z.number(),
-        targetDrillCount: z.number().optional(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.updateWeeklyGoal(input.goalId, {
-          targetDrillCount: input.targetDrillCount,
-          notes: input.notes,
-        });
-      }),
-
-    deleteWeeklyGoal: protectedProcedure
-      .input(z.object({ goalId: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.deleteWeeklyGoal(input.goalId);
-      }),
   }),
 
   // Submissions router
@@ -590,23 +516,6 @@ export const appRouter = router({
         }
         await db.saveDrillDetail(input.drillId, input as any, ctx.user.id);
         return { success: true };
-      }),
-    bulkUpdateGoals: protectedProcedure
-      .input(z.object({ goals: z.record(z.string(), z.string()) }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        const results: Array<{ drillName: string; success: boolean; error?: string }> = [];
-        for (const [drillName, goal] of Object.entries(input.goals)) {
-          try {
-            await db.updateDrillGoal(drillName, goal as string);
-            results.push({ drillName, success: true });
-          } catch (error) {
-            results.push({ drillName, success: false, error: String(error) });
-          }
-        }
-        return { results };
       }),
     bulkUpdateInstructions: protectedProcedure
       .input(z.object({ instructions: z.record(z.string(), z.string()) }))
