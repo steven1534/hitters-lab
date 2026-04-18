@@ -10,7 +10,6 @@ import CoachDashboard from "./pages/CoachDashboard";
 import AthletePortal from "./pages/AthletePortal";
 import DrillDetail from "./pages/DrillDetail";
 import AcceptInvite from "./pages/AcceptInvite";
-import DrillGeneratorPage from "./pages/DrillGeneratorPage";
 import { ManageDrillVideos } from "./pages/ManageDrillVideos";
 import CreateDrillDetails from "./pages/CreateDrillDetails";
 import SubmissionsDashboard from "./pages/SubmissionsDashboard";
@@ -20,8 +19,6 @@ import DrillsDirectory from "./pages/DrillsDirectory";
 import Pathways from "./pages/Pathways";
 import MyProgress from "./pages/MyProgress";
 import ParentDashboard from "./pages/ParentDashboard";
-import DrillComparison from "./pages/DrillComparison";
-import AthleteAssessment from "./pages/AthleteAssessment";
 import MyProfile from "./pages/MyProfile";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -73,12 +70,6 @@ function Router() {
           <CoachDashboard />
         </ProtectedRoute>
       </Route>
-           <Route path={"/drill-generator"}>
-        <ProtectedRoute requiredRole="admin">
-          <DrillGeneratorPage />
-        </ProtectedRoute>
-      </Route>
-      
       <Route path={"/manage-drill-videos"}>
         <ProtectedRoute requiredRole="coach">
           <ManageDrillVideos />
@@ -99,18 +90,6 @@ function Router() {
       <Route path={"/user-management"}>
         <ProtectedRoute requiredRole="admin">
           <UserManagement />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/drill-comparison"}>
-        <ProtectedRoute requiredRole="admin">
-          <DrillComparison />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/athlete-assessment"}>
-        <ProtectedRoute requiredRole="admin">
-          <AthleteAssessment />
         </ProtectedRoute>
       </Route>
       

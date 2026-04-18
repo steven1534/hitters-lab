@@ -13,7 +13,7 @@ import {
   LayoutTemplate, Edit3, ArrowLeftRight, FileText, ChevronRight,
   Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
   BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail, Bell,
-  ExternalLink, UserCog, Inbox, GitCompare, ClipboardCheck, Wand2,
+  UserCog, Inbox,
   Eye, EyeOff, Database,
 } from "lucide-react";
 import { Link } from "wouter";
@@ -82,17 +82,6 @@ const NAV_GROUPS = [
     label: "Settings",
     items: [
       { key: "account" as ActiveTab, label: "My Account", icon: Shield },
-    ],
-  },
-];
-
-const ADMIN_LINK_GROUPS = [
-  {
-    label: "Drill Tools",
-    items: [
-      { href: "/drill-generator", label: "Drill Generator", icon: Wand2 },
-      { href: "/drill-comparison", label: "Drill Comparison", icon: GitCompare },
-      { href: "/athlete-assessment", label: "Athlete Assessment", icon: ClipboardCheck },
     ],
   },
 ];
@@ -489,26 +478,6 @@ export default function CoachDashboard() {
           </div>
         ))}
       </nav>
-
-      {/* Admin page links */}
-      <div className="px-2 mt-2 space-y-4">
-        {ADMIN_LINK_GROUPS.map(group => (
-          <div key={group.label}>
-            <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest px-2 mb-1">{group.label}</p>
-            <div className="space-y-0.5">
-              {group.items.map(item => (
-                <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}>
-                  <div className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/[0.05] transition-all cursor-pointer">
-                    <item.icon className="w-4 h-4 shrink-0" />
-                    <span className="truncate font-medium">{item.label}</span>
-                    <ExternalLink className="w-3 h-3 ml-auto shrink-0 opacity-30" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* Footer links */}
       <div className="px-2 mt-4 pt-4 border-t border-white/[0.06] space-y-0.5">

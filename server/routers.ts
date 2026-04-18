@@ -8,7 +8,6 @@ import { ENV } from "./_core/env";
 import * as db from "./db";
 import * as drillAssignmentDb from "./drillAssignments";
 import * as inviteDb from "./invites";
-import { drillGeneratorRouter } from "./routers-drill-generator";
 import { submissionsRouter } from "./routers-submissions";
 import { videoUploadRouter } from "./routers-video-upload";
 import { notificationsRouter } from "./routers-notifications";
@@ -487,7 +486,6 @@ export const appRouter = router({
   playerReports: playerReportsRouter,
 
   // Drill generator router
-  drillGenerator: drillGeneratorRouter,
 
   // Drill details router
   drillDetails: router({
