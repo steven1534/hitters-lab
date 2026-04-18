@@ -11,8 +11,6 @@ import { Link } from "wouter";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAllDrills } from "@/hooks/useAllDrills";
-import { DrillEditModal } from "@/components/DrillEditModal";
-import { Pencil } from "lucide-react";
 import { useDrillListParams } from "@/hooks/useDrillListParams";
 import { getYouTubeThumbnail } from "@/lib/youtubeUtils";
 
@@ -88,10 +86,7 @@ export default function Home() {
   const hasRestoredScroll = useRef(false);
   const heroRef = useRef<HTMLElement>(null);
   const [scrollY, setScrollY] = useState(0);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editingDrill, setEditingDrill] = useState<Drill | null>(null);
-
-  // drillCustomizations removed — superseded by Manus data + drillCatalogOverrides
+  // drillCustomizations removed in Phase 1 — Manus data + drillCatalogOverrides cover this.
   const customizationsMap = new Map();
 
   const { data: allVideos = [] } = trpc.videos.getAllVideos.useQuery(undefined, {
@@ -384,20 +379,6 @@ export default function Home() {
                   className="group animate-fade-in-up relative"
                   style={{ animationDelay: `${Math.min(index * 0.04, 0.4)}s` }}
                 >
-                  {/* Admin Edit Button */}
-                  {user?.role === 'admin' && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        setEditingDrill(drill); setEditModalOpen(true);
-                      }}
-                      className="absolute top-2.5 left-2.5 z-20 p-2 rounded-lg bg-black/60 hover:bg-electric/80 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm"
-                      title="Edit drill card"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-
                   <Link
                     href={drillDetailHref}
                     className="block h-full"
@@ -553,16 +534,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Edit modal */}
-      {editingDrill && (
-        <DrillEditModal
-          isOpen={editModalOpen}
-          onClose={() => { setEditModalOpen(false); setEditingDrill(null); }}
-          drill={editingDrill}
-          customization={customizationsMap.get(editingDrill.id)}
-          onSaved={() => {}}
-        />
-      )}
     </div>
   );
 }

@@ -14,8 +14,6 @@ import DrillGeneratorPage from "./pages/DrillGeneratorPage";
 import { ManageDrillVideos } from "./pages/ManageDrillVideos";
 import CreateDrillDetails from "./pages/CreateDrillDetails";
 import SubmissionsDashboard from "./pages/SubmissionsDashboard";
-import CoachMessaging from "./pages/CoachMessaging";
-import AthleteMessaging from "./pages/AthleteMessaging";
 import VerifyEmail from "./pages/VerifyEmail";
 import UserManagement from "./pages/UserManagement";
 import DrillsDirectory from "./pages/DrillsDirectory";
@@ -105,12 +103,6 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
-      <Route path={"/coach-messaging"}>
-        <ProtectedRoute requiredRole="admin">
-          <CoachMessaging />
-        </ProtectedRoute>
-      </Route>
-      
       <Route path={"/activity-feed"}>
         <ProtectedRoute requiredRole="admin">
           <ActivityFeed />
@@ -126,12 +118,6 @@ function Router() {
       <Route path={"/athlete-assessment"}>
         <ProtectedRoute requiredRole="admin">
           <AthleteAssessment />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/athlete-messaging"}>
-        <ProtectedRoute requiredRole="athlete">
-          <AthleteMessaging />
         </ProtectedRoute>
       </Route>
       

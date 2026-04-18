@@ -61,7 +61,6 @@ const TABS = [
   { id: "progress", label: "Progress", icon: BarChart3 },
   { id: "swinglab", label: "Swing Lab", icon: Beaker },
   { id: "coach", label: "Coach Notes", icon: ClipboardList },
-  { id: "messages", label: "Messages", icon: MessageCircle },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -312,7 +311,6 @@ export default function AthletePortal() {
         {activeTab === "progress" && <ProgressTab stats={progressStats} completedCount={completedAssignments.length} />}
         {activeTab === "swinglab" && <SwingLabTab />}
         {activeTab === "coach" && <CoachNotesTab />}
-        {activeTab === "messages" && <MessagesTab />}
       </main>
 
       {/* Mobile Bottom Navigation */}
@@ -765,60 +763,6 @@ function CoachNotesTab() {
       <AthleteSessionNotes />
       <AthletePlayerReports />
       <SharedPracticePlans />
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-// TAB 5: Messages
-// ═══════════════════════════════════════════════════════════════
-function MessagesTab() {
-  const { data: questions = [], isLoading } = trpc.qa.getAthleteQuestions.useQuery();
-  const [expanded, setExpanded] = useState<number | null>(null);
-
-  if (isLoading) {
-    return <div className="glass-card rounded-2xl p-6 text-center text-muted-foreground">Loading messages...</div>;
-  }
-
-  if (questions.length === 0) {
-    return (
-      <div className="glass-card rounded-2xl p-8 text-center animate-fade-in-up">
-        <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
-        <h3 className="font-bold text-foreground mb-1">No Messages Yet</h3>
-        <p className="text-sm text-muted-foreground">Your conversations with Coach Steve will appear here.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3 animate-fade-in-up">
-      <h3 className="font-bold text-foreground flex items-center gap-2">
-        <MessageCircle className="w-5 h-5 text-electric" />Your Messages
-      </h3>
-      {(questions as any[]).map((q: any) => (
-        <button
-          key={q.id}
-          onClick={() => setExpanded(expanded === q.id ? null : q.id)}
-          className="w-full glass-card rounded-xl p-4 text-left transition-all duration-200"
-        >
-          <div className="flex items-start gap-3">
-            <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${q.answer ? "bg-emerald-400" : "bg-amber-400 animate-pulse"}`} />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground text-sm">{q.question}</p>
-              <span className="text-xs text-muted-foreground">
-                {new Date(q.createdAt).toLocaleDateString()}
-                {q.answer ? " — Answered" : " — Pending"}
-              </span>
-              {expanded === q.id && q.answer && (
-                <div className="mt-3 pt-3 border-t border-white/10">
-                  <p className="text-sm text-foreground/80">{q.answer}</p>
-                </div>
-              )}
-            </div>
-            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform flex-shrink-0 ${expanded === q.id ? "rotate-180" : ""}`} />
-          </div>
-        </button>
-      ))}
     </div>
   );
 }

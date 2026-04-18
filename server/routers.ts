@@ -7,15 +7,11 @@ import { z } from "zod";
 import { ENV } from "./_core/env";
 import * as db from "./db";
 import * as drillAssignmentDb from "./drillAssignments";
-import * as drillPageLayoutDb from "./drillPageLayouts";
-import * as drillPageTemplateDb from "./drillPageTemplates";
 import * as inviteDb from "./invites";
 import { drillGeneratorRouter } from "./routers-drill-generator";
 import { submissionsRouter } from "./routers-submissions";
 import { videoUploadRouter } from "./routers-video-upload";
 import { notificationsRouter } from "./routers-notifications";
-import { qaRouter } from "./routers-qa";
-import { imageUploadRouter } from "./routers-image-upload";
 import { activityRouter } from "./routers-activity";
 import { favoritesRouter } from "./routers-favorites";
 import { practicePlansRouter } from "./routers-practice-plans";
@@ -29,9 +25,7 @@ import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
 import { progressRouter } from "./routers-progress";
 import { challengesRouter } from "./routers-challenges";
-// drillCustomizations import removed — superseded by drillCatalogOverrides
 import * as drillCatalogOverridesDb from "./drillCatalogOverrides";
-import * as drillStatCardsDb from "./drillStatCards";
 import { storagePut } from "./storage";
 
 export const appRouter = router({
@@ -39,7 +33,6 @@ export const appRouter = router({
   system: systemRouter,
   siteContent: siteContentRouter,
   notifications: notificationsRouter,
-  imageUpload: imageUploadRouter,
   activity: activityRouter,
   favorites: favoritesRouter,
   practicePlans: practicePlansRouter,
@@ -593,9 +586,6 @@ export const appRouter = router({
   blastMetrics: blastMetricsRouter,
   playerReports: playerReportsRouter,
 
-  // Q&A router
-  qa: qaRouter,
-
   // Drill generator router
   drillGenerator: drillGeneratorRouter,
 
@@ -716,81 +706,6 @@ export const appRouter = router({
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
         }
         return await db.bulkImportCustomDrills(input.drills, ctx.user.id);
-      }),
-    // Drill page layout procedures
-    savePageLayout: protectedProcedure
-      .input(z.object({
-        drillId: z.string(),
-        blocks: z.array(z.any()),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillPageLayoutDb.saveDrillPageLayout(input.drillId, input.blocks, ctx.user.id);
-      }),
-    getPageLayout: publicProcedure
-      .input(z.object({ drillId: z.string() }))
-      .query(async ({ input }) => {
-        return await drillPageLayoutDb.getDrillPageLayout(input.drillId);
-      }),
-    // Drill page template procedures
-    createTemplate: protectedProcedure
-      .input(z.object({
-        name: z.string(),
-        description: z.string().optional(),
-        blocks: z.array(z.any()),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach or admin access required' });
-        }
-        return await drillPageTemplateDb.createTemplate({
-          ...input,
-          createdBy: ctx.user.id,
-        });
-      }),
-    getTemplates: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await drillPageTemplateDb.getTemplates(ctx.user.id);
-      }),
-    deleteTemplate: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach or admin access required' });
-        }
-        return await drillPageTemplateDb.deleteTemplate(input.id, ctx.user.id);
-      }),
-    deletePageLayout: protectedProcedure
-      .input(z.object({ drillId: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillPageLayoutDb.deleteDrillPageLayout(input.drillId);
-      }),
-    getStatCards: publicProcedure
-      .input(z.object({ drillId: z.string() }))
-      .query(async ({ input }) => {
-        return await drillStatCardsDb.getStatCards(input.drillId);
-      }),
-    saveStatCards: protectedProcedure
-      .input(z.object({
-        drillId: z.string(),
-        cards: z.array(z.object({
-          label: z.string(),
-          value: z.string(),
-          icon: z.string().optional(),
-          position: z.number(),
-          isVisible: z.number(),
-        })),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach or admin access required' });
-        }
-        return await drillStatCardsDb.upsertStatCards(input.drillId, input.cards);
       }),
   }),
 
@@ -919,24 +834,6 @@ export const appRouter = router({
         }
         return { success: true, remindersSent: sent };
       }),
-  }),
-
-  // DEPRECATED: drillCustomizations superseded by drillCatalogOverrides + Manus data.
-  // Kept as empty stubs so old clients don't crash during rollout.
-  drillCustomizations: router({
-    get: publicProcedure
-      .input(z.object({ drillId: z.string() }))
-      .query(async () => null),
-    getAll: publicProcedure.query(async () => []),
-    save: protectedProcedure
-      .input(z.object({ drillId: z.string(), thumbnailUrl: z.string().nullable().optional(), briefDescription: z.string().nullable().optional(), difficulty: z.string().nullable().optional(), category: z.string().nullable().optional() }))
-      .mutation(async () => ({ success: true })),
-    uploadThumbnail: protectedProcedure
-      .input(z.object({ drillId: z.string(), imageBase64: z.string(), mimeType: z.string() }))
-      .mutation(async () => ({ url: '' })),
-    delete: protectedProcedure
-      .input(z.object({ drillId: z.string() }))
-      .mutation(async () => ({ success: true })),
   }),
 
   /** Phase 1 — catalog field overrides (same drillId as static drills.ts / custom drills) */

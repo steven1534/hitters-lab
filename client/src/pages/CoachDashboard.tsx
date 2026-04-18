@@ -25,7 +25,6 @@ import { BulkImportCustomDrills } from "@/components/BulkImportCustomDrills";
 import { BulkGoalUpload } from "@/components/BulkGoalUpload";
 import { AthleteProgressReport } from "@/components/AthleteProgressReport";
 import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOverview";
-import { DrillPageBuilderNotion } from "@/components/DrillPageBuilderNotion";
 import { AthleteTable } from "@/components/AthleteTable";
 import PracticePlanner from "@/components/PracticePlanner";
 import { SessionNotesTab } from "@/components/SessionNotesTab";
@@ -41,7 +40,6 @@ import { AccountSettings } from "@/components/AccountSettings";
 import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
 import UserManagement from "@/pages/UserManagement";
 import SubmissionsDashboard from "@/pages/SubmissionsDashboard";
-import CoachMessaging from "@/pages/CoachMessaging";
 import ActivityFeed from "@/pages/ActivityFeed";
 import { ManageDrillVideos } from "@/pages/ManageDrillVideos";
 
@@ -53,7 +51,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "messaging" | "activity-feed" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -73,7 +71,6 @@ const NAV_GROUPS = [
       { key: "drill-videos" as ActiveTab, label: "Manage Videos", icon: Video },
       { key: "challenges" as ActiveTab, label: "Weekly Challenges", icon: Trophy },
       { key: "planner" as ActiveTab, label: "Practice Planner", icon: Target },
-      { key: "page-layouts" as ActiveTab, label: "Page Layouts", icon: LayoutTemplate },
     ],
   },
   {
@@ -90,12 +87,6 @@ const NAV_GROUPS = [
       { key: "blast-metrics" as ActiveTab, label: "Blast Metrics", icon: Activity },
       { key: "video-analysis" as ActiveTab, label: "Video Analysis", icon: Sparkles },
       { key: "activity-feed" as ActiveTab, label: "Activity Feed", icon: TrendingUp },
-    ],
-  },
-  {
-    label: "Communication",
-    items: [
-      { key: "messaging" as ActiveTab, label: "Messaging", icon: MessageSquare },
     ],
   },
   {
@@ -124,7 +115,6 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "bulk-import": "Bulk Import",
   "bulk-goals": "Bulk Goals",
   "catalog-overrides": "Catalog Overrides",
-  "page-layouts": "Page Layouts",
   athletes: "Athletes Table",
   planner: "Practice Planner",
   "session-notes": "Session Notes",
@@ -136,7 +126,6 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   challenges: "Weekly Challenges",
   "user-management": "User Management",
   submissions: "Submissions",
-  messaging: "Messaging",
   "activity-feed": "Activity Feed",
   notifications: "Notification Settings",
   account: "My Account",
@@ -302,8 +291,6 @@ export default function CoachDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
   // Cross-tab navigation: pre-select an athlete when switching tabs from Blast Metrics
   const [crossNavAthleteId, setCrossNavAthleteId] = useState<number | undefined>(undefined);
-  const [editingLayoutDrill, setEditingLayoutDrill] = useState<{ id: string; name: string } | null>(null);
-  const [layoutSearchQuery, setLayoutSearchQuery] = useState("");
   const [isBulkGoalOpen, setIsBulkGoalOpen] = useState(false);
   const [showProgressReport, setShowProgressReport] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -694,67 +681,7 @@ export default function CoachDashboard() {
 
             {activeTab === "user-management" && <UserManagement embedded />}
             {activeTab === "submissions" && <SubmissionsDashboard embedded />}
-            {activeTab === "messaging" && <CoachMessaging embedded />}
             {activeTab === "activity-feed" && <ActivityFeed embedded />}
-
-            {activeTab === "page-layouts" && (
-              <div className="space-y-6">
-                {editingLayoutDrill ? (
-                  <DrillPageBuilderNotion
-                    drillId={editingLayoutDrill.id}
-                    drillName={editingLayoutDrill.name}
-                    onClose={() => setEditingLayoutDrill(null)}
-                  />
-                ) : (
-                  <>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <h2 className="text-2xl font-heading font-bold">Drill Page Layouts</h2>
-                        <p className="text-muted-foreground mt-1 text-sm">Pick a drill to create or edit its page layout with the block editor.</p>
-                      </div>
-                      <div className="relative w-full sm:w-72">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search drills..."
-                          value={layoutSearchQuery}
-                          onChange={(e) => setLayoutSearchQuery(e.target.value)}
-                          className="pl-10 bg-card/50"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {allDrills
-                        .filter((d) => d.name.toLowerCase().includes(layoutSearchQuery.toLowerCase()))
-                        .map((drill) => (
-                          <div
-                            key={drill.id}
-                            className="glass-card rounded-xl p-4 cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-[#DC143C]/30 group"
-                            onClick={() => setEditingLayoutDrill({ id: String(drill.id), name: drill.name })}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#DC143C]/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
-                                <Edit3 className="h-5 w-5 text-[#DC143C]" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="font-medium text-sm truncate group-hover:text-[#DC143C] transition-colors">{drill.name}</p>
-                                <p className="text-xs text-muted-foreground">{drill.difficulty} · {drill.categories?.join(", ")}</p>
-                              </div>
-                              <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                    {allDrills.filter((d) => d.name.toLowerCase().includes(layoutSearchQuery.toLowerCase())).length === 0 && (
-                      <div className="text-center py-16 text-muted-foreground">
-                        <LayoutTemplate className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                        <p className="font-medium">No drills found</p>
-                        <p className="text-sm mt-1">Try a different search term</p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
 
             {activeTab === "bulk-import" && (
               <div className="max-w-4xl mx-auto space-y-6">
@@ -1052,7 +979,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
               { label: "Assign Drills", icon: Target, tab: "assign" as ActiveTab },
               { label: "Write Notes", icon: StickyNote, tab: "session-notes" as ActiveTab },
               { label: "Review Videos", icon: Sparkles, tab: "video-analysis" as ActiveTab },
-              { label: "View Messages", icon: MessageSquare, tab: "messaging" as ActiveTab },
               { label: "Player Reports", icon: BookOpen, tab: "player-reports" as ActiveTab },
               { label: "Blast Metrics", icon: BarChart3, tab: "blast-metrics" as ActiveTab },
               { label: "Submissions", icon: Inbox, tab: "submissions" as ActiveTab },
