@@ -3,6 +3,16 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { User, Lock, Mail, Save, Loader2, Eye, EyeOff } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function AccountSettings() {
   const { user, refresh } = useAuth();
@@ -14,6 +24,7 @@ export function AccountSettings() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
+  const [confirmPasswordOpen, setConfirmPasswordOpen] = useState(false);
 
   const updateAccountMutation = trpc.auth.updateMyAccount.useMutation({
     onSuccess: async () => {
@@ -45,6 +56,12 @@ export function AccountSettings() {
     if (!currentPassword) { toast.error("Enter your current password"); return; }
     if (newPassword.length < 8) { toast.error("New password must be at least 8 characters"); return; }
     if (newPassword !== confirmPassword) { toast.error("Passwords do not match"); return; }
+    if (newPassword === currentPassword) { toast.error("New password must be different from current password"); return; }
+    setConfirmPasswordOpen(true);
+  }
+
+  function confirmChangePassword() {
+    setConfirmPasswordOpen(false);
     changePasswordMutation.mutate({ currentPassword, newPassword });
   }
 
@@ -162,6 +179,26 @@ export function AccountSettings() {
           </button>
         </form>
       </div>
+
+      <AlertDialog open={confirmPasswordOpen} onOpenChange={setConfirmPasswordOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change your password?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You&rsquo;ll use the new password next time you sign in. Make sure you have it saved somewhere safe before continuing.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmChangePassword}
+              className="bg-[#DC143C] hover:bg-[#c41236]"
+            >
+              Yes, update password
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
