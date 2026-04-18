@@ -5,8 +5,6 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { NotificationProvider } from "./contexts/NotificationContext";
-import { ToastContainer } from "./components/ToastContainer";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
 import { Suspense, lazy, useEffect } from "react";
 
@@ -141,19 +139,16 @@ function App() {
 
   return (
     <ErrorBoundary resetKey={location}>
-      <NotificationProvider>
-        <ThemeProvider
-          defaultTheme="light"
-          // switchable
-        >
-          <TooltipProvider>
-            <Toaster />
-            <ToastContainer />
-            <Router />
-            <PWAInstallBanner />
-          </TooltipProvider>
-        </ThemeProvider>
-      </NotificationProvider>
+      <ThemeProvider
+        defaultTheme="light"
+        // switchable
+      >
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          <PWAInstallBanner />
+        </TooltipProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
