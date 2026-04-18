@@ -13,7 +13,6 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, desc, sql, or, isNull } from "drizzle-orm";
-import bcrypt from "bcryptjs";
 
 // ── YouTube URL normalizer (server-side) ──────────────────────────────────────
 const YT_ID_RE = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/|e\/|watch\/|attribution_link\?(?:.*&)?u=(?:.*%3Fv%3D|.*\/watch%3Fv%3D)))([a-zA-Z0-9_-]{11})/i;
@@ -145,12 +144,16 @@ export async function createUser(user: {
   const normalizedEmail = user.email.toLowerCase().trim();
   const isOwner = normalizedEmail === ENV.ownerEmail.toLowerCase();
 
-  // Default password is player123 if none provided
-  const passwordHash = user.passwordHash || await bcrypt.hash("player123", 12);
+  // passwordHash is REQUIRED — callers must hash the user-supplied password.
+  // (The old fallback of 'player123' has been removed; every account must
+  // have a real, user-chosen password.)
+  if (!user.passwordHash) {
+    throw new Error("[Database] createUser called without passwordHash — caller must supply a hashed user-chosen password");
+  }
 
   const result = await db.insert(users).values({
     email: normalizedEmail,
-    passwordHash,
+    passwordHash: user.passwordHash,
     name: user.name,
     role: (isOwner ? "admin" : (user.role as any)) ?? "athlete",
     isActiveClient: isOwner ? 1 : (user.isActiveClient ?? 1),

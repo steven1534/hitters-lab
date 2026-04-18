@@ -84,7 +84,14 @@ export async function assignDrill(
 }
 
 /**
- * Link all drill assignments from an invite to a user when they accept
+ * @deprecated Do NOT call this function directly. The linking logic now
+ * lives inside the `acceptInvite` transaction in server/invites.ts so that
+ * role updates, invite status, assignment linking, and notification inserts
+ * are all atomic. Calling this standalone re-introduces the partial-failure
+ * / orphaned-assignment bug that CRIT #6 of the audit described.
+ *
+ * Kept here only to avoid breaking any external seed scripts that might
+ * still import it. All in-app call sites have been removed.
  */
 export async function linkInviteAssignmentsToUser(inviteId: number, userId: number) {
   const db = await getDb();

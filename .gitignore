@@ -1,7 +1,65 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+build/
+
+# Environment files — NEVER commit
 .env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploads / local assets not meant for repo
 attached_assets/
-.env
+uploads/
+
+# One-off admin / debug / seed scripts at repo root (never commit these —
+# they have historically contained hardcoded DB credentials)
+/*.mjs
+/check-*.mjs
+/check_*.mjs
+/fix_*.mjs
+/insert_*.mjs
+/seed-*.mjs
+/test-*.mjs
+/reset_*.mjs
+/update_*.mjs
+/verify_*.mjs
+/del_*.mjs
+/get_*.mjs
+/final_*.mjs
+/populate_*.mjs
+/create_*.mjs
+/import_*.mjs
+/find_*.mjs
+
+# Test / coverage output
+coverage/
+.nyc_output/
+
+# Local notes
+debug-notes.txt
+design-notes.txt
+design-notes-update.txt
+ideas.md
+package-lock.json
