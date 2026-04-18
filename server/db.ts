@@ -308,7 +308,7 @@ export async function deleteUser(userId: number): Promise<boolean> {
       drillAssignments, badges, drillFavorites, athleteActivity,
       notifications: notificationsTable, notificationPreferences: notifPrefsTable,
       drillSubmissions: submissionsTable, coachFeedback: feedbackTable,
-      sessionNotes, playerReports,
+      playerReports,
       blastPlayers, drillQuestions: questionsTable, drillAnswers: answersTable,
       coachAlertPreferences, parentChildren: parentChildrenTable,
     } = await import("../drizzle/schema");
@@ -322,7 +322,6 @@ export async function deleteUser(userId: number): Promise<boolean> {
     await db.delete(notifPrefsTable).where(eq(notifPrefsTable.userId, userId));
     await db.delete(submissionsTable).where(eq(submissionsTable.userId, userId));
     await db.delete(questionsTable).where(eq(questionsTable.athleteId, userId));
-    await db.delete(sessionNotes).where(eq(sessionNotes.athleteId, userId));
     await db.delete(playerReports).where(eq(playerReports.athleteId, userId));
     await db.delete(parentChildrenTable).where(eq(parentChildrenTable.childId, userId));
 

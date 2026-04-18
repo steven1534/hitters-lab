@@ -26,7 +26,6 @@ import { BulkGoalUpload } from "@/components/BulkGoalUpload";
 import { AthleteProgressReport } from "@/components/AthleteProgressReport";
 import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOverview";
 import { AthleteTable } from "@/components/AthleteTable";
-import { SessionNotesTab } from "@/components/SessionNotesTab";
 import { PlayerReportsTab } from "@/components/PlayerReportsTab";
 import { BlastMetricsTab } from "@/components/BlastMetricsTab";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
@@ -49,7 +48,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "session-notes" | "player-reports" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -74,7 +73,6 @@ const NAV_GROUPS = [
     label: "Reports",
     items: [
       { key: "player-reports" as ActiveTab, label: "Player Reports", icon: BookOpen },
-      { key: "session-notes" as ActiveTab, label: "Session Notes", icon: StickyNote },
       { key: "submissions" as ActiveTab, label: "Submissions", icon: Inbox },
     ],
   },
@@ -112,7 +110,6 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "bulk-goals": "Bulk Goals",
   "catalog-overrides": "Catalog Overrides",
   athletes: "Athletes Table",
-  "session-notes": "Session Notes",
   "player-reports": "Player Reports",
   "blast-metrics": "Blast Metrics",
   "drill-library": "Drill Library",
@@ -631,14 +628,6 @@ export default function CoachDashboard() {
             {activeTab === "athletes" && <AthleteTable />}
 
 
-            {activeTab === "session-notes" && (
-              <SessionNotesTab
-                key={crossNavAthleteId ?? "default"}
-                initialAthleteId={crossNavAthleteId}
-                blastUserIds={blastUserIds}
-              />
-            )}
-
             {activeTab === "player-reports" && (
               <PlayerReportsTab
                 key={crossNavAthleteId ?? "default"}
@@ -650,10 +639,6 @@ export default function CoachDashboard() {
 
             {activeTab === "blast-metrics" && (
               <BlastMetricsTab
-                onNavigateToNotes={(userId) => {
-                  setCrossNavAthleteId(userId);
-                  setActiveTab("session-notes");
-                }}
                 onNavigateToReports={(userId) => {
                   setCrossNavAthleteId(userId);
                   setActiveTab("player-reports");
@@ -969,7 +954,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {[
               { label: "Assign Drills", icon: Target, tab: "assign" as ActiveTab },
-              { label: "Write Notes", icon: StickyNote, tab: "session-notes" as ActiveTab },
               { label: "Player Reports", icon: BookOpen, tab: "player-reports" as ActiveTab },
               { label: "Blast Metrics", icon: BarChart3, tab: "blast-metrics" as ActiveTab },
               { label: "Submissions", icon: Inbox, tab: "submissions" as ActiveTab },

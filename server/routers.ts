@@ -14,8 +14,6 @@ import { videoUploadRouter } from "./routers-video-upload";
 import { notificationsRouter } from "./routers-notifications";
 import { activityRouter } from "./routers-activity";
 import { favoritesRouter } from "./routers-favorites";
-import { sessionNotesRouter } from "./routers-session-notes";
-import { progressReportsRouter } from "./routers-progress-reports";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
 import { blastMetricsRouter } from "./routers-blast-metrics";
 import { playerReportsRouter } from "./routers-player-reports";
@@ -33,8 +31,6 @@ export const appRouter = router({
   notifications: notificationsRouter,
   activity: activityRouter,
   favorites: favoritesRouter,
-  sessionNotes: sessionNotesRouter,
-  progressReports: progressReportsRouter,
   athleteProfiles: athleteProfilesRouter,
   badges: badgesRouter,
   progress: progressRouter,

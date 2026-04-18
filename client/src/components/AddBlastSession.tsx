@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Loader2, Zap, Target, Crosshair, Gauge, FileText, Link2 } from "lucide-react";
+import { Plus, Loader2, Zap, Target, Crosshair, Gauge } from "lucide-react";
 
 const SESSION_TYPES = [
   "Tee",
@@ -42,11 +42,9 @@ interface AddBlastSessionProps {
   onOpenChange: (open: boolean) => void;
   playerId: string;
   playerName: string;
-  /** Whether this player is linked to a portal user (enables session note toggle) */
-  isLinkedToUser?: boolean;
 }
 
-export function AddBlastSession({ open, onOpenChange, playerId, playerName, isLinkedToUser }: AddBlastSessionProps) {
+export function AddBlastSession({ open, onOpenChange, playerId, playerName }: AddBlastSessionProps) {
   const [sessionDate, setSessionDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -54,21 +52,15 @@ export function AddBlastSession({ open, onOpenChange, playerId, playerName, isLi
   const [sessionType, setSessionType] = useState("");
   const [metrics, setMetrics] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [createNote, setCreateNote] = useState(true); // default on when linked
 
   const utils = trpc.useUtils();
 
   const addSessionMutation = trpc.blastMetrics.addSession.useMutation({
-    onSuccess: (data) => {
-      const noteMsg = data.linkedSessionNoteId
-        ? " + Session Note created"
-        : "";
-      toast.success(`Session added successfully!${noteMsg}`, {
+    onSuccess: () => {
+      toast.success(`Session added successfully!`, {
         description: `${sessionType} session for ${playerName} on ${new Date(sessionDate).toLocaleDateString()}`,
       });
-      // Invalidate both blast metrics and session notes queries
       utils.blastMetrics.invalidate();
-      utils.sessionNotes.invalidate();
       resetForm();
       onOpenChange(false);
     },
@@ -82,7 +74,6 @@ export function AddBlastSession({ open, onOpenChange, playerId, playerName, isLi
     setSessionDate(new Date().toISOString().split("T")[0]);
     setSessionType("");
     setMetrics({});
-    setCreateNote(true);
   }
 
   function handleMetricChange(key: string, value: string) {
@@ -113,7 +104,6 @@ export function AddBlastSession({ open, onOpenChange, playerId, playerName, isLi
       playerId,
       sessionDate,
       sessionType,
-      createSessionNote: isLinkedToUser ? createNote : false,
       metrics: metricsPayload,
     });
   }
@@ -157,51 +147,6 @@ export function AddBlastSession({ open, onOpenChange, playerId, playerName, isLi
               </Select>
             </div>
           </div>
-
-          {/* Auto-create Session Note toggle */}
-          {isLinkedToUser && (
-            <button
-              type="button"
-              onClick={() => setCreateNote(!createNote)}
-              className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 text-left ${
-                createNote
-                  ? "bg-[#DC143C]/10 border-[#DC143C]/30 text-white"
-                  : "bg-white/[0.02] border-border text-muted-foreground"
-              }`}
-            >
-              <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${
-                createNote ? "bg-[#DC143C]/20" : "bg-muted/60"
-              }`}>
-                <Link2 className={`h-4 w-4 ${createNote ? "text-[#DC143C]" : "text-muted-foreground/60"}`} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">
-                  {createNote ? "Session Note will be auto-created" : "No Session Note will be created"}
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {createNote
-                    ? "A linked session note with Blast metrics summary will appear in Session Notes"
-                    : "Click to enable — links this Blast session to the Session Notes timeline"}
-                </p>
-              </div>
-              <div className={`h-5 w-9 rounded-full transition-colors shrink-0 relative ${
-                createNote ? "bg-[#DC143C]" : "bg-white/20"
-              }`}>
-                <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-                  createNote ? "translate-x-4" : "translate-x-0.5"
-                }`} />
-              </div>
-            </button>
-          )}
-
-          {!isLinkedToUser && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300/80 text-xs">
-              <FileText className="h-4 w-4 shrink-0" />
-              <span>
-                This player is not linked to a portal account. Link them first to auto-create session notes.
-              </span>
-            </div>
-          )}
 
           {/* Divider */}
           <div className="flex items-center gap-3">

@@ -20,7 +20,6 @@ import { useAllDrills } from "@/hooks/useAllDrills";
 import { DrillSubmissionForm } from "@/components/DrillSubmissionForm";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
-import { AthleteSessionNotes } from "@/components/AthleteSessionNotes";
 import { AthleteBlastMetrics } from "@/components/AthleteBlastMetrics";
 import { AthletePlayerReports } from "@/components/AthletePlayerReports";
 import { DrillModalRedesigned } from "@/components/DrillModalRedesigned";
@@ -756,7 +755,6 @@ function VideoComparisonTool() {
 function CoachNotesTab() {
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <AthleteSessionNotes />
       <AthletePlayerReports />
     </div>
   );

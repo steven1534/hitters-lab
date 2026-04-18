@@ -2,9 +2,8 @@ import { protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
-import { blastPlayers, blastSessions, blastMetrics, users, sessionNotes } from "../drizzle/schema";
+import { blastPlayers, blastSessions, blastMetrics, users } from "../drizzle/schema";
 import { eq, asc, and, sql, desc } from "drizzle-orm";
-import * as sessionNotesDb from "./sessionNotes";
 
 async function requireDb() {
   const db = await getDb();
@@ -94,17 +93,15 @@ export const blastMetricsRouter = router({
           onPlaneEfficiencyPercent: blastMetrics.onPlaneEfficiencyPercent,
           attackAngleDeg: blastMetrics.attackAngleDeg,
           exitVelocityMph: blastMetrics.exitVelocityMph,
-          linkedNoteId: sessionNotes.id,
         })
         .from(blastSessions)
         .leftJoin(blastMetrics, eq(blastMetrics.sessionId, blastSessions.id))
-        .leftJoin(sessionNotes, eq(sessionNotes.blastSessionId, blastSessions.id))
         .where(and(...conditions))
         .orderBy(asc(blastSessions.sessionDate));
 
       return sessions.map(s => ({
         ...s,
-        hasLinkedNote: !!s.linkedNoteId,
+        hasLinkedNote: false,
       }));
     }),
 
@@ -228,55 +225,14 @@ export const blastMetricsRouter = router({
       return { success: true };
     }),
 
-  /** Get the linked session note for a Blast session */
-  getLinkedSessionNote: protectedProcedure
-    .input(z.object({ blastSessionId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      const db = await requireDb();
-      const [note] = await db
-        .select()
-        .from(sessionNotes)
-        .where(eq(sessionNotes.blastSessionId, input.blastSessionId))
-        .limit(1);
-      return note ?? null;
-    }),
-
-  /** Get Blast metrics for a session note (reverse lookup) */
-  getBlastDataForSessionNote: protectedProcedure
-    .input(z.object({ blastSessionId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      const db = await requireDb();
-      const [session] = await db
-        .select({
-          id: blastSessions.id,
-          sessionDate: blastSessions.sessionDate,
-          sessionType: blastSessions.sessionType,
-          batSpeedMph: blastMetrics.batSpeedMph,
-          onPlaneEfficiencyPercent: blastMetrics.onPlaneEfficiencyPercent,
-          attackAngleDeg: blastMetrics.attackAngleDeg,
-          exitVelocityMph: blastMetrics.exitVelocityMph,
-        })
-        .from(blastSessions)
-        .leftJoin(blastMetrics, eq(blastMetrics.sessionId, blastSessions.id))
-        .where(eq(blastSessions.id, input.blastSessionId))
-        .limit(1);
-      return session ?? null;
-    }),
-
-  /** Add a session with metrics for a player, auto-create linked session note if player has userId */
+  /** Add a session with metrics for a player */
   addSession: protectedProcedure
     .input(
       z.object({
         playerId: z.string(),
         sessionDate: z.string(),
         sessionType: z.string(),
-        createSessionNote: z.boolean().optional(), // explicitly opt-in/out
+        createSessionNote: z.boolean().optional(), // accepted but ignored; session notes removed
         metrics: z.object({
           batSpeedMph: z.string().optional(),
           onPlaneEfficiencyPercent: z.string().optional(),
@@ -305,48 +261,7 @@ export const blastMetricsRouter = router({
         exitVelocityMph: input.metrics.exitVelocityMph ?? null,
       });
 
-      // Auto-create a linked session note if the player is linked to a portal user
-      let linkedSessionNoteId: number | null = null;
-      const shouldCreateNote = input.createSessionNote !== false; // default true
-      if (shouldCreateNote) {
-        const [player] = await db
-          .select({ userId: blastPlayers.userId, fullName: blastPlayers.fullName })
-          .from(blastPlayers)
-          .where(eq(blastPlayers.id, input.playerId))
-          .limit(1);
-
-        if (player?.userId) {
-          const sessionNumber = await sessionNotesDb.getNextSessionNumber(player.userId);
-          // Build a summary of metrics for the session note
-          const metricsSummary: string[] = [];
-          if (input.metrics.batSpeedMph) metricsSummary.push(`Bat Speed: ${input.metrics.batSpeedMph} mph`);
-          if (input.metrics.onPlaneEfficiencyPercent) metricsSummary.push(`OPE: ${input.metrics.onPlaneEfficiencyPercent}%`);
-          if (input.metrics.attackAngleDeg) metricsSummary.push(`Attack Angle: ${input.metrics.attackAngleDeg}°`);
-          if (input.metrics.exitVelocityMph) metricsSummary.push(`Exit Velo: ${input.metrics.exitVelocityMph} mph`);
-          const metricsText = metricsSummary.length > 0
-            ? `Session Blast Metrics: ${metricsSummary.join(", ")}`
-            : "Blast session recorded (no metrics entered)";
-
-          const note = await sessionNotesDb.createSessionNote({
-            coachId: ctx.user.id,
-            athleteId: player.userId,
-            sessionNumber,
-            sessionLabel: `Blast ${input.sessionType} Session`,
-            sessionDate: new Date(input.sessionDate),
-            duration: null,
-            skillsWorked: ["Swing Mechanics"],
-            whatImproved: metricsText,
-            whatNeedsWork: "",
-            homeworkDrills: [],
-            overallRating: null,
-            privateNotes: null,
-            blastSessionId: sessionId,
-          });
-          linkedSessionNoteId = note?.id ?? null;
-        }
-      }
-
-      return { sessionId, linkedSessionNoteId };
+      return { sessionId, linkedSessionNoteId: null };
     }),
 
   /** Update a session's date, type, and metrics */
@@ -389,31 +304,6 @@ export const blastMetricsRouter = router({
         }).where(eq(blastMetrics.sessionId, input.sessionId));
       }
 
-      // Also update the linked session note summary if one exists
-      if (input.metrics) {
-        const [linkedNote] = await db
-          .select({ id: sessionNotes.id })
-          .from(sessionNotes)
-          .where(eq(sessionNotes.blastSessionId, input.sessionId))
-          .limit(1);
-        if (linkedNote) {
-          const m = input.metrics;
-          const metricsSummary: string[] = [];
-          if (m.batSpeedMph) metricsSummary.push(`Bat Speed: ${m.batSpeedMph} mph`);
-          if (m.onPlaneEfficiencyPercent) metricsSummary.push(`OPE: ${m.onPlaneEfficiencyPercent}%`);
-          if (m.attackAngleDeg) metricsSummary.push(`Attack Angle: ${m.attackAngleDeg}°`);
-          if (m.exitVelocityMph) metricsSummary.push(`Exit Velo: ${m.exitVelocityMph} mph`);
-          const metricsText = metricsSummary.length > 0
-            ? `Session Blast Metrics: ${metricsSummary.join(", ")}`
-            : "Blast session recorded (no metrics entered)";
-          await db.update(sessionNotes).set({
-            whatImproved: metricsText,
-            whatNeedsWork: "",
-            sessionLabel: `Blast ${input.sessionType || ""} Session`.trim(),
-          }).where(eq(sessionNotes.id, linkedNote.id));
-        }
-      }
-
       return { success: true };
     }),
 
@@ -443,21 +333,8 @@ export const blastMetricsRouter = router({
       }
       const db = await requireDb();
 
-      // Get player info for session note creation
-      let playerUserId: number | null = null;
-      let playerName = "";
-      if (input.createSessionNotes !== false) {
-        const [player] = await db
-          .select({ userId: blastPlayers.userId, fullName: blastPlayers.fullName })
-          .from(blastPlayers)
-          .where(eq(blastPlayers.id, input.playerId))
-          .limit(1);
-        playerUserId = player?.userId ?? null;
-        playerName = player?.fullName ?? "";
-      }
-
       let imported = 0;
-      let notesCreated = 0;
+      const notesCreated = 0;
       const errors: string[] = [];
 
       for (let i = 0; i < input.sessions.length; i++) {
@@ -478,41 +355,6 @@ export const blastMetricsRouter = router({
             exitVelocityMph: s.metrics.exitVelocityMph ?? null,
           });
           imported++;
-
-          // Create linked session note if player is linked
-          if (input.createSessionNotes !== false && playerUserId) {
-            try {
-              const sessionNumber = await sessionNotesDb.getNextSessionNumber(playerUserId);
-              const m = s.metrics;
-              const metricsSummary: string[] = [];
-              if (m.batSpeedMph) metricsSummary.push(`Bat Speed: ${m.batSpeedMph} mph`);
-              if (m.onPlaneEfficiencyPercent) metricsSummary.push(`OPE: ${m.onPlaneEfficiencyPercent}%`);
-              if (m.attackAngleDeg) metricsSummary.push(`Attack Angle: ${m.attackAngleDeg}°`);
-              if (m.exitVelocityMph) metricsSummary.push(`Exit Velo: ${m.exitVelocityMph} mph`);
-              const metricsText = metricsSummary.length > 0
-                ? `Session Blast Metrics: ${metricsSummary.join(", ")}`
-                : "Blast session recorded (no metrics entered)";
-              await sessionNotesDb.createSessionNote({
-                coachId: ctx.user.id,
-                athleteId: playerUserId,
-                sessionNumber,
-                sessionLabel: `Blast ${s.sessionType} Session`,
-                sessionDate: new Date(s.sessionDate),
-                duration: null,
-                skillsWorked: ["Swing Mechanics"],
-                whatImproved: metricsText,
-                whatNeedsWork: "",
-                homeworkDrills: [],
-                overallRating: null,
-                privateNotes: null,
-                blastSessionId: sessionId,
-              });
-              notesCreated++;
-            } catch (noteErr) {
-              // Don't fail the whole import if note creation fails
-              console.error(`[Blast Import] Failed to create note for session ${i}:`, noteErr);
-            }
-          }
         } catch (err) {
           errors.push(`Row ${i + 1}: ${err instanceof Error ? err.message : "Unknown error"}`);
         }
@@ -555,105 +397,7 @@ export const blastMetricsRouter = router({
     return { player, sessions };
   }),
 
-  /** Create session notes retroactively for all unlinked Blast sessions of a player */
-  createRetroactiveNotes: protectedProcedure
-    .input(z.object({ playerId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-      }
-      const db = await requireDb();
-
-      // Get the player and verify they're linked to a portal user
-      const [player] = await db
-        .select({ userId: blastPlayers.userId, fullName: blastPlayers.fullName })
-        .from(blastPlayers)
-        .where(eq(blastPlayers.id, input.playerId))
-        .limit(1);
-
-      if (!player) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Player not found" });
-      }
-      if (!player.userId) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Player must be linked to a portal account first" });
-      }
-
-      // Find all Blast sessions that don't have a linked session note
-      const allSessions = await db
-        .select({
-          sessionId: blastSessions.id,
-          sessionDate: blastSessions.sessionDate,
-          sessionType: blastSessions.sessionType,
-          batSpeedMph: blastMetrics.batSpeedMph,
-          onPlaneEfficiencyPercent: blastMetrics.onPlaneEfficiencyPercent,
-          attackAngleDeg: blastMetrics.attackAngleDeg,
-          exitVelocityMph: blastMetrics.exitVelocityMph,
-        })
-        .from(blastSessions)
-        .leftJoin(blastMetrics, eq(blastMetrics.sessionId, blastSessions.id))
-        .where(eq(blastSessions.playerId, input.playerId))
-        .orderBy(asc(blastSessions.sessionDate));
-
-      // Get existing linked session note blast IDs
-      const existingNotes = await db
-        .select({ blastSessionId: sessionNotes.blastSessionId })
-        .from(sessionNotes)
-        .where(
-          and(
-            eq(sessionNotes.athleteId, player.userId),
-            sql`${sessionNotes.blastSessionId} IS NOT NULL`
-          )
-        );
-      const linkedIds = new Set(existingNotes.map((n) => n.blastSessionId));
-
-      // Filter to unlinked sessions
-      const unlinkedSessions = allSessions.filter((s) => !linkedIds.has(s.sessionId));
-
-      let notesCreated = 0;
-      const errors: string[] = [];
-
-      for (const s of unlinkedSessions) {
-        try {
-          const sessionNumber = await sessionNotesDb.getNextSessionNumber(player.userId);
-          const metricsSummary: string[] = [];
-          if (s.batSpeedMph) metricsSummary.push(`Bat Speed: ${s.batSpeedMph} mph`);
-          if (s.onPlaneEfficiencyPercent) metricsSummary.push(`OPE: ${s.onPlaneEfficiencyPercent}%`);
-          if (s.attackAngleDeg) metricsSummary.push(`Attack Angle: ${s.attackAngleDeg}°`);
-          if (s.exitVelocityMph) metricsSummary.push(`Exit Velo: ${s.exitVelocityMph} mph`);
-          const metricsText = metricsSummary.length > 0
-            ? `Session Blast Metrics: ${metricsSummary.join(", ")}`
-            : "Blast session recorded (no metrics entered)";
-
-          await sessionNotesDb.createSessionNote({
-            coachId: ctx.user.id,
-            athleteId: player.userId,
-            sessionNumber,
-            sessionLabel: `Blast ${s.sessionType || "General"} Session`,
-            sessionDate: s.sessionDate ? new Date(s.sessionDate) : new Date(),
-            duration: null,
-            skillsWorked: ["Swing Mechanics"],
-            whatImproved: metricsText,
-            whatNeedsWork: "",
-            homeworkDrills: [],
-            overallRating: null,
-            privateNotes: null,
-            blastSessionId: s.sessionId,
-          });
-          notesCreated++;
-        } catch (err) {
-          errors.push(`Session ${s.sessionId}: ${err instanceof Error ? err.message : "Unknown error"}`);
-        }
-      }
-
-      return {
-        notesCreated,
-        errors,
-        totalUnlinked: unlinkedSessions.length,
-        alreadyLinked: linkedIds.size,
-      };
-    }),
-
-  /** Delete a session, its metrics, and any linked session note */
+  /** Delete a session and its metrics */
   deleteSession: protectedProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -661,9 +405,6 @@ export const blastMetricsRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
       }
       const db = await requireDb();
-      // Delete any linked session note first
-      await db.delete(sessionNotes).where(eq(sessionNotes.blastSessionId, input.sessionId));
-      // Delete metrics (child), then session (parent)
       await db.delete(blastMetrics).where(eq(blastMetrics.sessionId, input.sessionId));
       await db.delete(blastSessions).where(eq(blastSessions.id, input.sessionId));
       return { success: true };

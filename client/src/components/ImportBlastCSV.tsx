@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Loader2, FileSpreadsheet, AlertTriangle, CheckCircle2, Link2, X, Info } from "lucide-react";
+import { Upload, Loader2, FileSpreadsheet, AlertTriangle, CheckCircle2, X, Info } from "lucide-react";
 
 // Known Blast Motion CSV column names mapped to our metric keys
 const COLUMN_MAP: Record<string, string> = {
@@ -59,7 +59,6 @@ interface ImportBlastCSVProps {
   onOpenChange: (open: boolean) => void;
   playerId: string;
   playerName: string;
-  isLinkedToUser?: boolean;
 }
 
 function parseCSV(text: string): { headers: string[]; rows: string[][] } {
@@ -112,7 +111,7 @@ function tryParseDate(val: string): string | null {
   return null;
 }
 
-export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLinkedToUser }: ImportBlastCSVProps) {
+export function ImportBlastCSV({ open, onOpenChange, playerId, playerName }: ImportBlastCSVProps) {
   const [step, setStep] = useState<"upload" | "preview" | "importing" | "done">("upload");
   const [rawCSV, setRawCSV] = useState("");
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
@@ -120,17 +119,15 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
   const [headers, setHeaders] = useState<string[]>([]);
   const [unmappedHeaders, setUnmappedHeaders] = useState<string[]>([]);
   const [defaultSessionType, setDefaultSessionType] = useState("General");
-  const [createNotes, setCreateNotes] = useState(true);
-  const [importResult, setImportResult] = useState<{ imported: number; notesCreated: number; errors: string[] } | null>(null);
+  const [importResult, setImportResult] = useState<{ imported: number; errors: string[] } | null>(null);
 
   const utils = trpc.useUtils();
 
   const bulkImportMutation = trpc.blastMetrics.bulkImportSessions.useMutation({
     onSuccess: (data) => {
-      setImportResult(data);
+      setImportResult({ imported: data.imported, errors: data.errors });
       setStep("done");
       utils.blastMetrics.invalidate();
-      utils.sessionNotes.invalidate();
     },
     onError: (error) => {
       toast.error("Import failed", { description: error.message });
@@ -235,7 +232,6 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
 
     bulkImportMutation.mutate({
       playerId,
-      createSessionNotes: isLinkedToUser ? createNotes : false,
       sessions,
     });
   }
@@ -345,31 +341,6 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
               </div>
             )}
 
-            {/* Session Note toggle */}
-            {isLinkedToUser && (
-              <button
-                type="button"
-                onClick={() => setCreateNotes(!createNotes)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 text-left ${
-                  createNotes
-                    ? "bg-[#DC143C]/10 border-[#DC143C]/30 text-white"
-                    : "bg-white/[0.02] border-border text-muted-foreground"
-                }`}
-              >
-                <Link2 className={`h-4 w-4 shrink-0 ${createNotes ? "text-[#DC143C]" : "text-muted-foreground/60"}`} />
-                <span className="text-sm">
-                  {createNotes ? "Session Notes will be auto-created for each imported session" : "No Session Notes will be created"}
-                </span>
-                <div className={`ml-auto h-5 w-9 rounded-full transition-colors shrink-0 relative ${
-                  createNotes ? "bg-[#DC143C]" : "bg-white/20"
-                }`}>
-                  <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-                    createNotes ? "translate-x-4" : "translate-x-0.5"
-                  }`} />
-                </div>
-              </button>
-            )}
-
             {/* Preview table */}
             <div className="overflow-x-auto max-h-[300px] overflow-y-auto rounded-lg border border-border">
               <table className="w-full text-xs">
@@ -431,14 +402,10 @@ export function ImportBlastCSV({ open, onOpenChange, playerId, playerName, isLin
               <h3 className="text-lg font-bold text-foreground">Import Complete</h3>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-400">{importResult.imported}</p>
                 <p className="text-xs text-muted-foreground">Sessions Imported</p>
-              </div>
-              <div className="bg-[#DC143C]/10 border border-[#DC143C]/20 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-[#E8425A]">{importResult.notesCreated}</p>
-                <p className="text-xs text-muted-foreground">Notes Created</p>
               </div>
               <div className={`${importResult.errors.length > 0 ? "bg-red-500/10 border-red-500/20" : "bg-muted/40 border-border"} border rounded-lg p-3 text-center`}>
                 <p className={`text-2xl font-bold ${importResult.errors.length > 0 ? "text-red-400" : "text-muted-foreground/60"}`}>
