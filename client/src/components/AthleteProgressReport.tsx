@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { WeeklyGoalsTracker } from "@/components/WeeklyGoalsTracker";
 import { exportProgressReportToPDF } from "@/utils/pdfExport";
 import { FileDown } from "lucide-react";
 
@@ -51,17 +50,12 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
     { enabled: !!userId }
   );
 
-  const { data: weeklyGoals } = trpc.drillAssignments.getWeeklyGoals.useQuery(
-    { athleteId: userId },
-    { enabled: !!userId }
-  );
-
   const handleExportPDF = () => {
     if (!progressData) {
       toast.error("No progress data to export");
       return;
     }
-    exportProgressReportToPDF(athleteName, progressData as any, coachNotes || [], weeklyGoals || []);
+    exportProgressReportToPDF(athleteName, progressData as any, coachNotes || []);
     toast.success("Progress report exported successfully");
   };
 
@@ -356,12 +350,6 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
           </CardContent>
         </Card>
       </div>
-
-      {/* Weekly Goals Tracker */}
-      <WeeklyGoalsTracker 
-        athleteId={userId} 
-        completedThisWeek={progressData?.activity?.weeklyProgress?.[0]?.completed || 0}
-      />
 
       {/* Coach Notes Section */}
       <Card>

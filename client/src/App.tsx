@@ -10,28 +10,20 @@ import CoachDashboard from "./pages/CoachDashboard";
 import AthletePortal from "./pages/AthletePortal";
 import DrillDetail from "./pages/DrillDetail";
 import AcceptInvite from "./pages/AcceptInvite";
-import DrillGeneratorPage from "./pages/DrillGeneratorPage";
 import { ManageDrillVideos } from "./pages/ManageDrillVideos";
 import CreateDrillDetails from "./pages/CreateDrillDetails";
 import SubmissionsDashboard from "./pages/SubmissionsDashboard";
-import CoachMessaging from "./pages/CoachMessaging";
-import AthleteMessaging from "./pages/AthleteMessaging";
 import VerifyEmail from "./pages/VerifyEmail";
 import UserManagement from "./pages/UserManagement";
 import DrillsDirectory from "./pages/DrillsDirectory";
 import Pathways from "./pages/Pathways";
 import MyProgress from "./pages/MyProgress";
-import ParentDashboard from "./pages/ParentDashboard";
-import ActivityFeed from "./pages/ActivityFeed";
-import DrillComparison from "./pages/DrillComparison";
-import AthleteAssessment from "./pages/AthleteAssessment";
 import MyProfile from "./pages/MyProfile";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ToastContainer } from "./components/ToastContainer";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
-import { ImpersonationBanner } from "./components/ImpersonationBanner";
 import { useEffect } from "react";
 
 // Register service worker
@@ -76,12 +68,6 @@ function Router() {
           <CoachDashboard />
         </ProtectedRoute>
       </Route>
-           <Route path={"/drill-generator"}>
-        <ProtectedRoute requiredRole="admin">
-          <DrillGeneratorPage />
-        </ProtectedRoute>
-      </Route>
-      
       <Route path={"/manage-drill-videos"}>
         <ProtectedRoute requiredRole="coach">
           <ManageDrillVideos />
@@ -102,43 +88,6 @@ function Router() {
       <Route path={"/user-management"}>
         <ProtectedRoute requiredRole="admin">
           <UserManagement />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/coach-messaging"}>
-        <ProtectedRoute requiredRole="admin">
-          <CoachMessaging />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/activity-feed"}>
-        <ProtectedRoute requiredRole="admin">
-          <ActivityFeed />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/drill-comparison"}>
-        <ProtectedRoute requiredRole="admin">
-          <DrillComparison />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/athlete-assessment"}>
-        <ProtectedRoute requiredRole="admin">
-          <AthleteAssessment />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/athlete-messaging"}>
-        <ProtectedRoute requiredRole="athlete">
-          <AthleteMessaging />
-        </ProtectedRoute>
-      </Route>
-      
-      {/* Protected Routes - Parent Dashboard */}
-      <Route path={"/parent-dashboard"}>
-        <ProtectedRoute requiredRole="parent">
-          <ParentDashboard />
         </ProtectedRoute>
       </Route>
       
@@ -183,7 +132,6 @@ function App() {
           // switchable
         >
           <TooltipProvider>
-            <ImpersonationBanner />
             <Toaster />
             <ToastContainer />
             <Router />

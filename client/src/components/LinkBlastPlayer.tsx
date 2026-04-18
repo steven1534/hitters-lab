@@ -54,10 +54,9 @@ export function LinkBlastPlayer({
   const linkMutation = trpc.blastMetrics.linkPlayer.useMutation({
     onSuccess: () => {
       toast.success("Player linked!", {
-        description: `${playerName} is now linked to a portal account. Future Blast sessions will auto-create session notes.`,
+        description: `${playerName} is now linked to a portal account.`,
       });
       utils.blastMetrics.invalidate();
-      utils.sessionNotes.invalidate();
       onOpenChange(false);
     },
     onError: (error) => {

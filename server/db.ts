@@ -305,27 +305,23 @@ export async function deleteUser(userId: number): Promise<boolean> {
   if (!db) return false;
   try {
     const {
-      drillAssignments, badges, drillFavorites, athleteActivity,
+      drillAssignments, drillFavorites, athleteActivity,
       notifications: notificationsTable, notificationPreferences: notifPrefsTable,
       drillSubmissions: submissionsTable, coachFeedback: feedbackTable,
-      sessionNotes, practicePlans, playerReports, videoAnalysis,
+      playerReports,
       blastPlayers, drillQuestions: questionsTable, drillAnswers: answersTable,
       coachAlertPreferences, parentChildren: parentChildrenTable,
     } = await import("../drizzle/schema");
 
     // Delete from all related tables first
     await db.delete(drillAssignments).where(eq(drillAssignments.userId, userId));
-    await db.delete(badges).where(eq(badges.userId, userId));
     await db.delete(drillFavorites).where(eq(drillFavorites.userId, userId));
     await db.delete(athleteActivity).where(eq(athleteActivity.athleteId, userId));
     await db.delete(notificationsTable).where(eq(notificationsTable.userId, userId));
     await db.delete(notifPrefsTable).where(eq(notifPrefsTable.userId, userId));
     await db.delete(submissionsTable).where(eq(submissionsTable.userId, userId));
     await db.delete(questionsTable).where(eq(questionsTable.athleteId, userId));
-    await db.delete(sessionNotes).where(eq(sessionNotes.athleteId, userId));
-    await db.delete(practicePlans).where(eq(practicePlans.athleteId, userId));
     await db.delete(playerReports).where(eq(playerReports.athleteId, userId));
-    await db.delete(videoAnalysis).where(eq(videoAnalysis.athleteId, userId));
     await db.delete(parentChildrenTable).where(eq(parentChildrenTable.childId, userId));
 
     // Try optional tables that may not exist yet
@@ -1018,126 +1014,8 @@ export async function bulkImportDrillDescriptions(drillsData: { drillName: strin
   return { imported, skipped, errors };
 }
 
-export async function bulkImportDrillGoals(goalsData: { drillName: string; goal: string }[]) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  let imported = 0;
-  let skipped = 0;
-  const errors: string[] = [];
-  for (const item of goalsData) {
-    try {
-      const existing = await db.select().from(drillDetails).where(eq(drillDetails.drillId, item.drillName));
-      if (existing.length > 0) {
-        await db.update(drillDetails).set({ goal: item.goal, updatedAt: new Date() }).where(eq(drillDetails.drillId, item.drillName));
-      } else {
-        await db.insert(drillDetails).values({
-          drillId: item.drillName,
-          goal: item.goal,
-          description: [],
-          skillSet: "Custom", difficulty: "Medium", athletes: "Varies",
-          time: "Varies", equipment: "Varies",
-          createdBy: 0,
-        });
-      }
-      imported++;
-    } catch (e: any) {
-      skipped++;
-      errors.push(`${item.drillName}: ${e.message}`);
-    }
-  }
-  return { imported, skipped, errors };
-}
-
-export async function updateDrillGoal(drillId: string, goal: string, userId: number = 0): Promise<boolean> {
-  return saveDrillGoal(drillId, goal, userId);
-}
-
 export async function updateDrillInstructions(drillId: string, instructions: string, userId: number = 0): Promise<boolean> {
   return saveDrillInstructions(drillId, instructions, userId);
-}
-
-export async function linkChildToParent(childUserId: number, parentUserId: number): Promise<boolean> {
-  // Stub: parent-child linking not yet implemented in schema
-  console.warn("[Database] linkChildToParent not yet implemented");
-  return false;
-}
-
-export async function getChildrenByParent(parentUserId: number): Promise<any[]> {
-  // Stub: parent-child lookup not yet implemented in schema
-  console.warn("[Database] getChildrenByParent not yet implemented");
-  return [];
-}
-
-export async function isParentOf(parentUserId: number, childUserId: number): Promise<boolean> {
-  // Stub: parent-child relationship not yet implemented in schema
-  console.warn("[Database] isParentOf not yet implemented");
-  return false;
-}
-
-// ── Q&A ──────────────────────────────────────────────────────
-
-export async function createDrillQuestion(data: { athleteId: number; drillId: string; question: string }) {
-  const db = await getDb();
-  if (!db) return null;
-  try {
-    const result = await db.insert(drillQuestions).values(data).returning({ id: drillQuestions.id });
-    return result[0];
-  } catch (error) {
-    console.error("[Database] Failed to create drill question:", error);
-    throw error;
-  }
-}
-
-export async function getDrillQuestions(drillId: string) {
-  const db = await getDb();
-  if (!db) return [];
-  try {
-    return await db.select().from(drillQuestions).where(eq(drillQuestions.drillId, drillId));
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function getAthleteQuestions(athleteId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  try {
-    return await db.select().from(drillQuestions).where(eq(drillQuestions.athleteId, athleteId));
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function getAllQuestions() {
-  const db = await getDb();
-  if (!db) return [];
-  try {
-    return await db.select().from(drillQuestions);
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function createDrillAnswer(data: { questionId: number; coachId: number; answer: string }) {
-  const db = await getDb();
-  if (!db) return null;
-  try {
-    const result = await db.insert(drillAnswers).values(data).returning({ id: drillAnswers.id });
-    return result[0];
-  } catch (error) {
-    console.error("[Database] Failed to create drill answer:", error);
-    throw error;
-  }
-}
-
-export async function getAnswersByQuestion(questionId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  try {
-    return await db.select().from(drillAnswers).where(eq(drillAnswers.questionId, questionId));
-  } catch (error) {
-    return [];
-  }
 }
 
 export async function bulkImportCustomDrills(

@@ -89,7 +89,6 @@ export function EditBlastSession({ open, onOpenChange, session, playerName }: Ed
         description: `${sessionType} session for ${playerName}`,
       });
       utils.blastMetrics.invalidate();
-      utils.sessionNotes.invalidate();
       onOpenChange(false);
     },
     onError: (error) => {

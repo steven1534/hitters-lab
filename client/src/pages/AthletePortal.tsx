@@ -17,16 +17,12 @@ import { CompletionModal } from "@/components/CompletionModal";
 import { DrillCoachFocus, DrillQuickNotes } from "@/components/DrillActionComponents";
 import { AthletePortalSkeleton } from "@/components/Skeleton";
 import { useAllDrills } from "@/hooks/useAllDrills";
-import { AthleteVideoFeedback } from "@/components/AthleteVideoFeedback";
-import { SwingAnalyzer } from "@/components/SwingAnalyzer";
 import { DrillSubmissionForm } from "@/components/DrillSubmissionForm";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
-import { AthleteSessionNotes } from "@/components/AthleteSessionNotes";
 import { AthleteBlastMetrics } from "@/components/AthleteBlastMetrics";
 import { AthletePlayerReports } from "@/components/AthletePlayerReports";
 import { DrillModalRedesigned } from "@/components/DrillModalRedesigned";
-import { AthleteBadgesRedesigned } from "@/components/AthleteBadgesRedesigned";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from "recharts";
@@ -61,7 +57,6 @@ const TABS = [
   { id: "progress", label: "Progress", icon: BarChart3 },
   { id: "swinglab", label: "Swing Lab", icon: Beaker },
   { id: "coach", label: "Coach Notes", icon: ClipboardList },
-  { id: "messages", label: "Messages", icon: MessageCircle },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -147,7 +142,6 @@ export default function AthletePortal() {
   const { data: userAssignments = [], isLoading: assignmentsLoading } = trpc.drillAssignments.getUserAssignments.useQuery(
     undefined, { enabled: !!user?.id }
   );
-  const { data: streak = 0 } = trpc.drillAssignments.getStreak.useQuery(undefined, { enabled: !!user?.id });
   const { data: favoritesData } = trpc.favorites.getAll.useQuery(undefined, { enabled: !!user?.id });
   const favoriteIds = favoritesData?.drillIds || [];
 
@@ -156,25 +150,14 @@ export default function AthletePortal() {
   const updateStatusMutation = trpc.drillAssignments.updateStatus.useMutation({
     onSuccess: () => utils.drillAssignments.getUserAssignments.invalidate(),
   });
-  const logActivityMutation = trpc.activity.logActivity.useMutation();
-  const hasLoggedActivity = useRef(false);
-
-  useEffect(() => {
-    if (user?.id && !hasLoggedActivity.current) {
-      hasLoggedActivity.current = true;
-      logActivityMutation.mutate({ activityType: "portal_login" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
   const progressStats = useMemo(() => {
     const total = userAssignments.length;
     const completed = userAssignments.filter((a: any) => a.status === "completed").length;
     const inProgress = userAssignments.filter((a: any) => a.status === "in-progress").length;
     const assigned = userAssignments.filter((a: any) => a.status === "assigned").length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-    return { total, completed, inProgress, assigned, streak, percentage };
-  }, [userAssignments, streak]);
+    return { total, completed, inProgress, assigned, percentage };
+  }, [userAssignments]);
 
   const upNextDrill = useMemo(() => {
     const assignedDrills = userAssignments.filter((a: any) => a.status === "assigned");
@@ -312,7 +295,6 @@ export default function AthletePortal() {
         {activeTab === "progress" && <ProgressTab stats={progressStats} completedCount={completedAssignments.length} />}
         {activeTab === "swinglab" && <SwingLabTab />}
         {activeTab === "coach" && <CoachNotesTab />}
-        {activeTab === "messages" && <MessagesTab />}
       </main>
 
       {/* Mobile Bottom Navigation */}
@@ -379,9 +361,6 @@ function TrainingTab({
 
   return (
     <>
-      {/* Weekly Challenge Banner */}
-      <WeeklyChallengeBanner />
-
       {/* Up Next Hero */}
       {upNextDrill ? (
         <div className="glass-card rounded-2xl overflow-hidden border-glow animate-fade-in-up">
@@ -431,11 +410,7 @@ function TrainingTab({
             <span className="text-sm text-muted-foreground">Progress</span>
             <span className="text-sm font-medium text-foreground">{progressStats.completed}/{progressStats.total} done</span>
           </div>
-          <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-2">
-            <Flame className="w-5 h-5 text-orange-400" />
-            <span className="font-bold text-orange-400">{progressStats.streak}</span>
-            <span className="text-sm text-orange-400">Day Streak</span>
-          </div>
+
         </div>
       </div>
 
@@ -645,7 +620,6 @@ function ProgressTab({ stats, completedCount }: { stats: any; completedCount: nu
           { label: "Drills Done", value: progressStats?.uniqueDrills ?? 0, icon: Target, color: "text-electric" },
           { label: "Sessions", value: progressStats?.totalSessions ?? 0, icon: Zap, color: "text-yellow-400" },
           { label: "This Week", value: progressStats?.thisWeek ?? 0, icon: BarChart3, color: "text-emerald-400" },
-          { label: "Streak", value: progressStats?.streak ?? stats.streak, icon: Flame, color: "text-orange-400" },
           { label: "Favorites", value: progressStats?.favoritesCount ?? 0, icon: Star, color: "text-yellow-400" },
           { label: "Submissions", value: progressStats?.submissionsCount ?? 0, icon: Upload, color: "text-purple-400" },
         ].map((card) => {
@@ -664,8 +638,6 @@ function ProgressTab({ stats, completedCount }: { stats: any; completedCount: nu
         })}
       </div>
 
-      {/* Badges */}
-      <AthleteBadgesRedesigned />
     </div>
   );
 }
@@ -676,10 +648,8 @@ function ProgressTab({ stats, completedCount }: { stats: any; completedCount: nu
 function SwingLabTab() {
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <SwingAnalyzer />
       <VideoComparisonTool />
       <AthleteBlastMetrics />
-      <AthleteVideoFeedback />
     </div>
   );
 }
@@ -762,215 +732,8 @@ function VideoComparisonTool() {
 function CoachNotesTab() {
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <AthleteSessionNotes />
       <AthletePlayerReports />
-      <SharedPracticePlans />
     </div>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 5: Messages
-// ═══════════════════════════════════════════════════════════════
-function MessagesTab() {
-  const { data: questions = [], isLoading } = trpc.qa.getAthleteQuestions.useQuery();
-  const [expanded, setExpanded] = useState<number | null>(null);
-
-  if (isLoading) {
-    return <div className="glass-card rounded-2xl p-6 text-center text-muted-foreground">Loading messages...</div>;
-  }
-
-  if (questions.length === 0) {
-    return (
-      <div className="glass-card rounded-2xl p-8 text-center animate-fade-in-up">
-        <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
-        <h3 className="font-bold text-foreground mb-1">No Messages Yet</h3>
-        <p className="text-sm text-muted-foreground">Your conversations with Coach Steve will appear here.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3 animate-fade-in-up">
-      <h3 className="font-bold text-foreground flex items-center gap-2">
-        <MessageCircle className="w-5 h-5 text-electric" />Your Messages
-      </h3>
-      {(questions as any[]).map((q: any) => (
-        <button
-          key={q.id}
-          onClick={() => setExpanded(expanded === q.id ? null : q.id)}
-          className="w-full glass-card rounded-xl p-4 text-left transition-all duration-200"
-        >
-          <div className="flex items-start gap-3">
-            <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${q.answer ? "bg-emerald-400" : "bg-amber-400 animate-pulse"}`} />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground text-sm">{q.question}</p>
-              <span className="text-xs text-muted-foreground">
-                {new Date(q.createdAt).toLocaleDateString()}
-                {q.answer ? " — Answered" : " — Pending"}
-              </span>
-              {expanded === q.id && q.answer && (
-                <div className="mt-3 pt-3 border-t border-white/10">
-                  <p className="text-sm text-foreground/80">{q.answer}</p>
-                </div>
-              )}
-            </div>
-            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform flex-shrink-0 ${expanded === q.id ? "rotate-180" : ""}`} />
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─── Weekly Challenge Banner ─────────────────────────────────────────────────
-
-function WeeklyChallengeBanner() {
-  const { data: challengeData } = trpc.challenges.getMyProgress.useQuery();
-  if (!challengeData) return null;
-
-  const { challenge, completed } = challengeData;
-  const progress = Math.min(100, Math.round((completed / challenge.targetCount) * 100));
-  const isComplete = completed >= challenge.targetCount;
-  const daysLeft = Math.max(0, Math.ceil((new Date(challenge.endsAt).getTime() - Date.now()) / 86400000));
-
-  return (
-    <div className={`glass-card rounded-2xl p-5 border ${isComplete ? "border-emerald-500/30 bg-emerald-500/5" : "border-electric/20"} animate-fade-in-up`}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isComplete ? "bg-emerald-500/20" : "bg-electric/20"}`}>
-          <Trophy className={`w-5 h-5 ${isComplete ? "text-emerald-400" : "text-electric"}`} />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs font-medium text-electric uppercase tracking-wide">Weekly Challenge</p>
-          <h4 className="font-bold text-foreground text-sm">{challenge.title}</h4>
-        </div>
-        <Badge className="bg-white/10 text-muted-foreground border border-white/10 text-xs">{daysLeft}d left</Badge>
-      </div>
-      {challenge.description && (
-        <p className="text-xs text-muted-foreground mb-3">{challenge.description}</p>
-      )}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ${isComplete ? "bg-emerald-400" : "bg-electric"}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <span className={`text-sm font-bold ${isComplete ? "text-emerald-400" : "text-foreground"}`}>
-          {completed}/{challenge.targetCount}
-        </span>
-      </div>
-      {isComplete && (
-        <p className="text-xs text-emerald-400 font-medium mt-2 text-center">Challenge complete!</p>
-      )}
-    </div>
-  );
-}
-
-// ─── Shared Practice Plans Component ─────────────────────────────────────────
-
-const BLOCK_TYPE_CONFIG: Record<string, { icon: any; label: string; color: string; bg: string }> = {
-  drill: { icon: Target, label: "Drill", color: "text-[#E8425A]", bg: "bg-[#DC143C]/10 border-[#DC143C]/20" },
-  warmup: { icon: Zap, label: "Warm-Up", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
-  cooldown: { icon: Coffee, label: "Cool-Down", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  break: { icon: Coffee, label: "Break", color: "text-gray-400", bg: "bg-gray-500/10 border-gray-500/20" },
-  custom: { icon: Dumbbell, label: "Custom", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
-};
-
-function SharedPracticePlans() {
-  const { data: sharedPlans = [], isLoading } = trpc.practicePlans.getMySharedPlans.useQuery();
-  const [expandedPlan, setExpandedPlan] = useState<number | null>(null);
-
-  if (isLoading) return null;
-  if (sharedPlans.length === 0) return null;
-
-  return (
-    <div className="animate-fade-in-up" style={{ animationDelay: '0.35s' }}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-bold text-foreground flex items-center gap-2">
-          <FileText className="w-5 h-5 text-[#E8425A]" />Practice Plans
-        </h3>
-        <Badge className="bg-[#DC143C]/20 text-[#E8425A] border border-[#DC143C]/30">{sharedPlans.length}</Badge>
-      </div>
-
-      <div className="space-y-2">
-        {sharedPlans.map((plan: any) => {
-          const isExpanded = expandedPlan === plan.id;
-          const focusAreas = (plan.focusAreas as string[]) || [];
-          const blocks = plan.blocks || [];
-          let runningTime = 0;
-
-          return (
-            <div key={plan.id} className="bg-card/50 border border-border/50 rounded-xl overflow-hidden">
-              <button
-                onClick={() => setExpandedPlan(isExpanded ? null : plan.id)}
-                className="w-full text-left p-4 flex items-center gap-3"
-              >
-                <div className="h-10 w-10 rounded-lg bg-[#DC143C]/10 border border-[#DC143C]/20 flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-5 w-5 text-[#E8425A]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-foreground truncate">{plan.title}</h4>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{plan.duration} min</span>
-                    {plan.sessionDate && (
-                      <span>{new Date(plan.sessionDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-                    )}
-                  </div>
-                </div>
-                {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-              </button>
-
-              {isExpanded && (
-                <div className="px-4 pb-4 space-y-3 border-t border-border/30 pt-3">
-                  {focusAreas.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {focusAreas.map((area) => (
-                        <span key={area} className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#DC143C]/10 text-[#E8425A]">{area}</span>
-                      ))}
-                    </div>
-                  )}
-                  {plan.sessionNotes && (
-                    <div className="bg-muted/30 rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground italic">{plan.sessionNotes}</p>
-                    </div>
-                  )}
-                  {blocks.length > 0 && (
-                    <div className="space-y-1.5">
-                      {blocks.map((block: any, idx: number) => {
-                        const startTime = runningTime;
-                        runningTime += block.duration;
-                        const config = BLOCK_TYPE_CONFIG[block.blockType] || BLOCK_TYPE_CONFIG.custom;
-                        const Icon = config.icon;
-                        return (
-                          <div key={block.id || idx} className={`rounded-lg border p-3 ${config.bg}`}>
-                            <div className="flex items-center gap-2">
-                              <Icon className={`h-3.5 w-3.5 ${config.color} flex-shrink-0`} />
-                              <span className="text-sm font-medium text-foreground flex-1 truncate">{block.title}</span>
-                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">{startTime}–{runningTime}m</span>
-                            </div>
-                            {(block.sets || block.reps) && (
-                              <div className="flex gap-3 mt-1 ml-5.5 text-[10px] text-muted-foreground">
-                                {block.sets && <span>{block.sets} sets</span>}
-                                {block.reps && <span>{block.reps} reps</span>}
-                              </div>
-                            )}
-                            {block.notes && <p className="text-[10px] text-muted-foreground mt-1 ml-5.5 italic">{block.notes}</p>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                    <span className="text-xs text-muted-foreground">Total Duration</span>
-                    <span className="text-sm font-bold text-foreground">{plan.duration} min</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}

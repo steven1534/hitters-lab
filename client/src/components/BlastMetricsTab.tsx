@@ -18,7 +18,6 @@ import { DeleteBlastSession } from "./DeleteBlastSession";
 import { LinkBlastPlayer } from "./LinkBlastPlayer";
 import { EditBlastSession, type SessionData } from "./EditBlastSession";
 import { ImportBlastCSV } from "./ImportBlastCSV";
-import { RetroactiveBlastNotes } from "./RetroactiveBlastNotes";
 import { InlineEdit } from "./InlineEdit";
 import { exportHtmlToPdf } from "@/lib/exportPdf";
 
@@ -58,10 +57,8 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function BlastMetricsTab({
-  onNavigateToNotes,
   onNavigateToReports,
 }: {
-  onNavigateToNotes?: (userId: number) => void;
   onNavigateToReports?: (userId: number) => void;
 } = {}) {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
@@ -81,7 +78,6 @@ export function BlastMetricsTab({
   const [linkPlayerOpen, setLinkPlayerOpen] = useState(false);
   const [editSession, setEditSession] = useState<SessionData | null>(null);
   const [importCSVOpen, setImportCSVOpen] = useState(false);
-  const [retroNotesOpen, setRetroNotesOpen] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const { data: players = [], isLoading: playersLoading } = trpc.blastMetrics.listPlayers.useQuery(undefined, {
@@ -379,28 +375,6 @@ export function BlastMetricsTab({
             <Link2 className="h-3.5 w-3.5 mr-1" />
             {player?.userId ? "Linked" : "Link Account"}
           </Button>
-          {player?.userId && (
-            <Button
-              onClick={() => setRetroNotesOpen(true)}
-              size="sm"
-              variant="outline"
-              className="h-8 text-xs text-[#E8425A] border-[#DC143C]/30 hover:bg-[#B91030]/10"
-            >
-              <FileText className="h-3.5 w-3.5 mr-1" />
-              Sync Notes
-            </Button>
-          )}
-          {player?.userId && onNavigateToNotes && (
-            <Button
-              onClick={() => onNavigateToNotes(player.userId!)}
-              size="sm"
-              variant="outline"
-              className="h-8 text-xs text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
-            >
-              <FileText className="h-3.5 w-3.5 mr-1" />
-              Session Notes
-            </Button>
-          )}
           {player?.userId && onNavigateToReports && (
             <Button
               onClick={() => onNavigateToReports(player.userId!)}
@@ -791,7 +765,6 @@ export function BlastMetricsTab({
           onOpenChange={setAddSessionOpen}
           playerId={selectedPlayerId}
           playerName={player.fullName}
-          isLinkedToUser={!!player.userId}
         />
       )}
 
@@ -818,16 +791,6 @@ export function BlastMetricsTab({
         />
       )}
 
-      {/* Retroactive Notes Dialog */}
-      {selectedPlayerId && player && (
-        <RetroactiveBlastNotes
-          open={retroNotesOpen}
-          onOpenChange={setRetroNotesOpen}
-          playerId={selectedPlayerId}
-          playerName={player.fullName}
-        />
-      )}
-
       {/* Import CSV Dialog */}
       {selectedPlayerId && player && (
         <ImportBlastCSV
@@ -835,7 +798,6 @@ export function BlastMetricsTab({
           onOpenChange={setImportCSVOpen}
           playerId={selectedPlayerId}
           playerName={player.fullName}
-          isLinkedToUser={!!player.userId}
         />
       )}
 

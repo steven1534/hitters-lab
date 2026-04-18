@@ -7,31 +7,17 @@ import { z } from "zod";
 import { ENV } from "./_core/env";
 import * as db from "./db";
 import * as drillAssignmentDb from "./drillAssignments";
-import * as drillPageLayoutDb from "./drillPageLayouts";
-import * as drillPageTemplateDb from "./drillPageTemplates";
 import * as inviteDb from "./invites";
-import { drillGeneratorRouter } from "./routers-drill-generator";
 import { submissionsRouter } from "./routers-submissions";
 import { videoUploadRouter } from "./routers-video-upload";
 import { notificationsRouter } from "./routers-notifications";
-import { qaRouter } from "./routers-qa";
-import { imageUploadRouter } from "./routers-image-upload";
-import { activityRouter } from "./routers-activity";
 import { favoritesRouter } from "./routers-favorites";
-import { practicePlansRouter } from "./routers-practice-plans";
-import { sessionNotesRouter } from "./routers-session-notes";
-import { progressReportsRouter } from "./routers-progress-reports";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
-import { videoAnalysisRouter } from "./routers-video-analysis";
 import { blastMetricsRouter } from "./routers-blast-metrics";
 import { playerReportsRouter } from "./routers-player-reports";
-import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
 import { progressRouter } from "./routers-progress";
-import { challengesRouter } from "./routers-challenges";
-// drillCustomizations import removed — superseded by drillCatalogOverrides
 import * as drillCatalogOverridesDb from "./drillCatalogOverrides";
-import * as drillStatCardsDb from "./drillStatCards";
 import { storagePut } from "./storage";
 
 export const appRouter = router({
@@ -39,16 +25,9 @@ export const appRouter = router({
   system: systemRouter,
   siteContent: siteContentRouter,
   notifications: notificationsRouter,
-  imageUpload: imageUploadRouter,
-  activity: activityRouter,
   favorites: favoritesRouter,
-  practicePlans: practicePlansRouter,
-  sessionNotes: sessionNotesRouter,
-  progressReports: progressReportsRouter,
   athleteProfiles: athleteProfilesRouter,
-  badges: badgesRouter,
   progress: progressRouter,
-  challenges: challengesRouter,
   auth: router({
     me: publicProcedure.query(async (opts) => {
       if (!opts.ctx.user) return null;
@@ -98,58 +77,6 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // ── Impersonation (admin only) ──────────────────────────
-    impersonate: protectedProcedure
-      .input(z.object({ userId: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
-        }
-        const target = await db.getUserById(input.userId);
-        if (!target) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-        }
-        const { createSessionToken } = await import("./_core/auth");
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        const longOptions = { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 };
-        // Save the real admin session in a separate cookie
-        const { parse: parseCookies } = await import("cookie");
-        const cookies = parseCookies(ctx.req.headers.cookie ?? "");
-        const currentToken = cookies[COOKIE_NAME] ?? "";
-        ctx.res.cookie(COOKIE_NAME + "_real", currentToken, longOptions);
-        // Set the impersonation session
-        const impersonateToken = await createSessionToken(target.id, target.email!);
-        ctx.res.cookie(COOKIE_NAME, impersonateToken, longOptions);
-        return { success: true, user: { id: target.id, email: target.email, name: target.name, role: target.role } };
-      }),
-
-    stopImpersonating: protectedProcedure.mutation(async ({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      const longOptions = { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 };
-      const { parse: parseCookies } = await import("cookie");
-      const cookies = parseCookies(ctx.req.headers.cookie ?? "");
-      const realToken = cookies[COOKIE_NAME + "_real"];
-      if (!realToken) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Not currently impersonating" });
-      }
-      // Restore real admin session
-      ctx.res.cookie(COOKIE_NAME, realToken, longOptions);
-      ctx.res.clearCookie(COOKIE_NAME + "_real", { ...cookieOptions, maxAge: -1 });
-      return { success: true };
-    }),
-
-    isImpersonating: publicProcedure.query(async ({ ctx }) => {
-      const { parse: parseCookies } = await import("cookie");
-      const cookies = parseCookies(ctx.req.headers.cookie ?? "");
-      const realToken = cookies[COOKIE_NAME + "_real"];
-      if (!realToken) return { impersonating: false, realUser: null };
-      const { verifySessionToken } = await import("./_core/auth");
-      const session = await verifySessionToken(realToken);
-      if (!session) return { impersonating: false, realUser: null };
-      const realUser = await db.getUserById(session.userId);
-      if (!realUser || realUser.role !== "admin") return { impersonating: false, realUser: null };
-      return { impersonating: true, realUser: { id: realUser.id, email: realUser.email, name: realUser.name, role: realUser.role } };
-    }),
   }),
 
   // Admin router for managing client access
@@ -251,24 +178,6 @@ export const appRouter = router({
         }
         return await db.bulkImportDrillDescriptions(input.drillsData);
       }),
-    bulkImportGoals: protectedProcedure
-      .input(z.object({ goalsData: z.array(z.object({ drillName: z.string(), goal: z.string() })) }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await db.bulkImportDrillGoals(input.goalsData);
-      }),
-    triggerStreakReminders: protectedProcedure
-      .mutation(async ({ ctx }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        const { runStreakReminderJob } = await import('./streakReminderJob');
-        await runStreakReminderJob();
-        return { success: true };
-      }),
-
     resetUserPassword: protectedProcedure
       .input(z.object({ userId: z.number(), newPassword: z.string().min(8) }))
       .mutation(async ({ ctx, input }) => {
@@ -453,10 +362,6 @@ export const appRouter = router({
       return await drillAssignmentDb.getUserAssignments(ctx.user.id);
     }),
 
-    getStreak: protectedProcedure.query(async ({ ctx }) => {
-      return await drillAssignmentDb.calculateStreak(ctx.user.id);
-    }),
-
     getAthleteProgress: protectedProcedure
       .input(z.object({ userId: z.number() }))
       .query(async ({ ctx, input }) => {
@@ -516,70 +421,6 @@ export const appRouter = router({
       }),
 
     // Weekly goals for athlete drill targets
-    getWeeklyGoals: protectedProcedure
-      .input(z.object({ athleteId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.getWeeklyGoals(input.athleteId);
-      }),
-
-    getCurrentWeekGoal: protectedProcedure
-      .input(z.object({ athleteId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.getCurrentWeekGoal(input.athleteId);
-      }),
-
-    createWeeklyGoal: protectedProcedure
-      .input(z.object({
-        athleteId: z.number(),
-        weekStartDate: z.date(),
-        weekEndDate: z.date(),
-        targetDrillCount: z.number(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.createWeeklyGoal({
-          athleteId: input.athleteId,
-          coachId: ctx.user.id,
-          weekStartDate: input.weekStartDate,
-          weekEndDate: input.weekEndDate,
-          targetDrillCount: input.targetDrillCount,
-          notes: input.notes,
-        });
-      }),
-
-    updateWeeklyGoal: protectedProcedure
-      .input(z.object({
-        goalId: z.number(),
-        targetDrillCount: z.number().optional(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.updateWeeklyGoal(input.goalId, {
-          targetDrillCount: input.targetDrillCount,
-          notes: input.notes,
-        });
-      }),
-
-    deleteWeeklyGoal: protectedProcedure
-      .input(z.object({ goalId: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillAssignmentDb.deleteWeeklyGoal(input.goalId);
-      }),
   }),
 
   // Submissions router
@@ -589,15 +430,10 @@ export const appRouter = router({
   videoUpload: videoUploadRouter,
 
   // AI Video Analysis router
-  videoAnalysis: videoAnalysisRouter,
   blastMetrics: blastMetricsRouter,
   playerReports: playerReportsRouter,
 
-  // Q&A router
-  qa: qaRouter,
-
   // Drill generator router
-  drillGenerator: drillGeneratorRouter,
 
   // Drill details router
   drillDetails: router({
@@ -626,23 +462,6 @@ export const appRouter = router({
         }
         await db.saveDrillDetail(input.drillId, input as any, ctx.user.id);
         return { success: true };
-      }),
-    bulkUpdateGoals: protectedProcedure
-      .input(z.object({ goals: z.record(z.string(), z.string()) }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        const results: Array<{ drillName: string; success: boolean; error?: string }> = [];
-        for (const [drillName, goal] of Object.entries(input.goals)) {
-          try {
-            await db.updateDrillGoal(drillName, goal as string);
-            results.push({ drillName, success: true });
-          } catch (error) {
-            results.push({ drillName, success: false, error: String(error) });
-          }
-        }
-        return { results };
       }),
     bulkUpdateInstructions: protectedProcedure
       .input(z.object({ instructions: z.record(z.string(), z.string()) }))
@@ -716,81 +535,6 @@ export const appRouter = router({
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
         }
         return await db.bulkImportCustomDrills(input.drills, ctx.user.id);
-      }),
-    // Drill page layout procedures
-    savePageLayout: protectedProcedure
-      .input(z.object({
-        drillId: z.string(),
-        blocks: z.array(z.any()),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillPageLayoutDb.saveDrillPageLayout(input.drillId, input.blocks, ctx.user.id);
-      }),
-    getPageLayout: publicProcedure
-      .input(z.object({ drillId: z.string() }))
-      .query(async ({ input }) => {
-        return await drillPageLayoutDb.getDrillPageLayout(input.drillId);
-      }),
-    // Drill page template procedures
-    createTemplate: protectedProcedure
-      .input(z.object({
-        name: z.string(),
-        description: z.string().optional(),
-        blocks: z.array(z.any()),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach or admin access required' });
-        }
-        return await drillPageTemplateDb.createTemplate({
-          ...input,
-          createdBy: ctx.user.id,
-        });
-      }),
-    getTemplates: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await drillPageTemplateDb.getTemplates(ctx.user.id);
-      }),
-    deleteTemplate: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach or admin access required' });
-        }
-        return await drillPageTemplateDb.deleteTemplate(input.id, ctx.user.id);
-      }),
-    deletePageLayout: protectedProcedure
-      .input(z.object({ drillId: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        return await drillPageLayoutDb.deleteDrillPageLayout(input.drillId);
-      }),
-    getStatCards: publicProcedure
-      .input(z.object({ drillId: z.string() }))
-      .query(async ({ input }) => {
-        return await drillStatCardsDb.getStatCards(input.drillId);
-      }),
-    saveStatCards: protectedProcedure
-      .input(z.object({
-        drillId: z.string(),
-        cards: z.array(z.object({
-          label: z.string(),
-          value: z.string(),
-          icon: z.string().optional(),
-          position: z.number(),
-          isVisible: z.number(),
-        })),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== 'admin' && ctx.user.role !== 'coach') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Coach or admin access required' });
-        }
-        return await drillStatCardsDb.upsertStatCards(input.drillId, input.cards);
       }),
   }),
 
@@ -921,24 +665,6 @@ export const appRouter = router({
       }),
   }),
 
-  // DEPRECATED: drillCustomizations superseded by drillCatalogOverrides + Manus data.
-  // Kept as empty stubs so old clients don't crash during rollout.
-  drillCustomizations: router({
-    get: publicProcedure
-      .input(z.object({ drillId: z.string() }))
-      .query(async () => null),
-    getAll: publicProcedure.query(async () => []),
-    save: protectedProcedure
-      .input(z.object({ drillId: z.string(), thumbnailUrl: z.string().nullable().optional(), briefDescription: z.string().nullable().optional(), difficulty: z.string().nullable().optional(), category: z.string().nullable().optional() }))
-      .mutation(async () => ({ success: true })),
-    uploadThumbnail: protectedProcedure
-      .input(z.object({ drillId: z.string(), imageBase64: z.string(), mimeType: z.string() }))
-      .mutation(async () => ({ url: '' })),
-    delete: protectedProcedure
-      .input(z.object({ drillId: z.string() }))
-      .mutation(async () => ({ success: true })),
-  }),
-
   /** Phase 1 — catalog field overrides (same drillId as static drills.ts / custom drills) */
   drillCatalog: router({
     getAll: publicProcedure.query(async () => {
@@ -1007,90 +733,6 @@ export const appRouter = router({
       }),
   }),
 
-  // Parent Management router
-  parentManagement: router({
-    // Link a child account to parent
-    linkChild: protectedProcedure
-      .input(z.object({ childUserId: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        const success = await db.linkChildToParent(input.childUserId, ctx.user.id);
-        if (!success) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to link child account' });
-        }
-        return { success: true };
-      }),
-
-    // Get all children managed by current user
-    getMyChildren: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getChildrenByParent(ctx.user.id);
-    }),
-
-    // Get drill assignments for a child (parent can view)
-    getChildAssignments: protectedProcedure
-      .input(z.object({ childUserId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        // Verify parent-child relationship
-        const isParent = await db.isParentOf(ctx.user.id, input.childUserId);
-        if (!isParent) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to view this child\'s assignments' });
-        }
-        return await drillAssignmentDb.getUserAssignments(input.childUserId);
-      }),
-
-    // Mark drill complete on behalf of child
-    markChildDrillComplete: protectedProcedure
-      .input(z.object({ 
-        childUserId: z.number(),
-        assignmentId: z.number(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        // Verify parent-child relationship
-        const isParent = await db.isParentOf(ctx.user.id, input.childUserId);
-        if (!isParent) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to manage this child\'s drills' });
-        }
-        
-        // Mark assignment as completed
-        const success = await drillAssignmentDb.updateAssignmentStatus(input.assignmentId, 'completed');
-        if (!success) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to mark drill complete' });
-        }
-        return { success: true };
-      }),
-
-    // Update drill status on behalf of child
-    updateChildDrillStatus: protectedProcedure
-      .input(z.object({ 
-        childUserId: z.number(),
-        assignmentId: z.number(),
-        status: z.enum(['assigned', 'in-progress', 'completed']),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        // Verify parent-child relationship
-        const isParent = await db.isParentOf(ctx.user.id, input.childUserId);
-        if (!isParent) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to manage this child\'s drills' });
-        }
-        
-        const success = await drillAssignmentDb.updateAssignmentStatus(input.assignmentId, input.status);
-        if (!success) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to update drill status' });
-        }
-        return { success: true };
-      }),
-
-    // Get child's progress data (for parent view)
-    getChildProgress: protectedProcedure
-      .input(z.object({ childUserId: z.number() }))
-      .query(async ({ ctx, input }) => {
-        // Verify parent-child relationship
-        const isParent = await db.isParentOf(ctx.user.id, input.childUserId);
-        if (!isParent) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to view this child\'s progress' });
-        }
-        return await drillAssignmentDb.getAthleteProgressStats(input.childUserId);
-      }),
-  }),
 });
 
 export type AppRouter = typeof appRouter;

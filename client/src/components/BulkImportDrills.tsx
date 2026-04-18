@@ -11,7 +11,6 @@ import { toast } from "sonner";
 interface DrillData {
   drillName: string;
   description?: string;
-  goal?: string;
 }
 
 export function BulkImportDrills() {
@@ -21,7 +20,6 @@ export function BulkImportDrills() {
   const [results, setResults] = useState<{ success: number; failed: number; errors: string[] } | null>(null);
 
   const bulkImportDescriptionsMutation = trpc.admin.bulkImportDescriptions.useMutation();
-  const bulkImportGoalsMutation = trpc.admin.bulkImportGoals.useMutation();
 
   const handleImport = async () => {
     setIsImporting(true);
@@ -30,17 +28,13 @@ export function BulkImportDrills() {
 
     try {
       // Fetch the parsed data from the server
-      const [descriptionsRes, goalsRes] = await Promise.all([
-        fetch("/drill_descriptions.json"),
-        fetch("/drill_goals.json"),
-      ]);
+      const descriptionsRes = await fetch("/drill_descriptions.json");
 
-      if (!descriptionsRes.ok || !goalsRes.ok) {
+      if (!descriptionsRes.ok) {
         throw new Error("Failed to load backup files");
       }
 
       const descriptions: DrillData[] = await descriptionsRes.json();
-      const goals: DrillData[] = await goalsRes.json();
 
       setProgress(25);
 
@@ -52,21 +46,11 @@ export function BulkImportDrills() {
         })),
       });
 
-      setProgress(50);
-
-      // Import goals
-      const goalResult = await bulkImportGoalsMutation.mutateAsync({
-        goalsData: goals.map((g) => ({
-          drillName: g.drillName,
-          goal: g.goal || "",
-        })),
-      });
-
       setProgress(100);
 
-      const totalSuccess = descResult.imported + goalResult.imported;
-      const totalFailed = descResult.skipped + goalResult.skipped;
-      const allErrors = [...(descResult.errors || []), ...(goalResult.errors || [])];
+      const totalSuccess = descResult.imported;
+      const totalFailed = descResult.skipped;
+      const allErrors = descResult.errors || [];
 
       setResults({
         success: totalSuccess,
@@ -103,7 +87,7 @@ export function BulkImportDrills() {
         <DialogHeader>
           <DialogTitle>Bulk Import Drill Data</DialogTitle>
           <DialogDescription>
-            Import drill descriptions and goals from backup files to restore all 72+ drills.
+            Import drill descriptions from backup files to restore all 72+ drills.
           </DialogDescription>
         </DialogHeader>
 
@@ -113,7 +97,7 @@ export function BulkImportDrills() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  This will import drill descriptions and goals from the backup files. Existing drills will be updated.
+                  This will import drill descriptions from the backup files. Existing drills will be updated.
                 </AlertDescription>
               </Alert>
 

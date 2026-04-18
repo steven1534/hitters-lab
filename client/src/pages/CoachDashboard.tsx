@@ -9,11 +9,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { 
   ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, Search, 
-  Sparkles, Video, Upload, MessageSquare, BarChart3, Activity, Users, 
-  LayoutTemplate, Edit3, ArrowLeftRight, FileText, ChevronRight,
-  Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
-  BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail, Bell,
-  ExternalLink, UserCog, Inbox, GitCompare, ClipboardCheck, Wand2, Trophy,
+  Video, Upload, BarChart3, Activity, Users, 
+  Edit3, ChevronRight,
+  Target, Shield, Table2, LayoutDashboard,
+  BookOpen, Menu, X as XIcon, UserPlus, Mail,
+  UserCog, Inbox,
   Eye, EyeOff, Database,
 } from "lucide-react";
 import { Link } from "wouter";
@@ -22,27 +22,18 @@ import { trpc } from "@/lib/trpc";
 import { useAllDrills } from "@/hooks/useAllDrills";
 import { BulkInstructionImport } from "@/components/BulkInstructionImport";
 import { BulkImportCustomDrills } from "@/components/BulkImportCustomDrills";
-import { BulkGoalUpload } from "@/components/BulkGoalUpload";
 import { AthleteProgressReport } from "@/components/AthleteProgressReport";
 import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOverview";
-import { DrillPageBuilderNotion } from "@/components/DrillPageBuilderNotion";
 import { AthleteTable } from "@/components/AthleteTable";
-import PracticePlanner from "@/components/PracticePlanner";
-import { SessionNotesTab } from "@/components/SessionNotesTab";
 import { PlayerReportsTab } from "@/components/PlayerReportsTab";
-import { VideoAnalysisTab } from "@/components/VideoAnalysisTab";
 import { BlastMetricsTab } from "@/components/BlastMetricsTab";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { InlineEdit } from "@/components/InlineEdit";
-import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AddNewDrill } from "@/components/AddNewDrill";
-import { NotificationSettings } from "@/components/NotificationSettings";
 import { AccountSettings } from "@/components/AccountSettings";
 import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
 import UserManagement from "@/pages/UserManagement";
 import SubmissionsDashboard from "@/pages/SubmissionsDashboard";
-import CoachMessaging from "@/pages/CoachMessaging";
-import ActivityFeed from "@/pages/ActivityFeed";
 import { ManageDrillVideos } from "@/pages/ManageDrillVideos";
 
 interface Drill {
@@ -53,7 +44,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "page-layouts" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "messaging" | "activity-feed" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "account" | "user-management" | "submissions" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -71,16 +62,12 @@ const NAV_GROUPS = [
       { key: "assign" as ActiveTab, label: "Assign Drills", icon: Plus },
       { key: "drill-library" as ActiveTab, label: "Drill Library", icon: BookOpen },
       { key: "drill-videos" as ActiveTab, label: "Manage Videos", icon: Video },
-      { key: "challenges" as ActiveTab, label: "Weekly Challenges", icon: Trophy },
-      { key: "planner" as ActiveTab, label: "Practice Planner", icon: Target },
-      { key: "page-layouts" as ActiveTab, label: "Page Layouts", icon: LayoutTemplate },
     ],
   },
   {
     label: "Reports",
     items: [
       { key: "player-reports" as ActiveTab, label: "Player Reports", icon: BookOpen },
-      { key: "session-notes" as ActiveTab, label: "Session Notes", icon: StickyNote },
       { key: "submissions" as ActiveTab, label: "Submissions", icon: Inbox },
     ],
   },
@@ -88,32 +75,12 @@ const NAV_GROUPS = [
     label: "Analytics",
     items: [
       { key: "blast-metrics" as ActiveTab, label: "Blast Metrics", icon: Activity },
-      { key: "video-analysis" as ActiveTab, label: "Video Analysis", icon: Sparkles },
-      { key: "activity-feed" as ActiveTab, label: "Activity Feed", icon: TrendingUp },
-    ],
-  },
-  {
-    label: "Communication",
-    items: [
-      { key: "messaging" as ActiveTab, label: "Messaging", icon: MessageSquare },
     ],
   },
   {
     label: "Settings",
     items: [
-      { key: "notifications" as ActiveTab, label: "Notifications", icon: Bell },
       { key: "account" as ActiveTab, label: "My Account", icon: Shield },
-    ],
-  },
-];
-
-const ADMIN_LINK_GROUPS = [
-  {
-    label: "Drill Tools",
-    items: [
-      { href: "/drill-generator", label: "Drill Generator", icon: Wand2 },
-      { href: "/drill-comparison", label: "Drill Comparison", icon: GitCompare },
-      { href: "/athlete-assessment", label: "Athlete Assessment", icon: ClipboardCheck },
     ],
   },
 ];
@@ -122,23 +89,14 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   overview: "Athlete Overview",
   assign: "Assign Drills",
   "bulk-import": "Bulk Import",
-  "bulk-goals": "Bulk Goals",
   "catalog-overrides": "Catalog Overrides",
-  "page-layouts": "Page Layouts",
   athletes: "Athletes Table",
-  planner: "Practice Planner",
-  "session-notes": "Session Notes",
   "player-reports": "Player Reports",
-  "video-analysis": "Video Analysis",
   "blast-metrics": "Blast Metrics",
   "drill-library": "Drill Library",
   "drill-videos": "Manage Videos",
-  challenges: "Weekly Challenges",
   "user-management": "User Management",
   submissions: "Submissions",
-  messaging: "Messaging",
-  "activity-feed": "Activity Feed",
-  notifications: "Notification Settings",
   account: "My Account",
 };
 
@@ -302,9 +260,6 @@ export default function CoachDashboard() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
   // Cross-tab navigation: pre-select an athlete when switching tabs from Blast Metrics
   const [crossNavAthleteId, setCrossNavAthleteId] = useState<number | undefined>(undefined);
-  const [editingLayoutDrill, setEditingLayoutDrill] = useState<{ id: string; name: string } | null>(null);
-  const [layoutSearchQuery, setLayoutSearchQuery] = useState("");
-  const [isBulkGoalOpen, setIsBulkGoalOpen] = useState(false);
   const [showProgressReport, setShowProgressReport] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -523,35 +478,8 @@ export default function CoachDashboard() {
         ))}
       </nav>
 
-      {/* Admin page links */}
-      <div className="px-2 mt-2 space-y-4">
-        {ADMIN_LINK_GROUPS.map(group => (
-          <div key={group.label}>
-            <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest px-2 mb-1">{group.label}</p>
-            <div className="space-y-0.5">
-              {group.items.map(item => (
-                <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}>
-                  <div className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-white/45 hover:text-white/80 hover:bg-white/[0.05] transition-all cursor-pointer">
-                    <item.icon className="w-4 h-4 shrink-0" />
-                    <span className="truncate font-medium">{item.label}</span>
-                    <ExternalLink className="w-3 h-3 ml-auto shrink-0 opacity-30" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Footer links */}
       <div className="px-2 mt-4 pt-4 border-t border-white/[0.06] space-y-0.5">
-        <button
-          onClick={() => { setIsBulkGoalOpen(true); setSidebarOpen(false); }}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-all"
-        >
-          <Upload className="w-4 h-4 shrink-0" />
-          <span>Bulk Goals</span>
-        </button>
         <button
           onClick={() => navigate("bulk-import")}
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all ${activeTab === "bulk-import" ? "bg-[#DC143C]/15 text-white border border-[#DC143C]/25" : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"}`}
@@ -578,8 +506,6 @@ export default function CoachDashboard() {
 
   return (
     <div className="coach-dark min-h-screen flex flex-col">
-      <ImpersonationBanner />
-      <BulkGoalUpload isOpen={isBulkGoalOpen} onClose={() => setIsBulkGoalOpen(false)} />
 
       {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0a0a0a] border-b border-white/[0.06] sticky top-0 z-40">
@@ -649,15 +575,6 @@ export default function CoachDashboard() {
 
             {activeTab === "athletes" && <AthleteTable />}
 
-            {activeTab === "planner" && <PracticePlanner />}
-
-            {activeTab === "session-notes" && (
-              <SessionNotesTab
-                key={crossNavAthleteId ?? "default"}
-                initialAthleteId={crossNavAthleteId}
-                blastUserIds={blastUserIds}
-              />
-            )}
 
             {activeTab === "player-reports" && (
               <PlayerReportsTab
@@ -667,24 +584,15 @@ export default function CoachDashboard() {
               />
             )}
 
-            {activeTab === "video-analysis" && <VideoAnalysisTab />}
 
             {activeTab === "blast-metrics" && (
               <BlastMetricsTab
-                onNavigateToNotes={(userId) => {
-                  setCrossNavAthleteId(userId);
-                  setActiveTab("session-notes");
-                }}
                 onNavigateToReports={(userId) => {
                   setCrossNavAthleteId(userId);
                   setActiveTab("player-reports");
                 }}
               />
             )}
-
-            {activeTab === "challenges" && <WeeklyChallengesTab />}
-
-            {activeTab === "notifications" && <NotificationSettings />}
 
             {activeTab === "account" && <AccountSettings />}
 
@@ -694,67 +602,6 @@ export default function CoachDashboard() {
 
             {activeTab === "user-management" && <UserManagement embedded />}
             {activeTab === "submissions" && <SubmissionsDashboard embedded />}
-            {activeTab === "messaging" && <CoachMessaging embedded />}
-            {activeTab === "activity-feed" && <ActivityFeed embedded />}
-
-            {activeTab === "page-layouts" && (
-              <div className="space-y-6">
-                {editingLayoutDrill ? (
-                  <DrillPageBuilderNotion
-                    drillId={editingLayoutDrill.id}
-                    drillName={editingLayoutDrill.name}
-                    onClose={() => setEditingLayoutDrill(null)}
-                  />
-                ) : (
-                  <>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <h2 className="text-2xl font-heading font-bold">Drill Page Layouts</h2>
-                        <p className="text-muted-foreground mt-1 text-sm">Pick a drill to create or edit its page layout with the block editor.</p>
-                      </div>
-                      <div className="relative w-full sm:w-72">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search drills..."
-                          value={layoutSearchQuery}
-                          onChange={(e) => setLayoutSearchQuery(e.target.value)}
-                          className="pl-10 bg-card/50"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {allDrills
-                        .filter((d) => d.name.toLowerCase().includes(layoutSearchQuery.toLowerCase()))
-                        .map((drill) => (
-                          <div
-                            key={drill.id}
-                            className="glass-card rounded-xl p-4 cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-[#DC143C]/30 group"
-                            onClick={() => setEditingLayoutDrill({ id: String(drill.id), name: drill.name })}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#DC143C]/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
-                                <Edit3 className="h-5 w-5 text-[#DC143C]" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="font-medium text-sm truncate group-hover:text-[#DC143C] transition-colors">{drill.name}</p>
-                                <p className="text-xs text-muted-foreground">{drill.difficulty} · {drill.categories?.join(", ")}</p>
-                              </div>
-                              <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                    {allDrills.filter((d) => d.name.toLowerCase().includes(layoutSearchQuery.toLowerCase())).length === 0 && (
-                      <div className="text-center py-16 text-muted-foreground">
-                        <LayoutTemplate className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                        <p className="font-medium">No drills found</p>
-                        <p className="text-sm mt-1">Try a different search term</p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
 
             {activeTab === "bulk-import" && (
               <div className="max-w-4xl mx-auto space-y-6">
@@ -986,13 +833,10 @@ export default function CoachDashboard() {
 function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void }) {
   const { data: users = [] } = trpc.admin.getAllUsers.useQuery();
   const { data: invites = [] } = trpc.invites.getAllInvites.useQuery();
-  const { data: activities = [] } = trpc.activity.getRecentActivities.useQuery({ limit: 10 });
-  const { data: challenge } = trpc.challenges.getCurrent.useQuery();
 
   const athletes = (users as any[]).filter((u: any) => u.role === "athlete" || u.role === "user");
   const activeAthletes = athletes.filter((u: any) => u.isActiveClient);
   const pendingInvites = (invites as any[]).filter((i: any) => i.status === "pending");
-  const recentLogins = (activities as any[]).filter((a: any) => a.activityType === "portal_login");
 
   return (
     <div className="space-y-6">
@@ -1001,7 +845,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         {[
           { label: "Active Athletes", value: activeAthletes.length, icon: Users, color: "text-emerald-500", onClick: () => onNavigate("athletes") },
           { label: "Pending Invites", value: pendingInvites.length, icon: UserPlus, color: "text-amber-500", onClick: () => onNavigate("user-management") },
-          { label: "Recent Logins", value: recentLogins.length, icon: Activity, color: "text-blue-500", onClick: () => onNavigate("activity-feed") },
           { label: "Total Users", value: users.length, icon: Shield, color: "text-purple-500", onClick: () => onNavigate("user-management") },
         ].map((stat) => {
           const Icon = stat.icon;
@@ -1020,27 +863,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         })}
       </div>
 
-      {/* Active Challenge Banner */}
-      {challenge && (
-        <Card className="border-amber-500/20 bg-amber-500/5">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-              <Trophy className="h-5 w-5 text-amber-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-amber-600 font-medium uppercase tracking-wide">Active Challenge</p>
-              <p className="font-semibold truncate">{challenge.title}</p>
-              <p className="text-xs text-muted-foreground">
-                Ends {new Date(challenge.endsAt).toLocaleDateString()} · Target: {challenge.targetCount} drills
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => onNavigate("challenges")}>
-              Manage
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Quick Actions */}
       <Card>
         <CardHeader className="pb-3">
@@ -1050,13 +872,9 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {[
               { label: "Assign Drills", icon: Target, tab: "assign" as ActiveTab },
-              { label: "Write Notes", icon: StickyNote, tab: "session-notes" as ActiveTab },
-              { label: "Review Videos", icon: Sparkles, tab: "video-analysis" as ActiveTab },
-              { label: "View Messages", icon: MessageSquare, tab: "messaging" as ActiveTab },
               { label: "Player Reports", icon: BookOpen, tab: "player-reports" as ActiveTab },
               { label: "Blast Metrics", icon: BarChart3, tab: "blast-metrics" as ActiveTab },
               { label: "Submissions", icon: Inbox, tab: "submissions" as ActiveTab },
-              { label: "Challenges", icon: Trophy, tab: "challenges" as ActiveTab },
             ].map((action) => {
               const Icon = action.icon;
               return (
@@ -1074,149 +892,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         </CardContent>
       </Card>
 
-      {/* Recent Activity */}
-      {(activities as any[]).length > 0 && (
-        <Card>
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Recent Activity</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => onNavigate("activity-feed")} className="text-xs">
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {(activities as any[]).slice(0, 5).map((a: any) => (
-                <div key={a.id} className="flex items-center gap-3 py-2 border-b last:border-0">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">
-                      <span className="font-medium">{a.userName || "User"}</span>
-                      {" "}{a.activityType?.replace(/_/g, " ")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(a.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-// ── Weekly Challenges Tab (Coach) ────────────────────────────
-function WeeklyChallengesTab() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [targetCount, setTargetCount] = useState("5");
-  const utils = trpc.useUtils();
-
-  const { data: challenges = [], isLoading } = trpc.challenges.getAll.useQuery();
-
-  const createMutation = trpc.challenges.create.useMutation({
-    onSuccess: () => {
-      utils.challenges.getAll.invalidate();
-      setTitle("");
-      setDescription("");
-      setTargetCount("5");
-      toast.success("Challenge created!");
-    },
-    onError: (err: any) => toast.error(err.message || "Failed to create challenge"),
-  });
-
-  const handleCreate = () => {
-    if (!title.trim()) return;
-    const now = new Date();
-    const startsAt = now.toISOString();
-    const endsAt = new Date(now.getTime() + 7 * 86400000).toISOString();
-    createMutation.mutate({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      targetCount: parseInt(targetCount) || 5,
-      startsAt,
-      endsAt,
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-amber-500" />
-            Create Weekly Challenge
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Challenge Title *</Label>
-            <Input
-              placeholder="e.g. Complete 5 bat path drills this week"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Description (optional)</Label>
-            <Input
-              placeholder="Extra details about the challenge..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Target (number of drills to complete)</Label>
-            <Input
-              type="number"
-              min={1}
-              value={targetCount}
-              onChange={(e) => setTargetCount(e.target.value)}
-            />
-          </div>
-          <Button onClick={handleCreate} disabled={!title.trim() || createMutation.isPending} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {createMutation.isPending ? "Creating..." : "Create Challenge (7-day window)"}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Past challenges list */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Challenge History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p className="text-muted-foreground text-sm">Loading...</p>
-          ) : challenges.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No challenges created yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {(challenges as any[]).map((c: any) => {
-                const isActive = new Date(c.startsAt) <= new Date() && new Date(c.endsAt) >= new Date();
-                return (
-                  <div key={c.id} className="flex items-center gap-3 p-3 rounded-lg border">
-                    <div className={`w-2 h-2 rounded-full ${isActive ? "bg-green-500 animate-pulse" : "bg-muted-foreground"}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{c.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(c.startsAt).toLocaleDateString()} – {new Date(c.endsAt).toLocaleDateString()}
-                        {" · Target: "}{c.targetCount} drills
-                      </p>
-                    </div>
-                    {isActive && <Badge variant="secondary" className="bg-green-500/10 text-green-600">Active</Badge>}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
