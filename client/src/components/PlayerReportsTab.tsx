@@ -16,6 +16,8 @@ import {
   ChevronRight, Download, Check,
 } from "lucide-react";
 import { exportHtmlToPdf } from "@/lib/exportPdf";
+import { sanitizeReportHtml } from "@/lib/sanitizeHtml";
+import { toast } from "sonner";
 
 // ── Safe date helper (reportDate can be Date object or string) ──
 function toIsoDate(d: Date | string): string {
@@ -480,7 +482,7 @@ function ReportViewer({
 
         {/* Document view */}
         <div className="report-view rounded-xl border border-border bg-[#0e0e0e] px-12 py-10 shadow-xl"
-          dangerouslySetInnerHTML={{ __html: report.content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeReportHtml(report.content) }}
         />
       </div>
     </>
@@ -582,10 +584,17 @@ export function PlayerReportsTab({ initialAthleteId, blastUserIds: blastUserIdsP
 
   const deleteMutation = trpc.playerReports.delete.useMutation({
     onSuccess: () => {
-      if (view.type === "view") {
+      // Always invalidate so the list refreshes regardless of current view
+      if (view.type !== "select-athlete") {
         utils.playerReports.listByAthlete.invalidate({ athleteId: view.athleteId });
+      }
+      if (view.type === "view") {
         setView({ type: "list", athleteId: view.athleteId, athleteName: view.athleteName });
       }
+      toast.success("Report deleted");
+    },
+    onError: (err) => {
+      toast.error("Could not delete report", { description: err.message });
     },
   });
 

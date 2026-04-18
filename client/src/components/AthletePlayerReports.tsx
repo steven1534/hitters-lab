@@ -7,6 +7,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { exportHtmlToPdf } from "@/lib/exportPdf";
+import { sanitizeReportHtml } from "@/lib/sanitizeHtml";
 import { useAuth } from "@/_core/hooks/useAuth";
 import {
   FileText,
@@ -152,7 +153,7 @@ export function AthletePlayerReports() {
                 <div className="px-4 pb-5 border-t border-white/5 pt-4">
                   <div
                     className="portal-report-view"
-                    dangerouslySetInnerHTML={{ __html: report.content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeReportHtml(report.content) }}
                   />
                 </div>
               )}

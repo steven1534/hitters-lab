@@ -25,6 +25,16 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { exportProgressReportToPDF } from "@/utils/pdfExport";
 import { FileDown } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AthleteProgressReportProps {
   userId: number;
@@ -37,6 +47,7 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
   const [meetingDate, setMeetingDate] = useState(new Date().toISOString().split("T")[0]);
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
   const [editingNoteText, setEditingNoteText] = useState("");
+  const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState<number | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -117,9 +128,14 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
   };
 
   const handleDeleteNote = (noteId: number) => {
-    if (confirm("Are you sure you want to delete this note?")) {
-      deleteNoteMutation.mutate({ noteId });
+    setPendingDeleteNoteId(noteId);
+  };
+
+  const confirmDeleteNote = () => {
+    if (pendingDeleteNoteId != null) {
+      deleteNoteMutation.mutate({ noteId: pendingDeleteNoteId });
     }
+    setPendingDeleteNoteId(null);
   };
 
   if (isLoading) {
@@ -537,6 +553,31 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog
+        open={pendingDeleteNoteId != null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteNoteId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this note?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This meeting note will be removed permanently. You can’t undo this.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteNote}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
