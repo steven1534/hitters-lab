@@ -8,7 +8,6 @@ import {
   InsertUser, users, notifications, notificationPreferences,
   InsertNotificationPreference, invites, drillVideos, drillDetails,
   drillSubmissions, coachFeedback, customDrills,
-  drillQuestions, drillAnswers, parentChildren,
   passwordResetRequests, drills,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -100,19 +99,6 @@ export async function getDb() {
           "updatedBy" integer NOT NULL,
           "createdAt" timestamp DEFAULT now() NOT NULL,
           "updatedAt" timestamp DEFAULT now() NOT NULL
-        )
-      `);
-      await db.execute(sql`
-        CREATE TABLE IF NOT EXISTS "weeklyChallenges" (
-          "id" serial PRIMARY KEY NOT NULL,
-          "title" varchar(255) NOT NULL,
-          "description" text,
-          "targetCount" integer DEFAULT 5 NOT NULL,
-          "drillCategory" varchar(100),
-          "startsAt" timestamp NOT NULL,
-          "endsAt" timestamp NOT NULL,
-          "createdByUserId" integer NOT NULL,
-          "createdAt" timestamp DEFAULT now() NOT NULL
         )
       `);
       console.log("[Database] Tables ensured");
@@ -305,27 +291,22 @@ export async function deleteUser(userId: number): Promise<boolean> {
   if (!db) return false;
   try {
     const {
-      drillAssignments, drillFavorites, athleteActivity,
+      drillAssignments, drillFavorites,
       notifications: notificationsTable, notificationPreferences: notifPrefsTable,
-      drillSubmissions: submissionsTable, coachFeedback: feedbackTable,
+      drillSubmissions: submissionsTable,
       playerReports,
-      blastPlayers, drillQuestions: questionsTable, drillAnswers: answersTable,
-      coachAlertPreferences, parentChildren: parentChildrenTable,
+      blastPlayers,
+      coachNotes,
     } = await import("../drizzle/schema");
 
     // Delete from all related tables first
     await db.delete(drillAssignments).where(eq(drillAssignments.userId, userId));
     await db.delete(drillFavorites).where(eq(drillFavorites.userId, userId));
-    await db.delete(athleteActivity).where(eq(athleteActivity.athleteId, userId));
     await db.delete(notificationsTable).where(eq(notificationsTable.userId, userId));
     await db.delete(notifPrefsTable).where(eq(notifPrefsTable.userId, userId));
     await db.delete(submissionsTable).where(eq(submissionsTable.userId, userId));
-    await db.delete(questionsTable).where(eq(questionsTable.athleteId, userId));
     await db.delete(playerReports).where(eq(playerReports.athleteId, userId));
-    await db.delete(parentChildrenTable).where(eq(parentChildrenTable.childId, userId));
-
-    // Try optional tables that may not exist yet
-    try { await db.delete(coachAlertPreferences).where(eq(coachAlertPreferences.coachId, userId)); } catch {}
+    try { await db.delete(coachNotes).where(eq(coachNotes.athleteId, userId)); } catch {}
     try { await db.delete(blastPlayers).where(eq(blastPlayers.userId, userId)); } catch {}
 
     // Finally delete the user

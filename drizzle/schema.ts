@@ -8,17 +8,8 @@ export const assignmentStatusEnum = pgEnum("assignment_status", ["assigned", "in
 export const inviteRoleEnum = pgEnum("invite_role", ["user", "admin", "athlete", "coach"]);
 export const inviteStatusEnum = pgEnum("invite_status", ["pending", "accepted", "expired"]);
 export const notificationTypeEnum = pgEnum("notification_type", ["submission", "feedback", "badge", "assignment", "system"]);
-export const activityTypeEnum = pgEnum("activity_type", ["portal_login", "drill_view", "assignment_view", "drill_start", "drill_complete", "video_submit", "message_sent", "profile_update"]);
-export const blockTypeEnum = pgEnum("block_type", ["drill", "warmup", "cooldown", "break", "custom"]);
-export const intensityEnum = pgEnum("intensity", ["low", "medium", "high"]);
-export const practicePlanStatusEnum = pgEnum("practice_plan_status", ["draft", "scheduled", "completed", "cancelled"]);
-export const reportStatusEnum = pgEnum("report_status", ["draft", "reviewed", "sent"]);
 export const batsEnum = pgEnum("bats", ["L", "R", "S"]);
 export const throwsEnum = pgEnum("throws", ["L", "R"]);
-export const quizDifficultyEnum = pgEnum("quiz_difficulty", ["beginner", "intermediate", "advanced"]);
-export const quizTypeEnum = pgEnum("quiz_type", ["standard", "adaptive"]);
-export const videoAnalysisStatusEnum = pgEnum("video_analysis_status", ["pending", "analyzing", "complete", "failed"]);
-export const messageStatusEnum = pgEnum("message_status", ["sent", "delivered", "read"]);
 
 // ============================================================
 // Drills (unified — single source of truth in Supabase)
@@ -167,23 +158,6 @@ export type DrillDetail = typeof drillDetails.$inferSelect;
 export type InsertDrillDetail = typeof drillDetails.$inferInsert;
 
 // ============================================================
-// Badges
-// ============================================================
-export const badges = pgTable("badges", {
-  id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  badgeType: varchar("badgeType", { length: 100 }).notNull(),
-  badgeName: varchar("badgeName", { length: 255 }).notNull(),
-  badgeDescription: text("badgeDescription"),
-  badgeIcon: varchar("badgeIcon", { length: 50 }),
-  earnedAt: timestamp("earnedAt").defaultNow().notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Badge = typeof badges.$inferSelect;
-export type InsertBadge = typeof badges.$inferInsert;
-
-// ============================================================
 // Drill Submissions & Coach Feedback
 // ============================================================
 export const drillSubmissions = pgTable("drillSubmissions", {
@@ -252,31 +226,6 @@ export type NotificationPreference = typeof notificationPreferences.$inferSelect
 export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
 
 // ============================================================
-// Drill Q&A
-// ============================================================
-export const drillQuestions = pgTable("drillQuestions", {
-  id: serial("id").primaryKey(),
-  athleteId: integer("athleteId").notNull(),
-  drillId: varchar("drillId", { length: 255 }).notNull(),
-  question: text("question").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type DrillQuestion = typeof drillQuestions.$inferSelect;
-export type InsertDrillQuestion = typeof drillQuestions.$inferInsert;
-
-export const drillAnswers = pgTable("drillAnswers", {
-  id: serial("id").primaryKey(),
-  questionId: integer("questionId").notNull(),
-  coachId: integer("coachId").notNull(),
-  answer: text("answer").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type DrillAnswer = typeof drillAnswers.$inferSelect;
-export type InsertDrillAnswer = typeof drillAnswers.$inferInsert;
-
-// ============================================================
 // Custom Drills & Customizations
 // ============================================================
 export const customDrills = pgTable("customDrills", {
@@ -312,23 +261,6 @@ export const customDrills = pgTable("customDrills", {
 
 export type CustomDrill = typeof customDrills.$inferSelect;
 export type InsertCustomDrill = typeof customDrills.$inferInsert;
-
-export const drillCustomizations = pgTable("drillCustomizations", {
-  id: serial("id").primaryKey(),
-  drillId: varchar("drillId", { length: 255 }).notNull().unique(),
-  thumbnailUrl: text("thumbnailUrl"),
-  imageBase64: text("imageBase64"),
-  imageMimeType: varchar("imageMimeType", { length: 50 }),
-  briefDescription: text("briefDescription"),
-  difficulty: varchar("difficulty", { length: 50 }),
-  category: varchar("category", { length: 100 }),
-  updatedBy: integer("updatedBy").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type DrillCustomization = typeof drillCustomizations.$inferSelect;
-export type InsertDrillCustomization = typeof drillCustomizations.$inferInsert;
 
 // ============================================================
 // Drill catalog overrides (Phase 1 — DB overlay on static/custom drills, same drillId)
@@ -374,109 +306,6 @@ export const coachNotes = pgTable("coachNotes", {
 export type CoachNote = typeof coachNotes.$inferSelect;
 export type InsertCoachNote = typeof coachNotes.$inferInsert;
 
-export const weeklyGoals = pgTable("weeklyGoals", {
-  id: serial("id").primaryKey(),
-  athleteId: integer("athleteId").notNull(),
-  coachId: integer("coachId").notNull(),
-  weekStartDate: timestamp("weekStartDate").notNull(),
-  weekEndDate: timestamp("weekEndDate").notNull(),
-  targetDrillCount: integer("targetDrillCount").notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type WeeklyGoal = typeof weeklyGoals.$inferSelect;
-export type InsertWeeklyGoal = typeof weeklyGoals.$inferInsert;
-
-// ============================================================
-// Drill Page Layouts & Templates
-// ============================================================
-export const drillPageLayouts = pgTable("drillPageLayouts", {
-  id: serial("id").primaryKey(),
-  drillId: varchar("drillId", { length: 255 }).notNull().unique(),
-  blocks: json("blocks").notNull(),
-  createdBy: integer("createdBy").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type DrillPageLayout = typeof drillPageLayouts.$inferSelect;
-export type InsertDrillPageLayout = typeof drillPageLayouts.$inferInsert;
-
-export const drillPageTemplates = pgTable("drillPageTemplates", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
-  blocks: json("blocks").notNull(),
-  createdBy: integer("createdBy").notNull(),
-  isSystem: integer("isSystem").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type DrillPageTemplate = typeof drillPageTemplates.$inferSelect;
-export type InsertDrillPageTemplate = typeof drillPageTemplates.$inferInsert;
-
-// ============================================================
-// Athlete Activity Tracking
-// ============================================================
-export const athleteActivity = pgTable("athleteActivity", {
-  id: serial("id").primaryKey(),
-  athleteId: integer("athleteId").notNull(),
-  athleteName: varchar("athleteName", { length: 255 }),
-  activityType: activityTypeEnum("activityType").notNull(),
-  relatedId: varchar("relatedId", { length: 255 }),
-  relatedType: varchar("relatedType", { length: 50 }),
-  metadata: json("metadata"),
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  userAgent: text("userAgent"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type AthleteActivity = typeof athleteActivity.$inferSelect;
-export type InsertAthleteActivity = typeof athleteActivity.$inferInsert;
-
-export const coachAlertPreferences = pgTable("coachAlertPreferences", {
-  id: serial("id").primaryKey(),
-  coachId: integer("coachId").notNull().unique(),
-  alertOnPortalLogin: integer("alertOnPortalLogin").default(1).notNull(),
-  alertOnDrillView: integer("alertOnDrillView").default(1).notNull(),
-  alertOnAssignmentView: integer("alertOnAssignmentView").default(1).notNull(),
-  alertOnDrillStart: integer("alertOnDrillStart").default(1).notNull(),
-  alertOnDrillComplete: integer("alertOnDrillComplete").default(1).notNull(),
-  alertOnVideoSubmit: integer("alertOnVideoSubmit").default(1).notNull(),
-  alertOnMessageSent: integer("alertOnMessageSent").default(1).notNull(),
-  alertOnInactivity: integer("alertOnInactivity").default(1).notNull(),
-  inactivityDays: integer("inactivityDays").default(3).notNull(),
-  inAppAlerts: integer("inAppAlerts").default(1).notNull(),
-  emailAlerts: integer("emailAlerts").default(1).notNull(),
-  emailDigest: integer("emailDigest").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type CoachAlertPreference = typeof coachAlertPreferences.$inferSelect;
-export type InsertCoachAlertPreference = typeof coachAlertPreferences.$inferInsert;
-
-export const pendingEmailAlerts = pgTable("pendingEmailAlerts", {
-  id: serial("id").primaryKey(),
-  coachId: integer("coachId").notNull(),
-  athleteId: integer("athleteId").notNull(),
-  athleteName: varchar("athleteName", { length: 255 }),
-  activityType: varchar("activityType", { length: 50 }).notNull(),
-  activityMessage: text("activityMessage").notNull(),
-  actionUrl: varchar("actionUrl", { length: 500 }),
-  metadata: json("metadata"),
-  batchKey: varchar("batchKey", { length: 100 }).notNull(),
-  scheduledSendAt: timestamp("scheduledSendAt").notNull(),
-  isSent: integer("isSent").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type PendingEmailAlert = typeof pendingEmailAlerts.$inferSelect;
-export type InsertPendingEmailAlert = typeof pendingEmailAlerts.$inferInsert;
-
 // ============================================================
 // Drill Favorites
 // ============================================================
@@ -489,145 +318,6 @@ export const drillFavorites = pgTable("drillFavorites", {
 
 export type DrillFavorite = typeof drillFavorites.$inferSelect;
 export type InsertDrillFavorite = typeof drillFavorites.$inferInsert;
-
-// ============================================================
-// Smart Baseball Quiz
-// ============================================================
-export const quizQuestions = pgTable("quizQuestions", {
-  id: serial("id").primaryKey(),
-  scenario: text("scenario").notNull(),
-  answers: json("answers").notNull(),
-  correctIndex: integer("correctIndex").notNull(),
-  explanation: text("explanation").notNull(),
-  category: varchar("category", { length: 100 }).notNull(),
-  subcategory: varchar("subcategory", { length: 100 }),
-  difficulty: quizDifficultyEnum("difficulty").default("intermediate").notNull(),
-  isAiGenerated: integer("isAiGenerated").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type QuizQuestion = typeof quizQuestions.$inferSelect;
-export type InsertQuizQuestion = typeof quizQuestions.$inferInsert;
-
-export const quizAttempts = pgTable("quizAttempts", {
-  id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  score: integer("score").notNull(),
-  totalQuestions: integer("totalQuestions").notNull(),
-  percentage: integer("percentage").notNull(),
-  quizType: quizTypeEnum("quizType").default("standard").notNull(),
-  targetCategory: varchar("targetCategory", { length: 100 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type QuizAttempt = typeof quizAttempts.$inferSelect;
-export type InsertQuizAttempt = typeof quizAttempts.$inferInsert;
-
-export const quizQuestionResults = pgTable("quizQuestionResults", {
-  id: serial("id").primaryKey(),
-  attemptId: integer("attemptId").notNull(),
-  userId: integer("userId").notNull(),
-  questionId: integer("questionId").notNull(),
-  selectedAnswerIndex: integer("selectedAnswerIndex").notNull(),
-  isCorrect: integer("isCorrect").notNull(),
-  category: varchar("category", { length: 100 }).notNull(),
-  subcategory: varchar("subcategory", { length: 100 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type QuizQuestionResult = typeof quizQuestionResults.$inferSelect;
-export type InsertQuizQuestionResult = typeof quizQuestionResults.$inferInsert;
-
-// ============================================================
-// Practice Plans
-// ============================================================
-export const practicePlans = pgTable("practicePlans", {
-  id: serial("id").primaryKey(),
-  coachId: integer("coachId").notNull(),
-  athleteId: integer("athleteId"),
-  inviteId: integer("inviteId"),
-  title: varchar("title", { length: 255 }).notNull(),
-  sessionDate: timestamp("sessionDate"),
-  duration: integer("duration").notNull(),
-  sessionNotes: text("sessionNotes"),
-  focusAreas: json("focusAreas"),
-  status: practicePlanStatusEnum("status").default("draft").notNull(),
-  isShared: integer("isShared").default(0).notNull(),
-  isTemplate: integer("isTemplate").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type PracticePlan = typeof practicePlans.$inferSelect;
-export type InsertPracticePlan = typeof practicePlans.$inferInsert;
-
-export const practicePlanBlocks = pgTable("practicePlanBlocks", {
-  id: serial("id").primaryKey(),
-  planId: integer("planId").notNull(),
-  sortOrder: integer("sortOrder").notNull(),
-  blockType: blockTypeEnum("blockType").notNull(),
-  drillId: varchar("drillId", { length: 255 }),
-  title: varchar("title", { length: 255 }).notNull(),
-  duration: integer("duration").notNull(),
-  sets: integer("sets"),
-  reps: integer("reps"),
-  notes: text("notes"),
-  coachingCues: text("coachingCues"),
-  keyPoints: text("keyPoints"),
-  equipment: varchar("equipment", { length: 500 }),
-  intensity: intensityEnum("intensity"),
-  goal: varchar("goal", { length: 500 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type PracticePlanBlock = typeof practicePlanBlocks.$inferSelect;
-export type InsertPracticePlanBlock = typeof practicePlanBlocks.$inferInsert;
-
-// ============================================================
-// Session Notes & Progress Reports
-// ============================================================
-export const sessionNotes = pgTable("sessionNotes", {
-  id: serial("id").primaryKey(),
-  coachId: integer("coachId").notNull(),
-  athleteId: integer("athleteId").notNull(),
-  sessionNumber: integer("sessionNumber").notNull(),
-  sessionLabel: varchar("sessionLabel", { length: 200 }),
-  sessionDate: timestamp("sessionDate").notNull(),
-  duration: integer("duration"),
-  skillsWorked: json("skillsWorked").notNull(),
-  whatImproved: text("whatImproved").notNull(),
-  whatNeedsWork: text("whatNeedsWork").notNull(),
-  homeworkDrills: json("homeworkDrills"),
-  overallRating: integer("overallRating"),
-  privateNotes: text("privateNotes"),
-  practicePlanId: integer("practicePlanId"),
-  blastSessionId: varchar("blastSessionId", { length: 36 }),
-  sharedWithAthlete: boolean("sharedWithAthlete").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type SessionNote = typeof sessionNotes.$inferSelect;
-export type InsertSessionNote = typeof sessionNotes.$inferInsert;
-
-export const progressReports = pgTable("progressReports", {
-  id: serial("id").primaryKey(),
-  coachId: integer("coachId").notNull(),
-  athleteId: integer("athleteId").notNull(),
-  sessionNoteId: integer("sessionNoteId"),
-  title: varchar("title", { length: 500 }).notNull(),
-  reportContent: json("reportContent").notNull(),
-  reportHtml: text("reportHtml"),
-  status: reportStatusEnum("status").default("draft").notNull(),
-  sentAt: timestamp("sentAt"),
-  sentToEmail: varchar("sentToEmail", { length: 320 }),
-  sentToName: varchar("sentToName", { length: 255 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type ProgressReport = typeof progressReports.$inferSelect;
-export type InsertProgressReport = typeof progressReports.$inferInsert;
 
 // ============================================================
 // Athlete Profiles
@@ -664,53 +354,6 @@ export const athleteProfiles = pgTable("athleteProfiles", {
 
 export type AthleteProfile = typeof athleteProfiles.$inferSelect;
 export type InsertAthleteProfile = typeof athleteProfiles.$inferInsert;
-
-// ============================================================
-// Messaging
-// ============================================================
-export const messages = pgTable("messages", {
-  id: serial("id").primaryKey(),
-  senderId: integer("senderId").notNull(),
-  recipientId: integer("recipientId").notNull(),
-  content: text("content").notNull(),
-  status: messageStatusEnum("status").default("sent").notNull(),
-  parentMessageId: integer("parentMessageId"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type Message = typeof messages.$inferSelect;
-export type InsertMessage = typeof messages.$inferInsert;
-
-// ============================================================
-// Video Analysis
-// ============================================================
-export const videoAnalysis = pgTable("videoAnalysis", {
-  id: serial("id").primaryKey(),
-  athleteId: integer("athleteId").notNull(),
-  coachId: integer("coachId"),
-  videoUrl: text("videoUrl").notNull(),
-  thumbnailUrl: text("thumbnailUrl"),
-  title: varchar("title", { length: 255 }),
-  analysisType: varchar("analysisType", { length: 100 }),
-  swingType: varchar("swingType", { length: 50 }),
-  drillId: varchar("drillId", { length: 255 }),
-  isStandalone: integer("isStandalone").default(0),
-  athleteNotes: text("athleteNotes"),
-  status: videoAnalysisStatusEnum("status").default("pending").notNull(),
-  aiAnalysis: text("aiAnalysis"),
-  coachFeedbackText: text("coachFeedbackText"),
-  analyzedAt: timestamp("analyzedAt"),
-  reviewedAt: timestamp("reviewedAt"),
-  approvedAt: timestamp("approvedAt"),
-  sentAt: timestamp("sentAt"),
-  sentToEmail: varchar("sentToEmail", { length: 320 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type VideoAnalysisRecord = typeof videoAnalysis.$inferSelect;
-export type InsertVideoAnalysis = typeof videoAnalysis.$inferInsert;
 
 // ============================================================
 // Blast Motion
@@ -764,21 +407,6 @@ export const siteContent = pgTable("siteContent", {
 export type SiteContent = typeof siteContent.$inferSelect;
 export type InsertSiteContent = typeof siteContent.$inferInsert;
 
-export const drillStatCards = pgTable("drillStatCards", {
-  id: serial("id").primaryKey(),
-  drillId: varchar("drillId", { length: 128 }).notNull(),
-  label: varchar("label", { length: 128 }).notNull(),
-  value: varchar("value", { length: 512 }).notNull().default(""),
-  icon: varchar("icon", { length: 64 }).default("info"),
-  position: integer("position").notNull().default(0),
-  isVisible: integer("isVisible").notNull().default(1),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-});
-
-export type DrillStatCard = typeof drillStatCards.$inferSelect;
-export type InsertDrillStatCard = typeof drillStatCards.$inferInsert;
-
 // ============================================================
 // Player Reports
 // ============================================================
@@ -796,22 +424,6 @@ export const playerReports = pgTable("playerReports", {
 export type PlayerReport = typeof playerReports.$inferSelect;
 export type InsertPlayerReport = typeof playerReports.$inferInsert;
 
-// ============================================================
-// Parent-Child Relationships
-// ============================================================
-export const parentChildren = pgTable("parentChildren", {
-  id: serial("id").primaryKey(),
-  parentId: integer("parentId").notNull(),
-  childId: integer("childId").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type ParentChild = typeof parentChildren.$inferSelect;
-export type InsertParentChild = typeof parentChildren.$inferInsert;
-
-// ============================================================
-// Drill Progress (personal completion tracking)
-// ============================================================
 // ============================================================
 // Password Reset Requests
 // ============================================================
@@ -842,21 +454,3 @@ export const drillProgress = pgTable("drillProgress", {
 
 export type DrillProgress = typeof drillProgress.$inferSelect;
 export type InsertDrillProgress = typeof drillProgress.$inferInsert;
-
-// ============================================================
-// Weekly Challenges (coach-set goals for athletes)
-// ============================================================
-export const weeklyChallenges = pgTable("weeklyChallenges", {
-  id: serial("id").primaryKey(),
-  title: varchar("title", { length: 256 }).notNull(),
-  description: text("description"),
-  targetCount: integer("targetCount").notNull().default(5),
-  drillCategory: varchar("drillCategory", { length: 128 }),
-  startsAt: timestamp("startsAt").notNull(),
-  endsAt: timestamp("endsAt").notNull(),
-  createdByUserId: integer("createdByUserId").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type WeeklyChallenge = typeof weeklyChallenges.$inferSelect;
-export type InsertWeeklyChallenge = typeof weeklyChallenges.$inferInsert;
