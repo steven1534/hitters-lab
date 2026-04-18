@@ -5,11 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, Video, FileText, Search, Home, LogOut, ChevronRight, Send } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { MessageSquare, Video, FileText, Search, Home, LogOut, ChevronRight, Send, Inbox, CheckCheck, Clock } from "lucide-react";
+import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { useNotification } from "@/contexts/NotificationContext";
+import { useAllDrills, type UnifiedDrill } from "@/hooks/useAllDrills";
+import { toast } from "sonner";
 
 interface Submission {
   id: number;
@@ -19,20 +20,23 @@ interface Submission {
   videoUrl: string | null;
   submittedAt: Date;
   athleteName?: string;
+  drillName?: string;
+  feedbackCount?: number;
 }
+
+type TabKey = "all" | "unreviewed" | "reviewed";
 
 export default function SubmissionsDashboard({ embedded = false }: { embedded?: boolean }) {
   const { user, loading, logout } = useAuth();
-  const { addToast } = useNotification();
-  const [, navigate] = useLocation();
+  const utils = trpc.useUtils();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterAthlete, setFilterAthlete] = useState("all");
   const [filterDrill, setFilterDrill] = useState("all");
   const [sortBy, setSortBy] = useState<"recent" | "oldest">("recent");
+  const [tab, setTab] = useState<TabKey>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [feedbackText, setFeedbackText] = useState("");
-  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const itemsPerPage = 10;
 
   // Fetch all users for athlete filter
@@ -41,10 +45,25 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
   });
 
   // Fetch all submissions from all athletes (admin-only route)
-  const { data: allSubmissions = [], isLoading: submissionsLoading, refetch } = trpc.submissions.drillSubmissions.getAllSubmissions.useQuery(
-    undefined,
-    { enabled: user?.role === 'admin' }
-  );
+  const { data: allSubmissions = [], isLoading: submissionsLoading } =
+    trpc.submissions.drillSubmissions.getAllSubmissions.useQuery(undefined, {
+      enabled: user?.role === 'admin',
+    });
+
+  // Drill catalog (static + custom), so we can show drill names instead of IDs
+  const drillCatalog = useAllDrills();
+  const drillLookup = useMemo(() => {
+    const m = new Map<string, UnifiedDrill>();
+    for (const d of drillCatalog) m.set(d.id, d);
+    return m;
+  }, [drillCatalog]);
+  const drillName = (drillId: string) => drillLookup.get(drillId)?.name ?? drillId;
+
+  // Per-submission feedback counts (admin-only route), to power the Unreviewed/Reviewed tabs
+  const { data: feedbackCounts = {} } =
+    trpc.submissions.coachFeedback.getFeedbackCountsBySubmissions.useQuery(undefined, {
+      enabled: user?.role === 'admin',
+    });
 
   // Fetch feedback for selected submission
   const { data: feedbackList = [] } = trpc.submissions.coachFeedback.getFeedbackBySubmission.useQuery(
@@ -55,93 +74,105 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
   // Create feedback mutation
   const createFeedbackMutation = trpc.submissions.coachFeedback.createFeedback.useMutation({
     onSuccess: () => {
-      addToast({
-        type: 'success',
-        title: 'Feedback Sent',
-        message: 'Your feedback has been sent to the athlete',
-      });
+      toast.success("Feedback sent to athlete");
       setFeedbackText("");
-      refetch();
+      utils.submissions.coachFeedback.getFeedbackBySubmission.invalidate();
+      utils.submissions.coachFeedback.getFeedbackCountsBySubmissions.invalidate();
     },
-    onError: (error: any) => {
-      addToast({
-        type: 'error',
-        title: 'Error',
-        message: error.message || 'Failed to send feedback',
-      });
+    onError: (error) => {
+      toast.error("Failed to send feedback", { description: error.message });
     },
   });
 
-  // Filter and sort submissions
-  const filteredSubmissions = useMemo(() => {
-    let filtered = allSubmissions.map((sub: any) => ({
-      ...sub,
-      athleteName: allUsers.find((u: any) => u.id === sub.userId)?.name || `Athlete ${sub.userId}`,
-    }));
+  // Filter, tab-partition, and sort submissions
+  const decoratedSubmissions = useMemo(() => {
+    return allSubmissions.map((sub: any) => {
+      const count = (feedbackCounts as Record<string, number>)[String(sub.id)] ?? 0;
+      return {
+        ...sub,
+        athleteName: allUsers.find((u: any) => u.id === sub.userId)?.name || `Athlete ${sub.userId}`,
+        drillName: drillName(sub.drillId),
+        feedbackCount: count,
+      } as Submission;
+    });
+  }, [allSubmissions, allUsers, feedbackCounts, drillLookup]);
 
-    // Apply search filter
+  const tabCounts = useMemo(() => {
+    let unreviewed = 0;
+    let reviewed = 0;
+    for (const s of decoratedSubmissions) {
+      if ((s.feedbackCount ?? 0) > 0) reviewed++;
+      else unreviewed++;
+    }
+    return { all: decoratedSubmissions.length, unreviewed, reviewed };
+  }, [decoratedSubmissions]);
+
+  const filteredSubmissions = useMemo(() => {
+    let filtered = decoratedSubmissions;
+
+    if (tab === "unreviewed") filtered = filtered.filter((s) => (s.feedbackCount ?? 0) === 0);
+    else if (tab === "reviewed") filtered = filtered.filter((s) => (s.feedbackCount ?? 0) > 0);
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((sub: any) =>
-        sub.athleteName.toLowerCase().includes(query) ||
+      filtered = filtered.filter((sub) =>
+        (sub.athleteName ?? "").toLowerCase().includes(query) ||
         sub.drillId.toLowerCase().includes(query) ||
-        sub.notes?.toLowerCase().includes(query)
+        (sub.drillName ?? "").toLowerCase().includes(query) ||
+        (sub.notes ?? "").toLowerCase().includes(query)
       );
     }
 
-    // Apply athlete filter
     if (filterAthlete !== "all") {
-      filtered = filtered.filter((sub: any) => sub.userId.toString() === filterAthlete);
+      filtered = filtered.filter((sub) => sub.userId.toString() === filterAthlete);
     }
 
-    // Apply drill filter
     if (filterDrill !== "all") {
-      filtered = filtered.filter((sub: any) => sub.drillId === filterDrill);
+      filtered = filtered.filter((sub) => sub.drillId === filterDrill);
     }
 
-    // Sort
-    filtered.sort((a: any, b: any) => {
+    const sorted = [...filtered];
+    sorted.sort((a, b) => {
       const dateA = new Date(a.submittedAt).getTime();
       const dateB = new Date(b.submittedAt).getTime();
       return sortBy === "recent" ? dateB - dateA : dateA - dateB;
     });
 
-    return filtered;
-  }, [allSubmissions, searchQuery, filterAthlete, filterDrill, sortBy, allUsers]);
+    return sorted;
+  }, [decoratedSubmissions, tab, searchQuery, filterAthlete, filterDrill, sortBy]);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / itemsPerPage));
   const paginatedSubmissions = filteredSubmissions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // Get unique drills for filter
+  // Unique drills that actually appear in submissions (for drill filter)
   const uniqueDrills = useMemo(() => {
-    const drillSet = new Set(allSubmissions.map((s: any) => s.drillId));
-    return Array.from(drillSet);
-  }, [allSubmissions]);
+    const seen = new Map<string, string>();
+    for (const s of decoratedSubmissions) {
+      if (!seen.has(s.drillId)) seen.set(s.drillId, s.drillName ?? s.drillId);
+    }
+    return Array.from(seen.entries())
+      .sort((a, b) => a[1].localeCompare(b[1], undefined, { sensitivity: "base" }));
+  }, [decoratedSubmissions]);
+
+  const hasActiveFilters = !!searchQuery.trim() || filterAthlete !== "all" || filterDrill !== "all" || tab !== "all";
 
   const handleSubmitFeedback = async () => {
     if (!feedbackText.trim() || !selectedSubmission) return;
-    
-    setIsSubmittingFeedback(true);
-    try {
-      await createFeedbackMutation.mutateAsync({
-        submissionId: selectedSubmission.id,
-        userId: selectedSubmission.userId,
-        drillId: selectedSubmission.drillId,
-        feedback: feedbackText.trim(),
-      });
-    } finally {
-      setIsSubmittingFeedback(false);
-    }
+    await createFeedbackMutation.mutateAsync({
+      submissionId: selectedSubmission.id,
+      userId: selectedSubmission.userId,
+      drillId: selectedSubmission.drillId,
+      feedback: feedbackText.trim(),
+    });
   };
 
-  if (loading || submissionsLoading) {
+  if (loading) {
     return (
       <div className="coach-dark min-h-screen bg-background flex items-center justify-center">
-        <div className="container py-12 text-center text-muted-foreground">Loading submissions...</div>
+        <div className="container py-12 text-center text-muted-foreground">Loading…</div>
       </div>
     );
   }
@@ -166,6 +197,14 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
     );
   }
 
+  const clearFilters = () => {
+    setSearchQuery("");
+    setFilterAthlete("all");
+    setFilterDrill("all");
+    setTab("all");
+    setCurrentPage(1);
+  };
+
   const mainContent = (
     <>
         {/* Stats */}
@@ -173,7 +212,7 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">{filteredSubmissions.length}</div>
+                <div className="text-3xl font-bold text-primary">{tabCounts.all}</div>
                 <p className="text-sm text-muted-foreground">Total Submissions</p>
               </div>
             </CardContent>
@@ -181,16 +220,16 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-secondary">{allUsers.filter((u: any) => u.role === 'athlete').length}</div>
-                <p className="text-sm text-muted-foreground">Active Athletes</p>
+                <div className="text-3xl font-bold text-amber-400">{tabCounts.unreviewed}</div>
+                <p className="text-sm text-muted-foreground">Awaiting Feedback</p>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-accent">{uniqueDrills.length}</div>
-                <p className="text-sm text-muted-foreground">Drills Assigned</p>
+                <div className="text-3xl font-bold text-green-500">{tabCounts.reviewed}</div>
+                <p className="text-sm text-muted-foreground">Feedback Sent</p>
               </div>
             </CardContent>
           </Card>
@@ -201,13 +240,49 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle className="mb-4">Submissions</CardTitle>
+                <div className="flex items-center justify-between mb-4">
+                  <CardTitle>Submissions</CardTitle>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7">
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
+
+                {/* Tabs */}
+                <div className="inline-flex bg-muted/40 rounded-lg border border-border p-0.5 mb-4">
+                  {([
+                    { key: "all", label: "All", icon: Inbox, count: tabCounts.all },
+                    { key: "unreviewed", label: "Unreviewed", icon: Clock, count: tabCounts.unreviewed },
+                    { key: "reviewed", label: "Reviewed", icon: CheckCheck, count: tabCounts.reviewed },
+                  ] as const).map((t) => {
+                    const Icon = t.icon;
+                    const active = tab === t.key;
+                    return (
+                      <button
+                        key={t.key}
+                        onClick={() => { setTab(t.key); setCurrentPage(1); }}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          active
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground/80"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        {t.label}
+                        <Badge variant="outline" className="ml-1 h-4 px-1 text-[10px] font-normal border-border">
+                          {t.count}
+                        </Badge>
+                      </button>
+                    );
+                  })}
+                </div>
 
                 {/* Search */}
                 <div className="relative mb-4">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by athlete name, drill, or notes..."
+                    placeholder="Search by athlete, drill, or notes…"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -245,9 +320,9 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Drills</SelectItem>
-                      {uniqueDrills.map((drillId: string) => (
+                      {uniqueDrills.map(([drillId, name]) => (
                         <SelectItem key={drillId} value={drillId}>
-                          {drillId}
+                          {name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -266,48 +341,78 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
               </CardHeader>
 
               <CardContent>
-                {paginatedSubmissions.length > 0 ? (
+                {submissionsLoading ? (
                   <div className="space-y-3">
-                    {paginatedSubmissions.map((submission: Submission) => (
-                      <div
-                        key={submission.id}
-                        onClick={() => setSelectedSubmission(submission)}
-                        className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                          selectedSubmission?.id === submission.id ? "border-secondary bg-secondary/5" : "hover:bg-muted/50"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg mb-2">{submission.athleteName}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">Drill: {submission.drillId}</p>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              {submission.notes && (
-                                <Badge variant="outline" className="gap-1">
-                                  <FileText className="h-3 w-3" />
-                                  Notes
-                                </Badge>
-                              )}
-                              {submission.videoUrl && (
-                                <Badge variant="outline" className="gap-1">
-                                  <Video className="h-3 w-3" />
-                                  Video
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(submission.submittedAt).toLocaleString()}
-                            </p>
-                          </div>
-                          <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                        </div>
-                      </div>
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-24 rounded-lg bg-muted/40 animate-pulse" />
                     ))}
+                  </div>
+                ) : paginatedSubmissions.length > 0 ? (
+                  <div className="space-y-3">
+                    {paginatedSubmissions.map((submission) => {
+                      const unreviewed = (submission.feedbackCount ?? 0) === 0;
+                      return (
+                        <div
+                          key={submission.id}
+                          onClick={() => setSelectedSubmission(submission)}
+                          className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
+                            selectedSubmission?.id === submission.id ? "border-secondary bg-secondary/5" : "hover:bg-muted/50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold text-lg truncate">{submission.athleteName}</h3>
+                                {unreviewed ? (
+                                  <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px] h-5 px-1.5">
+                                    New
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-green-500/15 text-green-500 border-green-500/30 text-[10px] h-5 px-1.5">
+                                    <CheckCheck className="h-3 w-3 mr-0.5" />
+                                    {submission.feedbackCount}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-2 truncate">
+                                Drill: <span className="text-foreground/80">{submission.drillName}</span>
+                              </p>
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {submission.notes && (
+                                  <Badge variant="outline" className="gap-1">
+                                    <FileText className="h-3 w-3" />
+                                    Notes
+                                  </Badge>
+                                )}
+                                {submission.videoUrl && (
+                                  <Badge variant="outline" className="gap-1">
+                                    <Video className="h-3 w-3" />
+                                    Video
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(submission.submittedAt).toLocaleString()}
+                              </p>
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : decoratedSubmissions.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Inbox className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2">No submissions yet</p>
+                    <p className="text-sm">Athletes haven't submitted any drill work yet. Once they do, it'll show up here.</p>
                   </div>
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
-                    <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg font-medium mb-2">No submissions found</p>
-                    <p className="text-sm">Athletes haven't submitted any drill work yet.</p>
+                    <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2">No matches</p>
+                    <p className="text-sm mb-4">Try a different search or clear your filters.</p>
+                    <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button>
                   </div>
                 )}
 
@@ -357,7 +462,7 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase">Drill</p>
-                      <p className="text-sm font-medium">{selectedSubmission.drillId}</p>
+                      <p className="text-sm font-medium">{selectedSubmission.drillName || selectedSubmission.drillId}</p>
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase">Submitted</p>
@@ -369,7 +474,7 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
                   {selectedSubmission.notes && (
                     <div>
                       <p className="text-sm font-semibold mb-2">Athlete Notes</p>
-                      <p className="text-sm text-muted-foreground p-2 bg-muted rounded">{selectedSubmission.notes}</p>
+                      <p className="text-sm text-muted-foreground p-2 bg-muted rounded whitespace-pre-wrap">{selectedSubmission.notes}</p>
                     </div>
                   )}
 
@@ -380,7 +485,7 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
                       <video
                         src={selectedSubmission.videoUrl}
                         controls
-                        className="w-full rounded-lg max-h-48 bg-black"
+                        className="w-full rounded-lg max-h-64 bg-black"
                       />
                     </div>
                   )}
@@ -392,7 +497,7 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {feedbackList.map((feedback: any) => (
                           <div key={feedback.id} className="p-2 bg-red-500/10 rounded border border-red-500/20">
-                            <p className="text-xs text-red-200">{feedback.feedback}</p>
+                            <p className="text-xs text-red-200 whitespace-pre-wrap">{feedback.feedback}</p>
                             <p className="text-xs text-red-400/80 mt-1">
                               {new Date(feedback.createdAt).toLocaleString()}
                             </p>
@@ -410,17 +515,17 @@ export default function SubmissionsDashboard({ embedded = false }: { embedded?: 
                       onChange={(e) => setFeedbackText(e.target.value)}
                       placeholder="Share constructive feedback on their performance..."
                       rows={3}
-                      disabled={isSubmittingFeedback}
+                      disabled={createFeedbackMutation.isPending}
                       className="text-sm"
                     />
                     <Button
                       onClick={handleSubmitFeedback}
-                      disabled={!feedbackText.trim() || isSubmittingFeedback}
+                      disabled={!feedbackText.trim() || createFeedbackMutation.isPending}
                       className="w-full"
                       size="sm"
                     >
                       <Send className="h-4 w-4 mr-2" />
-                      {isSubmittingFeedback ? "Sending..." : "Send Feedback"}
+                      {createFeedbackMutation.isPending ? "Sending..." : "Send Feedback"}
                     </Button>
                   </div>
                 </CardContent>
