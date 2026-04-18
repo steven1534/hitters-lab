@@ -680,6 +680,25 @@ export async function getFeedbackBySubmission(submissionId: number) {
   }
 }
 
+export async function getFeedbackCountsBySubmissions(): Promise<Record<string, number>> {
+  const db = await getDb();
+  if (!db) return {};
+  try {
+    const rows = await db
+      .select({ submissionId: coachFeedback.submissionId, count: sql<number>`count(*)::int` })
+      .from(coachFeedback)
+      .groupBy(coachFeedback.submissionId);
+    const result: Record<string, number> = {};
+    for (const r of rows) {
+      if (r.submissionId != null) result[String(r.submissionId)] = Number(r.count) || 0;
+    }
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get feedback counts:", error);
+    return {};
+  }
+}
+
 export async function getFeedbackByDrill(drillId: string, userId: number) {
   const db = await getDb();
   if (!db) return [];

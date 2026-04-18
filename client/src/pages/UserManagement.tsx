@@ -26,8 +26,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Loader2, CheckCircle2, AlertCircle, KeyRound, Pencil, X, AlertTriangle } from "lucide-react";
+import {
+  Search,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  KeyRound,
+  Pencil,
+  X,
+  AlertTriangle,
+  Copy,
+  ShieldAlert,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface User {
@@ -40,97 +61,146 @@ interface User {
   lastSignedIn: Date;
 }
 
+const ROLE_OPTIONS = [
+  { value: "user", label: "User" },
+  { value: "athlete", label: "Athlete" },
+  { value: "coach", label: "Coach" },
+  { value: "admin", label: "Admin" },
+];
+
+function formatRelative(date: Date | string | null | undefined): string {
+  if (!date) return "Never";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "Never";
+  const diffMs = Date.now() - d.getTime();
+  if (diffMs < 60_000) return "Just now";
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return d.toLocaleDateString();
+}
+
 export default function UserManagement({ embedded = false }: { embedded?: boolean }) {
   const { user } = useAuth();
+  const utils = trpc.useUtils();
   const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
+
+  // Confirmation dialog state
+  const [roleConfirm, setRoleConfirm] = useState<{ user: User; newRole: string } | null>(null);
+  const [accessConfirm, setAccessConfirm] = useState<User | null>(null);
 
   // Reset password dialog state
   const [resetDialogUser, setResetDialogUser] = useState<User | null>(null);
   const [resetPassword, setResetPassword] = useState("");
   const [resetRequestId, setResetRequestId] = useState<number | null>(null);
+  const [lastResetPassword, setLastResetPassword] = useState<{ userId: number; password: string } | null>(null);
 
   // Edit user dialog state
   const [editDialogUser, setEditDialogUser] = useState<User | null>(null);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
 
-  const { data: users = [], isLoading, refetch } = trpc.admin.getAllUsers.useQuery();
-  const { data: resetRequests = [], refetch: refetchRequests } = trpc.admin.getPasswordResetRequests.useQuery();
+  const { data: users = [], isLoading } = trpc.admin.getAllUsers.useQuery();
+  const { data: resetRequests = [] } = trpc.admin.getPasswordResetRequests.useQuery();
+
+  const invalidateUsers = () => utils.admin.getAllUsers.invalidate();
+  const invalidateRequests = () => utils.admin.getPasswordResetRequests.invalidate();
 
   const updateRoleMutation = trpc.admin.updateUserRole.useMutation({
     onSuccess: () => {
-      toast.success("User role updated successfully");
+      toast.success("Role updated");
       setSelectedUserId(null);
       setSelectedRole("");
-      refetch();
+      setRoleConfirm(null);
+      invalidateUsers();
     },
-    onError: (error) => toast.error(error.message || "Failed to update user role"),
+    onError: (error) => toast.error("Failed to update role", { description: error.message }),
   });
 
   const toggleAccessMutation = trpc.admin.toggleClientAccess.useMutation({
-    onSuccess: () => {
-      toast.success("User access updated");
-      refetch();
+    onSuccess: (_data, vars) => {
+      toast.success(vars.isActive ? "User activated" : "User deactivated");
+      setAccessConfirm(null);
+      invalidateUsers();
     },
-    onError: (error) => toast.error(error.message || "Failed to update user access"),
+    onError: (error) => {
+      toast.error("Failed to update access", { description: error.message });
+      setAccessConfirm(null);
+    },
   });
 
   const resetPasswordMutation = trpc.admin.resetUserPassword.useMutation({
-    onSuccess: () => {
-      toast.success("Password reset. Share the new password with the user securely.");
+    onSuccess: (_data, vars) => {
+      toast.success("Password reset", { description: "Share the new password securely." });
+      setLastResetPassword({ userId: vars.userId, password: vars.newPassword });
       setResetDialogUser(null);
       setResetPassword("");
       setResetRequestId(null);
-      refetchRequests();
+      invalidateRequests();
     },
-    onError: (error) => toast.error(error.message || "Failed to reset password"),
+    onError: (error) => toast.error("Failed to reset password", { description: error.message }),
   });
 
   const completeResetMutation = trpc.admin.completeResetRequest.useMutation({
-    onSuccess: () => {
-      toast.success("Password reset and request completed.");
+    onSuccess: (_data, vars) => {
+      toast.success("Password reset", { description: "Request marked complete." });
+      setLastResetPassword({ userId: vars.userId, password: vars.newPassword });
       setResetDialogUser(null);
       setResetPassword("");
       setResetRequestId(null);
-      refetchRequests();
+      invalidateRequests();
     },
-    onError: (error) => toast.error(error.message || "Failed to reset password"),
+    onError: (error) => toast.error("Failed to reset password", { description: error.message }),
   });
 
   const dismissRequestMutation = trpc.admin.dismissResetRequest.useMutation({
     onSuccess: () => {
       toast.success("Reset request dismissed");
-      refetchRequests();
+      invalidateRequests();
     },
-    onError: (error) => toast.error(error.message || "Failed to dismiss request"),
+    onError: (error) => toast.error("Failed to dismiss request", { description: error.message }),
   });
 
   const updateUserInfoMutation = trpc.admin.updateUserInfo.useMutation({
     onSuccess: () => {
       toast.success("User info updated");
       setEditDialogUser(null);
-      refetch();
+      invalidateUsers();
     },
-    onError: (error) => toast.error(error.message || "Failed to update user"),
+    onError: (error) => toast.error("Failed to update user", { description: error.message }),
   });
 
   const filteredUsers = useMemo(() => {
     if (!users) return [];
+    const searchLower = searchQuery.toLowerCase();
     return users.filter((u: User) => {
-      const searchLower = searchQuery.toLowerCase();
-      return (
-        (u.name?.toLowerCase().includes(searchLower) || false) ||
-        (u.email?.toLowerCase().includes(searchLower) || false)
-      );
+      const matchesSearch =
+        !searchLower ||
+        (u.name?.toLowerCase().includes(searchLower) ?? false) ||
+        (u.email?.toLowerCase().includes(searchLower) ?? false);
+      const matchesRole = roleFilter === "all" || u.role === roleFilter;
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && u.isActiveClient === 1) ||
+        (statusFilter === "inactive" && u.isActiveClient === 0);
+      return matchesSearch && matchesRole && matchesStatus;
     });
-  }, [users, searchQuery]);
+  }, [users, searchQuery, roleFilter, statusFilter]);
+
+  const hasActiveFilters = !!searchQuery.trim() || roleFilter !== "all" || statusFilter !== "all";
 
   function openResetDialog(u: User, requestId?: number) {
     setResetDialogUser(u);
     setResetPassword("");
     setResetRequestId(requestId ?? null);
+    setLastResetPassword(null);
   }
 
   function openEditDialog(u: User) {
@@ -151,6 +221,16 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
   function handleEditUser() {
     if (!editDialogUser) return;
     updateUserInfoMutation.mutate({ userId: editDialogUser.id, name: editName || undefined, email: editEmail || undefined });
+  }
+
+  async function handleCopyPassword() {
+    if (!lastResetPassword) return;
+    try {
+      await navigator.clipboard.writeText(lastResetPassword.password);
+      toast.success("Password copied to clipboard");
+    } catch {
+      toast.error("Copy failed", { description: "Select and copy manually." });
+    }
   }
 
   const getRoleBadgeColor = (role: string) => {
@@ -190,6 +270,12 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
       </div>
     );
   }
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setRoleFilter("all");
+    setStatusFilter("all");
+  };
 
   const content = (
     <>
@@ -246,9 +332,9 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
           </Card>
         )}
 
-        {/* Search Bar */}
+        {/* Filters */}
         <Card className="mb-6">
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
@@ -257,6 +343,36 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              <div className="flex gap-2 items-center flex-1">
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="All roles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    {ROLE_OPTIONS.map((r) => (
+                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-36">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+                  Clear filters
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -267,6 +383,9 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
             <CardTitle>All Users</CardTitle>
             <CardDescription>
               Total: {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
+              {hasActiveFilters && users.length !== filteredUsers.length && (
+                <> (filtered from {users.length})</>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -275,8 +394,15 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : filteredUsers.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No users found</p>
+              <div className="text-center py-12 text-muted-foreground">
+                {users.length === 0 ? (
+                  <p>No users found</p>
+                ) : (
+                  <>
+                    <p className="mb-3">No users match your filters.</p>
+                    <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button>
+                  </>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -288,6 +414,7 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
                       <TableHead>Role</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Joined</TableHead>
+                      <TableHead>Last Signed In</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -303,12 +430,15 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
                         <TableCell className="text-sm text-muted-foreground">
                           {new Date(u.createdAt).toLocaleDateString()}
                         </TableCell>
+                        <TableCell className="text-sm text-muted-foreground" title={u.lastSignedIn ? new Date(u.lastSignedIn).toLocaleString() : "Never"}>
+                          {formatRelative(u.lastSignedIn)}
+                        </TableCell>
                         <TableCell>
                           <div className="flex gap-2 flex-wrap">
                             <Button
                               size="sm"
                               variant={u.isActiveClient === 1 ? "outline" : "default"}
-                              onClick={() => toggleAccessMutation.mutate({ userId: u.id, isActive: u.isActiveClient === 0 })}
+                              onClick={() => setAccessConfirm(u)}
                               disabled={toggleAccessMutation.isPending}
                             >
                               {u.isActiveClient === 1 ? "Deactivate" : "Activate"}
@@ -321,16 +451,18 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
                                     <SelectValue placeholder="Select role" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="athlete">Athlete</SelectItem>
-                                    <SelectItem value="coach">Coach</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    {ROLE_OPTIONS.map((r) => (
+                                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                                 <Button
                                   size="sm"
-                                  onClick={() => selectedRole && updateRoleMutation.mutate({ userId: u.id, role: selectedRole })}
-                                  disabled={!selectedRole || updateRoleMutation.isPending}
+                                  onClick={() => {
+                                    if (!selectedRole || selectedRole === u.role) return;
+                                    setRoleConfirm({ user: u, newRole: selectedRole });
+                                  }}
+                                  disabled={!selectedRole || selectedRole === u.role || updateRoleMutation.isPending}
                                 >
                                   Save
                                 </Button>
@@ -362,44 +494,151 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
           </CardContent>
         </Card>
 
+      {/* Role Change Confirmation */}
+      <AlertDialog open={!!roleConfirm} onOpenChange={(open) => { if (!open) setRoleConfirm(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              {roleConfirm?.newRole === "admin" && <ShieldAlert className="h-5 w-5 text-red-500" />}
+              Change role to {roleConfirm?.newRole}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will change <span className="text-foreground font-medium">{roleConfirm?.user.name || roleConfirm?.user.email}</span>'s
+              role from <span className="text-foreground font-medium">{roleConfirm?.user.role}</span> to <span className="text-foreground font-medium">{roleConfirm?.newRole}</span>.
+              {roleConfirm?.newRole === "admin" && (
+                <span className="block mt-2 text-red-400">
+                  Admins can manage all users, reset passwords, and change other users' roles.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updateRoleMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => roleConfirm && updateRoleMutation.mutate({ userId: roleConfirm.user.id, role: roleConfirm.newRole })}
+              disabled={updateRoleMutation.isPending}
+              className={roleConfirm?.newRole === "admin" ? "bg-red-600 hover:bg-red-700" : undefined}
+            >
+              {updateRoleMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Change Role
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Access Toggle Confirmation */}
+      <AlertDialog open={!!accessConfirm} onOpenChange={(open) => { if (!open) setAccessConfirm(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {accessConfirm?.isActiveClient === 1 ? "Deactivate user?" : "Activate user?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {accessConfirm?.isActiveClient === 1 ? (
+                <>
+                  <span className="text-foreground font-medium">{accessConfirm?.name || accessConfirm?.email}</span> will
+                  lose access to their account. They can be reactivated at any time.
+                </>
+              ) : (
+                <>
+                  Restore access for <span className="text-foreground font-medium">{accessConfirm?.name || accessConfirm?.email}</span>?
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={toggleAccessMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => accessConfirm && toggleAccessMutation.mutate({ userId: accessConfirm.id, isActive: accessConfirm.isActiveClient === 0 })}
+              disabled={toggleAccessMutation.isPending}
+              className={accessConfirm?.isActiveClient === 1 ? "bg-red-600 hover:bg-red-700" : undefined}
+            >
+              {toggleAccessMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              {accessConfirm?.isActiveClient === 1 ? "Deactivate" : "Activate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Reset Password Dialog */}
-      <Dialog open={!!resetDialogUser} onOpenChange={(open) => { if (!open) { setResetDialogUser(null); setResetRequestId(null); } }}>
+      <Dialog
+        open={!!resetDialogUser || !!lastResetPassword}
+        onOpenChange={(open) => {
+          if (!open) {
+            setResetDialogUser(null);
+            setResetRequestId(null);
+            setLastResetPassword(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
+            <DialogTitle>{lastResetPassword ? "Password Reset" : "Reset Password"}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
-              Set a new password for <span className="font-medium text-foreground">{resetDialogUser?.name || resetDialogUser?.email}</span>
-            </p>
-            <div className="space-y-2">
-              <Label>New Password</Label>
-              <Input
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                value={resetPassword}
-                onChange={(e) => setResetPassword(e.target.value)}
-                placeholder="At least 8 characters"
-              />
-              <p className="text-xs text-muted-foreground">
-                Minimum 8 characters. Share the new password with the user
-                through a secure channel — never reuse a default.
+
+          {lastResetPassword ? (
+            <div className="space-y-4 py-2">
+              <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-4 space-y-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground">Password reset successfully</p>
+                    <p className="text-muted-foreground mt-1">
+                      Copy and share it with the user through a secure channel. It won't be shown again.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={lastResetPassword.password}
+                    className="font-mono text-sm"
+                    onFocus={(e) => e.currentTarget.select()}
+                  />
+                  <Button variant="outline" onClick={handleCopyPassword}>
+                    <Copy className="h-4 w-4 mr-1.5" />
+                    Copy
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={() => setLastResetPassword(null)}>Done</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <p className="text-sm text-muted-foreground">
+                Set a new password for <span className="font-medium text-foreground">{resetDialogUser?.name || resetDialogUser?.email}</span>
               </p>
+              <div className="space-y-2">
+                <Label>New Password</Label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  value={resetPassword}
+                  onChange={(e) => setResetPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Minimum 8 characters. Share the new password with the user
+                  through a secure channel — never reuse a default.
+                </p>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => { setResetDialogUser(null); setResetRequestId(null); }}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleResetPassword}
+                  disabled={resetPassword.length < 8 || resetPasswordMutation.isPending || completeResetMutation.isPending}
+                >
+                  {(resetPasswordMutation.isPending || completeResetMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Reset Password
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => { setResetDialogUser(null); setResetRequestId(null); }}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleResetPassword}
-                disabled={resetPassword.length < 8 || resetPasswordMutation.isPending || completeResetMutation.isPending}
-              >
-                {(resetPasswordMutation.isPending || completeResetMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                Reset Password
-              </Button>
-            </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
 

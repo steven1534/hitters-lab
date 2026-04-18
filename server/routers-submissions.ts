@@ -155,6 +155,14 @@ export const submissionsRouter = router({
         return await db.getFeedbackBySubmission(input.submissionId);
       }),
 
+    getFeedbackCountsBySubmissions: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        return await db.getFeedbackCountsBySubmissions();
+      }),
+
     getFeedbackByDrill: protectedProcedure
       .input(z.object({ drillId: z.string() }))
       .query(async ({ ctx, input }) => {
