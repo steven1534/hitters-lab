@@ -98,7 +98,12 @@ export function isInviteValid(invite: any): boolean {
 }
 
 /**
- * Accept an invite and create user account
+ * Accept an invite and link pre-assigned drills to the user account.
+ *
+ * All writes run inside a single DB transaction so a partial failure
+ * cannot leave the account half-linked: either the user's role is
+ * updated AND the invite is marked accepted AND the pre-assigned
+ * drills + notifications are linked, or none of those happen.
  */
 export async function acceptInvite(
   token: string,
@@ -114,52 +119,77 @@ export async function acceptInvite(
     throw new Error("Invalid or expired invite");
   }
 
-  // Import users table for role update
   const { users } = await import("../drizzle/schema");
+  const { drillAssignments, notifications: notificationsTbl } =
+    await import("../drizzle/schema");
 
-  // First verify the user exists in the database
-  const existingUser = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  
-  if (!existingUser || existingUser.length === 0) {
-    console.error('[Invites] User not found in database with id:', userId);
-    throw new Error("User account not found. Please try logging in again.");
-  }
-  
-  console.log('[Invites] Found user:', existingUser[0].email, 'current role:', existingUser[0].role);
+  return await db.transaction(async (tx) => {
+    // 1. Verify the user exists (inside the tx so a deletion racing with
+    //    acceptance rolls us back rather than orphaning the invite).
+    const existingUser = await tx
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
 
-  // Update user role based on invite role and set as active if athlete
-  const updateData: any = { role: invite.role };
-  if (invite.role === "athlete") {
-    updateData.isActiveClient = 1;
-  }
-  
-  const updateResult = await db
-    .update(users)
-    .set(updateData)
-    .where(eq(users.id, userId));
-  
-  console.log('[Invites] User role updated to:', invite.role, 'isActiveClient:', updateData.isActiveClient);
+    if (!existingUser || existingUser.length === 0) {
+      console.error('[Invites] User not found in database with id:', userId);
+      throw new Error("User account not found. Please try logging in again.");
+    }
+    console.log('[Invites] Found user:', existingUser[0].email, 'current role:', existingUser[0].role);
 
-  // Update invite status
-  await db
-    .update(invites)
-    .set({
-      status: "accepted",
-      acceptedAt: new Date(),
-      acceptedByUserId: userId,
-    })
-    .where(eq(invites.inviteToken, token));
+    // 2. Update user role (+ activate if athlete).
+    const updateData: any = { role: invite.role };
+    if (invite.role === "athlete") {
+      updateData.isActiveClient = 1;
+    }
+    await tx.update(users).set(updateData).where(eq(users.id, userId));
+    console.log('[Invites] User role updated to:', invite.role, 'isActiveClient:', updateData.isActiveClient);
 
-  // Link any pre-assigned drills from this invite to the user
-  const { linkInviteAssignmentsToUser } = await import("./drillAssignments");
-  await linkInviteAssignmentsToUser(invite.id, userId);
-  console.log('[Invites] Linked drill assignments from invite', invite.id, 'to user', userId);
+    // 3. Mark invite accepted.
+    await tx
+      .update(invites)
+      .set({
+        status: "accepted",
+        acceptedAt: new Date(),
+        acceptedByUserId: userId,
+      })
+      .where(eq(invites.inviteToken, token));
 
-  return invite;
+    // 4. Link any pre-assigned drills from this invite to the user and
+    //    create notifications. All inside the same transaction, so if
+    //    any notification insert fails, the role update and invite
+    //    acceptance are also rolled back.
+    await tx
+      .update(drillAssignments)
+      .set({ userId })
+      .where(eq(drillAssignments.inviteId, invite.id));
+
+    const linkedAssignments = await tx
+      .select()
+      .from(drillAssignments)
+      .where(eq(drillAssignments.inviteId, invite.id));
+
+    for (const assignment of linkedAssignments) {
+      await tx.insert(notificationsTbl).values({
+        userId,
+        type: "assignment",
+        title: "Drill Waiting for You",
+        message: `You have a drill assigned: ${assignment.drillName}`,
+        isRead: 0,
+      });
+    }
+    console.log(
+      '[Invites] Linked',
+      linkedAssignments.length,
+      'drill assignments from invite',
+      invite.id,
+      'to user',
+      userId,
+    );
+
+    return invite;
+  });
 }
 
 /**
