@@ -4,27 +4,32 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-import AdminDashboard from "./pages/AdminDashboard";
-import CoachDashboard from "./pages/CoachDashboard";
-import AthletePortal from "./pages/AthletePortal";
-import DrillDetail from "./pages/DrillDetail";
-import AcceptInvite from "./pages/AcceptInvite";
-import { ManageDrillVideos } from "./pages/ManageDrillVideos";
-import CreateDrillDetails from "./pages/CreateDrillDetails";
-import SubmissionsDashboard from "./pages/SubmissionsDashboard";
-import VerifyEmail from "./pages/VerifyEmail";
-import UserManagement from "./pages/UserManagement";
-import DrillsDirectory from "./pages/DrillsDirectory";
-import Pathways from "./pages/Pathways";
-import MyProgress from "./pages/MyProgress";
-import MyProfile from "./pages/MyProfile";
-import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ToastContainer } from "./components/ToastContainer";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
+
+// Eager (public / SEO-critical / small) routes
+import DrillsDirectory from "./pages/DrillsDirectory";
+import Login from "./pages/Login";
+import DrillDetail from "./pages/DrillDetail";
+import Pathways from "./pages/Pathways";
+import AcceptInvite from "./pages/AcceptInvite";
+import VerifyEmail from "./pages/VerifyEmail";
+
+// Lazy (protected / admin / coach / athlete) routes — loaded on demand
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const CoachDashboard = lazy(() => import("./pages/CoachDashboard"));
+const AthletePortal = lazy(() => import("./pages/AthletePortal"));
+const SubmissionsDashboard = lazy(() => import("./pages/SubmissionsDashboard"));
+const UserManagement = lazy(() => import("./pages/UserManagement"));
+const MyProgress = lazy(() => import("./pages/MyProgress"));
+const MyProfile = lazy(() => import("./pages/MyProfile"));
+const ManageDrillVideos = lazy(() =>
+  import("./pages/ManageDrillVideos").then((m) => ({ default: m.ManageDrillVideos }))
+);
+const CreateDrillDetails = lazy(() => import("./pages/CreateDrillDetails"));
 
 // Register service worker
 function registerServiceWorker() {
@@ -42,72 +47,82 @@ function registerServiceWorker() {
   }
 }
 
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+    </div>
+  );
+}
+
 function Router() {
   return (
-    <Switch>
-      <Route path={"/"} component={DrillsDirectory} />
-      <Route path={"/login"} component={Login} />
-      <Route path={"/register"} component={Login} />
-      <Route path={"/drills"} component={DrillsDirectory} />
-      <Route path={"/pathways"} component={Pathways} />
-      <Route path={"/progress"} component={MyProgress} />
-      <Route path={"/accept-invite/:token"} component={AcceptInvite} />
-      <Route path={"/verify-email/:token"} component={VerifyEmail} />
-      <Route path={"/drill/:id"} component={DrillDetail} />
-      
-      {/* Protected Routes - Admin Only */}
-      <Route path={"/admin"}>
-        <ProtectedRoute requiredRole="admin">
-          <AdminDashboard />
-        </ProtectedRoute>
-      </Route>
-      
-      {/* Protected Routes - Coach Only */}
-      <Route path={"/coach-dashboard"}>
-        <ProtectedRoute requiredRole="coach">
-          <CoachDashboard />
-        </ProtectedRoute>
-      </Route>
-      <Route path={"/manage-drill-videos"}>
-        <ProtectedRoute requiredRole="coach">
-          <ManageDrillVideos />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/create-drill-details"}>
-        <ProtectedRoute requiredRole="coach">
-          <CreateDrillDetails />
-        </ProtectedRoute>
-      </Route>
-      <Route path={"/submissions"}>
-        <ProtectedRoute requiredRole="admin">
-          <SubmissionsDashboard />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/user-management"}>
-        <ProtectedRoute requiredRole="admin">
-          <UserManagement />
-        </ProtectedRoute>
-      </Route>
-      
-      {/* Protected Routes - Athlete Only */}
-      <Route path={"/athlete-portal"}>
-        <ProtectedRoute requiredRole="athlete">
-          <AthletePortal />
-        </ProtectedRoute>
-      </Route>
+    <Suspense fallback={<RouteFallback />}>
+      <Switch>
+        <Route path={"/"} component={DrillsDirectory} />
+        <Route path={"/login"} component={Login} />
+        <Route path={"/register"} component={Login} />
+        <Route path={"/drills"} component={DrillsDirectory} />
+        <Route path={"/pathways"} component={Pathways} />
+        <Route path={"/progress"} component={MyProgress} />
+        <Route path={"/accept-invite/:token"} component={AcceptInvite} />
+        <Route path={"/verify-email/:token"} component={VerifyEmail} />
+        <Route path={"/drill/:id"} component={DrillDetail} />
 
-      <Route path={"/my-profile"}>
-        <ProtectedRoute requiredRole="athlete">
-          <MyProfile />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+        {/* Protected Routes - Admin Only */}
+        <Route path={"/admin"}>
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        </Route>
+
+        {/* Protected Routes - Coach Only */}
+        <Route path={"/coach-dashboard"}>
+          <ProtectedRoute requiredRole="coach">
+            <CoachDashboard />
+          </ProtectedRoute>
+        </Route>
+        <Route path={"/manage-drill-videos"}>
+          <ProtectedRoute requiredRole="coach">
+            <ManageDrillVideos />
+          </ProtectedRoute>
+        </Route>
+
+        <Route path={"/create-drill-details"}>
+          <ProtectedRoute requiredRole="coach">
+            <CreateDrillDetails />
+          </ProtectedRoute>
+        </Route>
+        <Route path={"/submissions"}>
+          <ProtectedRoute requiredRole="admin">
+            <SubmissionsDashboard />
+          </ProtectedRoute>
+        </Route>
+
+        <Route path={"/user-management"}>
+          <ProtectedRoute requiredRole="admin">
+            <UserManagement />
+          </ProtectedRoute>
+        </Route>
+
+        {/* Protected Routes - Athlete Only */}
+        <Route path={"/athlete-portal"}>
+          <ProtectedRoute requiredRole="athlete">
+            <AthletePortal />
+          </ProtectedRoute>
+        </Route>
+
+        <Route path={"/my-profile"}>
+          <ProtectedRoute requiredRole="athlete">
+            <MyProfile />
+          </ProtectedRoute>
+        </Route>
+
+        <Route path={"/404"} component={NotFound} />
+        {/* Final fallback route */}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
