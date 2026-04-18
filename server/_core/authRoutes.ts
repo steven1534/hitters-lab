@@ -155,11 +155,19 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // ── Accept Invite (auto-provisions account with default password) ──
+  // ── Accept Invite (athlete chooses their own password on the invite page) ──
   app.post("/api/auth/accept-invite", async (req: Request, res: Response) => {
-    const { token } = req.body ?? {};
+    const { token, password, name } = req.body ?? {};
     if (!token) {
       res.status(400).json({ error: "Invite token is required" });
+      return;
+    }
+    if (!password || typeof password !== "string") {
+      res.status(400).json({ error: "Password is required" });
+      return;
+    }
+    if (password.length < 8) {
+      res.status(400).json({ error: "Password must be at least 8 characters" });
       return;
     }
 
@@ -177,14 +185,17 @@ export function registerAuthRoutes(app: Express) {
 
       if (!user) {
         try {
-          const passwordHash = await hashPassword("player123");
-          const name = (invite as any).name || normalizedEmail.split("@")[0];
+          const passwordHash = await hashPassword(password);
+          const displayName =
+            (typeof name === "string" && name.trim()) ||
+            (invite as any).name ||
+            normalizedEmail.split("@")[0];
           const role = invite.role === "coach" ? "coach" : "athlete";
 
           const userId = await db.createUser({
             email: normalizedEmail,
             passwordHash,
-            name,
+            name: displayName,
             role: role as any,
             isActiveClient: 1,
             emailVerified: 1,
@@ -193,21 +204,32 @@ export function registerAuthRoutes(app: Express) {
           });
 
           user = await db.getUserById(userId);
-          console.log(`[Auth] Auto-created account for ${normalizedEmail} with default password`);
+          console.log(`[Auth] Created account for ${normalizedEmail} via invite`);
         } catch (createErr: any) {
-          // Handle duplicate email race condition
+          // Handle duplicate email race condition — account was created
+          // between our lookup and our insert. Fall back to existing user,
+          // but DO NOT overwrite their password; force them to log in normally.
           if (createErr.message?.includes("unique") || createErr.code === "23505") {
-            console.log(`[Auth] User ${normalizedEmail} already exists (race condition), fetching existing`);
-            user = await db.getUserByEmail(normalizedEmail);
-          } else {
-            throw createErr;
+            console.log(`[Auth] User ${normalizedEmail} already exists (race), returning 409`);
+            res.status(409).json({
+              error: "An account with this email already exists. Please log in instead.",
+            });
+            return;
           }
+          throw createErr;
         }
 
         if (!user) {
           res.status(500).json({ error: "Failed to create account" });
           return;
         }
+      } else {
+        // Account already exists — do NOT change its password via the invite
+        // endpoint. The user should log in normally.
+        res.status(409).json({
+          error: "An account with this email already exists. Please log in instead.",
+        });
+        return;
       }
 
       await inviteDb.acceptInvite(token, user.id);

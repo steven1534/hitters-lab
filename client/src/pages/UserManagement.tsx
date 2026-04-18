@@ -48,7 +48,7 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
 
   // Reset password dialog state
   const [resetDialogUser, setResetDialogUser] = useState<User | null>(null);
-  const [resetPassword, setResetPassword] = useState("player123");
+  const [resetPassword, setResetPassword] = useState("");
   const [resetRequestId, setResetRequestId] = useState<number | null>(null);
 
   // Edit user dialog state
@@ -79,9 +79,9 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
 
   const resetPasswordMutation = trpc.admin.resetUserPassword.useMutation({
     onSuccess: () => {
-      toast.success(`Password reset to "${resetPassword}"`);
+      toast.success("Password reset. Share the new password with the user securely.");
       setResetDialogUser(null);
-      setResetPassword("player123");
+      setResetPassword("");
       setResetRequestId(null);
       refetchRequests();
     },
@@ -90,9 +90,9 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
 
   const completeResetMutation = trpc.admin.completeResetRequest.useMutation({
     onSuccess: () => {
-      toast.success(`Password reset to "${resetPassword}" and request completed`);
+      toast.success("Password reset and request completed.");
       setResetDialogUser(null);
-      setResetPassword("player123");
+      setResetPassword("");
       setResetRequestId(null);
       refetchRequests();
     },
@@ -129,7 +129,7 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
 
   function openResetDialog(u: User, requestId?: number) {
     setResetDialogUser(u);
-    setResetPassword("player123");
+    setResetPassword("");
     setResetRequestId(requestId ?? null);
   }
 
@@ -375,11 +375,17 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
             <div className="space-y-2">
               <Label>New Password</Label>
               <Input
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
                 value={resetPassword}
                 onChange={(e) => setResetPassword(e.target.value)}
-                placeholder="Enter new password"
+                placeholder="At least 8 characters"
               />
-              <p className="text-xs text-muted-foreground">Default: player123</p>
+              <p className="text-xs text-muted-foreground">
+                Minimum 8 characters. Share the new password with the user
+                through a secure channel — never reuse a default.
+              </p>
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => { setResetDialogUser(null); setResetRequestId(null); }}>
@@ -387,7 +393,7 @@ export default function UserManagement({ embedded = false }: { embedded?: boolea
               </Button>
               <Button
                 onClick={handleResetPassword}
-                disabled={!resetPassword || resetPasswordMutation.isPending || completeResetMutation.isPending}
+                disabled={resetPassword.length < 8 || resetPasswordMutation.isPending || completeResetMutation.isPending}
               >
                 {(resetPasswordMutation.isPending || completeResetMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                 Reset Password

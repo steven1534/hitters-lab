@@ -270,7 +270,7 @@ export const appRouter = router({
       }),
 
     resetUserPassword: protectedProcedure
-      .input(z.object({ userId: z.number(), newPassword: z.string().min(4) }))
+      .input(z.object({ userId: z.number(), newPassword: z.string().min(8) }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== 'admin') {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
