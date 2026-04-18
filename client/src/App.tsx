@@ -137,7 +137,7 @@ function Router() {
       
       {/* Protected Routes - Parent Dashboard */}
       <Route path={"/parent-dashboard"}>
-        <ProtectedRoute>
+        <ProtectedRoute requiredRole="parent">
           <ParentDashboard />
         </ProtectedRoute>
       </Route>

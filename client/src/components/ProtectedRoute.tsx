@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: "admin" | "coach" | "athlete" | "user";
+  requiredRole?: "admin" | "coach" | "athlete" | "parent" | "user";
   fallbackPath?: string;
 }
 
@@ -79,7 +79,12 @@ export default function ProtectedRoute({
 }
 
 /**
- * Check if a user role has access to a required role
+ * Check if a user role has access to a required role.
+ *
+ * Rules:
+ *  - admin has access to every gated page (superuser).
+ *  - coach, athlete, and parent each only match their own scope.
+ *  - 'user' is the generic "any signed-in non-admin" bucket.
  */
 function checkRoleAccess(userRole: string, requiredRole: string): boolean {
   // Admin has access to everything
@@ -97,8 +102,16 @@ function checkRoleAccess(userRole: string, requiredRole: string): boolean {
     return true;
   }
 
-  // User role can access user routes
-  if (requiredRole === "user" && (userRole === "athlete" || userRole === "coach")) {
+  // Parent can access parent routes
+  if (requiredRole === "parent" && userRole === "parent") {
+    return true;
+  }
+
+  // 'user' = any authenticated non-admin with a real app role
+  if (
+    requiredRole === "user" &&
+    (userRole === "athlete" || userRole === "coach" || userRole === "parent")
+  ) {
     return true;
   }
 

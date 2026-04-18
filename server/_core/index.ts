@@ -36,10 +36,29 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Allow the site to be embedded in iframes on any domain
+  // Clickjacking protection.
+  //
+  // The previous policy was `frame-ancestors *` (any site could iframe us)
+  // which the audit flagged as CRIT. That permissive policy was originally
+  // added so Manus preview could embed the dev build; it is not needed now
+  // that the app runs on its own domain.
+  //
+  // Default: only allow embedding from our own origin + the coachstevebaseball
+  // brand. Override via the EMBED_ALLOWED_ORIGINS env var (space-separated)
+  // if you ever need to re-enable cross-site embedding intentionally.
+  const embedAllowed = (process.env.EMBED_ALLOWED_ORIGINS || "").trim();
+  const frameAncestors = embedAllowed
+    ? `'self' ${embedAllowed}`
+    : "'self' https://*.coachstevebaseball.com https://coachstevebaseball.com";
   app.use((_req, res, next) => {
-    res.removeHeader("X-Frame-Options");
-    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    // Keep X-Frame-Options as a fallback for older browsers that don't
+    // honor CSP frame-ancestors. SAMEORIGIN is stricter-compatible-with
+    // the default CSP above.
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader(
+      "Content-Security-Policy",
+      `frame-ancestors ${frameAncestors}`,
+    );
     next();
   });
 
