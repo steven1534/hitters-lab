@@ -83,37 +83,10 @@ export const progressRouter = router({
       // table may not exist yet
     }
 
-    // Streak: count consecutive days ending today with at least one session
-    const recentDays = await db
-      .select({
-        day: sql<string>`date(${drillProgress.completedAt})`.as("day"),
-      })
-      .from(drillProgress)
-      .where(eq(drillProgress.userId, userId))
-      .groupBy(sql`date(${drillProgress.completedAt})`)
-      .orderBy(desc(sql`date(${drillProgress.completedAt})`));
-
-    let streak = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (const row of recentDays) {
-      const d = new Date(row.day);
-      d.setHours(0, 0, 0, 0);
-      const expectedDate = new Date(today);
-      expectedDate.setDate(expectedDate.getDate() - streak);
-      if (d.getTime() === expectedDate.getTime()) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
     return {
       uniqueDrills: Number(progressStats?.uniqueDrills ?? 0),
       totalSessions: Number(progressStats?.totalSessions ?? 0),
       thisWeek: Number(weekStats?.thisWeek ?? 0),
-      streak,
       favoritesCount: Number(favCount?.count ?? 0),
       submissionsCount,
     };

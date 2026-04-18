@@ -32,12 +32,10 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { InlineEdit } from "@/components/InlineEdit";
 import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AddNewDrill } from "@/components/AddNewDrill";
-import { NotificationSettings } from "@/components/NotificationSettings";
 import { AccountSettings } from "@/components/AccountSettings";
 import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
 import UserManagement from "@/pages/UserManagement";
 import SubmissionsDashboard from "@/pages/SubmissionsDashboard";
-import ActivityFeed from "@/pages/ActivityFeed";
 import { ManageDrillVideos } from "@/pages/ManageDrillVideos";
 
 interface Drill {
@@ -48,7 +46,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "account" | "challenges" | "user-management" | "submissions" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -80,13 +78,11 @@ const NAV_GROUPS = [
     label: "Analytics",
     items: [
       { key: "blast-metrics" as ActiveTab, label: "Blast Metrics", icon: Activity },
-      { key: "activity-feed" as ActiveTab, label: "Activity Feed", icon: TrendingUp },
     ],
   },
   {
     label: "Settings",
     items: [
-      { key: "notifications" as ActiveTab, label: "Notifications", icon: Bell },
       { key: "account" as ActiveTab, label: "My Account", icon: Shield },
     ],
   },
@@ -117,8 +113,6 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   challenges: "Weekly Challenges",
   "user-management": "User Management",
   submissions: "Submissions",
-  "activity-feed": "Activity Feed",
-  notifications: "Notification Settings",
   account: "My Account",
 };
 
@@ -648,7 +642,6 @@ export default function CoachDashboard() {
 
             {activeTab === "challenges" && <WeeklyChallengesTab />}
 
-            {activeTab === "notifications" && <NotificationSettings />}
 
             {activeTab === "account" && <AccountSettings />}
 
@@ -658,7 +651,6 @@ export default function CoachDashboard() {
 
             {activeTab === "user-management" && <UserManagement embedded />}
             {activeTab === "submissions" && <SubmissionsDashboard embedded />}
-            {activeTab === "activity-feed" && <ActivityFeed embedded />}
 
             {activeTab === "bulk-import" && (
               <div className="max-w-4xl mx-auto space-y-6">
@@ -890,13 +882,11 @@ export default function CoachDashboard() {
 function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void }) {
   const { data: users = [] } = trpc.admin.getAllUsers.useQuery();
   const { data: invites = [] } = trpc.invites.getAllInvites.useQuery();
-  const { data: activities = [] } = trpc.activity.getRecentActivities.useQuery({ limit: 10 });
   const { data: challenge } = trpc.challenges.getCurrent.useQuery();
 
   const athletes = (users as any[]).filter((u: any) => u.role === "athlete" || u.role === "user");
   const activeAthletes = athletes.filter((u: any) => u.isActiveClient);
   const pendingInvites = (invites as any[]).filter((i: any) => i.status === "pending");
-  const recentLogins = (activities as any[]).filter((a: any) => a.activityType === "portal_login");
 
   return (
     <div className="space-y-6">
@@ -905,7 +895,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         {[
           { label: "Active Athletes", value: activeAthletes.length, icon: Users, color: "text-emerald-500", onClick: () => onNavigate("athletes") },
           { label: "Pending Invites", value: pendingInvites.length, icon: UserPlus, color: "text-amber-500", onClick: () => onNavigate("user-management") },
-          { label: "Recent Logins", value: recentLogins.length, icon: Activity, color: "text-blue-500", onClick: () => onNavigate("activity-feed") },
           { label: "Total Users", value: users.length, icon: Shield, color: "text-purple-500", onClick: () => onNavigate("user-management") },
         ].map((stat) => {
           const Icon = stat.icon;
@@ -975,37 +964,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
         </CardContent>
       </Card>
 
-      {/* Recent Activity */}
-      {(activities as any[]).length > 0 && (
-        <Card>
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Recent Activity</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => onNavigate("activity-feed")} className="text-xs">
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {(activities as any[]).slice(0, 5).map((a: any) => (
-                <div key={a.id} className="flex items-center gap-3 py-2 border-b last:border-0">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">
-                      <span className="font-medium">{a.userName || "User"}</span>
-                      {" "}{a.activityType?.replace(/_/g, " ")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(a.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

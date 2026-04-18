@@ -20,7 +20,6 @@ import DrillsDirectory from "./pages/DrillsDirectory";
 import Pathways from "./pages/Pathways";
 import MyProgress from "./pages/MyProgress";
 import ParentDashboard from "./pages/ParentDashboard";
-import ActivityFeed from "./pages/ActivityFeed";
 import DrillComparison from "./pages/DrillComparison";
 import AthleteAssessment from "./pages/AthleteAssessment";
 import MyProfile from "./pages/MyProfile";
@@ -100,12 +99,6 @@ function Router() {
       <Route path={"/user-management"}>
         <ProtectedRoute requiredRole="admin">
           <UserManagement />
-        </ProtectedRoute>
-      </Route>
-      
-      <Route path={"/activity-feed"}>
-        <ProtectedRoute requiredRole="admin">
-          <ActivityFeed />
         </ProtectedRoute>
       </Route>
       

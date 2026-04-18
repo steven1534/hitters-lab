@@ -1,13 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Clock, AlertCircle, Flame } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 interface ProgressStats {
   total: number;
   completed: number;
   inProgress: number;
   assigned: number;
-  streak?: number;
 }
 
 interface ProgressDashboardProps {
@@ -71,23 +70,6 @@ export function ProgressDashboard({ stats }: ProgressDashboardProps) {
         </CardContent>
       </Card>
 
-      {/* Streak Card (if available) */}
-      {stats.streak !== undefined && (
-        <Card className="border-l-4 border-l-red-500 md:col-span-2 lg:col-span-4">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Flame className="h-4 w-4 text-red-500" />
-              Current Streak
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">{stats.streak} day{stats.streak !== 1 ? 's' : ''}</div>
-              <p className="text-sm text-muted-foreground">Keep it going! 🔥</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

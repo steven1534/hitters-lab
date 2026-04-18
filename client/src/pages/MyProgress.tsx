@@ -12,7 +12,6 @@ const STAT_CARDS = [
   { key: "uniqueDrills", label: "Drills Completed", icon: Target, color: "text-gold" },
   { key: "totalSessions", label: "Total Sessions", icon: Zap, color: "text-teal" },
   { key: "thisWeek", label: "This Week", icon: Calendar, color: "text-foundation" },
-  { key: "streak", label: "Current Streak", icon: Flame, color: "text-advanced" },
   { key: "favoritesCount", label: "Favorites", icon: Star, color: "text-gold" },
   { key: "submissionsCount", label: "Submissions", icon: Upload, color: "text-teal" },
 ] as const;
@@ -40,7 +39,7 @@ export default function MyProgress() {
             My Progress
           </h1>
           <p className="mt-3 max-w-xl text-[0.8rem] leading-relaxed text-film-muted">
-            Track your drill completions, sessions, and training streak.
+            Track your drill completions and training sessions.
           </p>
         </div>
       </header>
@@ -54,7 +53,7 @@ export default function MyProgress() {
             </div>
             <h2 className="font-heading text-xl font-bold text-film-fg">Sign in to track progress</h2>
             <p className="mt-2 max-w-sm text-[0.8rem] text-film-muted">
-              Log in to start logging drill completions and building your training streak.
+              Log in to start logging drill completions and track your training.
             </p>
             <Link href={getLoginUrl()}>
               <Button className="mt-5 bg-gold text-canvas hover:bg-gold-dim font-heading text-[0.7rem] font-bold uppercase tracking-[0.1em]">

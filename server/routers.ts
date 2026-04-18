@@ -12,7 +12,6 @@ import { drillGeneratorRouter } from "./routers-drill-generator";
 import { submissionsRouter } from "./routers-submissions";
 import { videoUploadRouter } from "./routers-video-upload";
 import { notificationsRouter } from "./routers-notifications";
-import { activityRouter } from "./routers-activity";
 import { favoritesRouter } from "./routers-favorites";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
 import { blastMetricsRouter } from "./routers-blast-metrics";
@@ -28,7 +27,6 @@ export const appRouter = router({
   system: systemRouter,
   siteContent: siteContentRouter,
   notifications: notificationsRouter,
-  activity: activityRouter,
   favorites: favoritesRouter,
   athleteProfiles: athleteProfilesRouter,
   progress: progressRouter,
@@ -243,16 +241,6 @@ export const appRouter = router({
         }
         return await db.bulkImportDrillGoals(input.goalsData);
       }),
-    triggerStreakReminders: protectedProcedure
-      .mutation(async ({ ctx }) => {
-        if (ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-        }
-        const { runStreakReminderJob } = await import('./streakReminderJob');
-        await runStreakReminderJob();
-        return { success: true };
-      }),
-
     resetUserPassword: protectedProcedure
       .input(z.object({ userId: z.number(), newPassword: z.string().min(8) }))
       .mutation(async ({ ctx, input }) => {
@@ -435,10 +423,6 @@ export const appRouter = router({
 
     getUserAssignments: protectedProcedure.query(async ({ ctx }) => {
       return await drillAssignmentDb.getUserAssignments(ctx.user.id);
-    }),
-
-    getStreak: protectedProcedure.query(async ({ ctx }) => {
-      return await drillAssignmentDb.calculateStreak(ctx.user.id);
     }),
 
     getAthleteProgress: protectedProcedure

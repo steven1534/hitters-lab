@@ -142,7 +142,6 @@ export default function AthletePortal() {
   const { data: userAssignments = [], isLoading: assignmentsLoading } = trpc.drillAssignments.getUserAssignments.useQuery(
     undefined, { enabled: !!user?.id }
   );
-  const { data: streak = 0 } = trpc.drillAssignments.getStreak.useQuery(undefined, { enabled: !!user?.id });
   const { data: favoritesData } = trpc.favorites.getAll.useQuery(undefined, { enabled: !!user?.id });
   const favoriteIds = favoritesData?.drillIds || [];
 
@@ -151,25 +150,14 @@ export default function AthletePortal() {
   const updateStatusMutation = trpc.drillAssignments.updateStatus.useMutation({
     onSuccess: () => utils.drillAssignments.getUserAssignments.invalidate(),
   });
-  const logActivityMutation = trpc.activity.logActivity.useMutation();
-  const hasLoggedActivity = useRef(false);
-
-  useEffect(() => {
-    if (user?.id && !hasLoggedActivity.current) {
-      hasLoggedActivity.current = true;
-      logActivityMutation.mutate({ activityType: "portal_login" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
   const progressStats = useMemo(() => {
     const total = userAssignments.length;
     const completed = userAssignments.filter((a: any) => a.status === "completed").length;
     const inProgress = userAssignments.filter((a: any) => a.status === "in-progress").length;
     const assigned = userAssignments.filter((a: any) => a.status === "assigned").length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-    return { total, completed, inProgress, assigned, streak, percentage };
-  }, [userAssignments, streak]);
+    return { total, completed, inProgress, assigned, percentage };
+  }, [userAssignments]);
 
   const upNextDrill = useMemo(() => {
     const assignedDrills = userAssignments.filter((a: any) => a.status === "assigned");
@@ -425,11 +413,7 @@ function TrainingTab({
             <span className="text-sm text-muted-foreground">Progress</span>
             <span className="text-sm font-medium text-foreground">{progressStats.completed}/{progressStats.total} done</span>
           </div>
-          <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-2">
-            <Flame className="w-5 h-5 text-orange-400" />
-            <span className="font-bold text-orange-400">{progressStats.streak}</span>
-            <span className="text-sm text-orange-400">Day Streak</span>
-          </div>
+
         </div>
       </div>
 
@@ -639,7 +623,6 @@ function ProgressTab({ stats, completedCount }: { stats: any; completedCount: nu
           { label: "Drills Done", value: progressStats?.uniqueDrills ?? 0, icon: Target, color: "text-electric" },
           { label: "Sessions", value: progressStats?.totalSessions ?? 0, icon: Zap, color: "text-yellow-400" },
           { label: "This Week", value: progressStats?.thisWeek ?? 0, icon: BarChart3, color: "text-emerald-400" },
-          { label: "Streak", value: progressStats?.streak ?? stats.streak, icon: Flame, color: "text-orange-400" },
           { label: "Favorites", value: progressStats?.favoritesCount ?? 0, icon: Star, color: "text-yellow-400" },
           { label: "Submissions", value: progressStats?.submissionsCount ?? 0, icon: Upload, color: "text-purple-400" },
         ].map((card) => {
