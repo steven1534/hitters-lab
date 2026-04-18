@@ -17,7 +17,6 @@ import { favoritesRouter } from "./routers-favorites";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
 import { blastMetricsRouter } from "./routers-blast-metrics";
 import { playerReportsRouter } from "./routers-player-reports";
-import { badgesRouter } from "./routers-badges";
 import { siteContentRouter } from "./routers-site-content";
 import { progressRouter } from "./routers-progress";
 import { challengesRouter } from "./routers-challenges";
@@ -32,7 +31,6 @@ export const appRouter = router({
   activity: activityRouter,
   favorites: favoritesRouter,
   athleteProfiles: athleteProfilesRouter,
-  badges: badgesRouter,
   progress: progressRouter,
   challenges: challengesRouter,
   auth: router({

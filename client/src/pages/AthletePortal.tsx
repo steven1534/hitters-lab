@@ -23,7 +23,6 @@ import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { AthleteBlastMetrics } from "@/components/AthleteBlastMetrics";
 import { AthletePlayerReports } from "@/components/AthletePlayerReports";
 import { DrillModalRedesigned } from "@/components/DrillModalRedesigned";
-import { AthleteBadgesRedesigned } from "@/components/AthleteBadgesRedesigned";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from "recharts";
@@ -659,8 +658,6 @@ function ProgressTab({ stats, completedCount }: { stats: any; completedCount: nu
         })}
       </div>
 
-      {/* Badges */}
-      <AthleteBadgesRedesigned />
     </div>
   );
 }

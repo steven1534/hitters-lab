@@ -305,7 +305,7 @@ export async function deleteUser(userId: number): Promise<boolean> {
   if (!db) return false;
   try {
     const {
-      drillAssignments, badges, drillFavorites, athleteActivity,
+      drillAssignments, drillFavorites, athleteActivity,
       notifications: notificationsTable, notificationPreferences: notifPrefsTable,
       drillSubmissions: submissionsTable, coachFeedback: feedbackTable,
       playerReports,
@@ -315,7 +315,6 @@ export async function deleteUser(userId: number): Promise<boolean> {
 
     // Delete from all related tables first
     await db.delete(drillAssignments).where(eq(drillAssignments.userId, userId));
-    await db.delete(badges).where(eq(badges.userId, userId));
     await db.delete(drillFavorites).where(eq(drillFavorites.userId, userId));
     await db.delete(athleteActivity).where(eq(athleteActivity.athleteId, userId));
     await db.delete(notificationsTable).where(eq(notificationsTable.userId, userId));

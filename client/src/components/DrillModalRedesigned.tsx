@@ -63,7 +63,6 @@ export function DrillModalRedesigned({
   const updateStatus = trpc.drillAssignments.updateStatus.useMutation({
     onSuccess: () => {
       utils.drillAssignments.getUserAssignments.invalidate();
-      utils.badges.getMyProgress.invalidate();
       onComplete();
     },
     onError: () => {
