@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Send, AlertCircle, Video, Loader2, CheckCircle, Zap, ArrowDown } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { useNotification } from "@/contexts/NotificationContext";
+import { toast } from "sonner";
 import { uploadVideo, type UploadProgress, type UploadPhase } from "@/lib/videoUpload";
 
 interface DrillSubmissionFormProps {
@@ -12,7 +12,7 @@ interface DrillSubmissionFormProps {
 }
 
 export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: DrillSubmissionFormProps) {
-  const { addToast } = useNotification();
+  const utils = trpc.useUtils();
   const [notes, setNotes] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
@@ -26,7 +26,13 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
   const [submitted, setSubmitted] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const createSubmissionMutation = trpc.submissions.drillSubmissions.createSubmission.useMutation();
+  const createSubmissionMutation = trpc.submissions.drillSubmissions.createSubmission.useMutation({
+    onSuccess: () => {
+      // Refresh any view that shows submissions for this assignment / user
+      utils.submissions.drillSubmissions.invalidate();
+      utils.drillAssignments.invalidate();
+    },
+  });
 
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,11 +91,9 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
       setProgress({ phase: "done", percent: 100, message: "Upload complete!" });
       setSubmitted(true);
 
-      addToast({
-        type: "success",
-        title: "Video Submitted!",
-        message: videoFile
-          ? "Your video has been uploaded and queued for AI analysis. Coach will review the feedback soon."
+      toast.success("Video submitted", {
+        description: videoFile
+          ? "Queued for AI analysis. Coach will review the feedback soon."
           : "Your drill submission has been recorded. Great work!",
       });
 
@@ -108,11 +112,7 @@ export function DrillSubmissionForm({ assignmentId, drillId, onSubmitSuccess }: 
       setError(errorMessage);
       setProgress({ phase: "error", percent: 0, message: errorMessage });
 
-      addToast({
-        type: "error",
-        title: "Submission Failed",
-        message: errorMessage,
-      });
+      toast.error("Submission failed", { description: errorMessage });
     } finally {
       setIsSubmitting(false);
       abortRef.current = null;
