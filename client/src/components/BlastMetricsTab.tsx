@@ -4,12 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import {
   ArrowLeft, Users, TrendingUp, Zap, Target,
-  ChevronRight, BarChart3, Gauge, Crosshair, Plus, UserPlus, Trash2, Link2, FileText, Pencil, FileSpreadsheet, Download
+  ChevronRight, BarChart3, Gauge, Crosshair, Plus, UserPlus, Trash2, Link2, FileText, Pencil, FileSpreadsheet, Download,
+  Search, ArrowUpDown, ArrowUp, ArrowDown
 } from "lucide-react";
+import { toast } from "sonner";
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, Area, AreaChart
 } from "recharts";
 import { AddBlastSession } from "./AddBlastSession";
@@ -66,6 +69,15 @@ export function BlastMetricsTab({
   const [chartMetric1, setChartMetric1] = useState<MetricKey>("batSpeed");
   const [chartMetric2, setChartMetric2] = useState<MetricKey>("onPlaneEff");
   const [chartView, setChartView] = useState<"line" | "bar">("line");
+
+  // Roster view filters/sort
+  const [rosterSearch, setRosterSearch] = useState("");
+  const [rosterLinkFilter, setRosterLinkFilter] = useState<"all" | "linked" | "unlinked">("all");
+  const [rosterSort, setRosterSort] = useState<"recent" | "name" | "sessions">("recent");
+
+  // Session table sort
+  type SortKey = "date" | "type" | "batSpeed" | "onPlane" | "attackAngle" | "exitVelo";
+  const [sessionSort, setSessionSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "date", dir: "desc" });
 
   // Dialog states
   const [addSessionOpen, setAddSessionOpen] = useState(false);
@@ -225,6 +237,107 @@ export function BlastMetricsTab({
     };
   }, [sessions]);
 
+  // Filter + sort the roster
+  const filteredPlayers = useMemo(() => {
+    const q = rosterSearch.trim().toLowerCase();
+    let list = players.filter((p: any) => {
+      const name = (p.portalName || p.fullName || "").toLowerCase();
+      const blastName = (p.fullName || "").toLowerCase();
+      const email = (p.portalEmail || "").toLowerCase();
+      const matchesSearch = !q || name.includes(q) || blastName.includes(q) || email.includes(q);
+      const matchesLink =
+        rosterLinkFilter === "all" ||
+        (rosterLinkFilter === "linked" && !!p.userId) ||
+        (rosterLinkFilter === "unlinked" && !p.userId);
+      return matchesSearch && matchesLink;
+    });
+    list = [...list];
+    if (rosterSort === "name") {
+      list.sort((a: any, b: any) =>
+        (a.portalName || a.fullName || "").localeCompare(b.portalName || b.fullName || "", undefined, { sensitivity: "base" })
+      );
+    } else if (rosterSort === "sessions") {
+      list.sort((a: any, b: any) => (b.sessionCount || 0) - (a.sessionCount || 0));
+    } else {
+      list.sort((a: any, b: any) => {
+        const ad = a.latestSession ? new Date(a.latestSession).getTime() : 0;
+        const bd = b.latestSession ? new Date(b.latestSession).getTime() : 0;
+        return bd - ad;
+      });
+    }
+    return list;
+  }, [players, rosterSearch, rosterLinkFilter, rosterSort]);
+
+  const rosterHasActiveFilters = !!rosterSearch.trim() || rosterLinkFilter !== "all";
+
+  // Sort sessions for detail view
+  const sortedSessions = useMemo(() => {
+    const sortVal = (s: any, key: SortKey): number | string => {
+      switch (key) {
+        case "date": return s.sessionDate ? new Date(s.sessionDate).getTime() : 0;
+        case "type": return (s.sessionType || "").toLowerCase();
+        case "batSpeed": return s.batSpeedMph ? parseFloat(s.batSpeedMph) : -Infinity;
+        case "onPlane": return s.onPlaneEfficiencyPercent ? parseFloat(s.onPlaneEfficiencyPercent) : -Infinity;
+        case "attackAngle": return s.attackAngleDeg ? parseFloat(s.attackAngleDeg) : -Infinity;
+        case "exitVelo": return s.exitVelocityMph ? parseFloat(s.exitVelocityMph) : -Infinity;
+      }
+    };
+    const dirMul = sessionSort.dir === "asc" ? 1 : -1;
+    return [...sessions].sort((a: any, b: any) => {
+      const av = sortVal(a, sessionSort.key);
+      const bv = sortVal(b, sessionSort.key);
+      if (typeof av === "string" && typeof bv === "string") return av.localeCompare(bv) * dirMul;
+      return ((av as number) - (bv as number)) * dirMul;
+    });
+  }, [sessions, sessionSort]);
+
+  const toggleSort = (key: SortKey) => {
+    setSessionSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: key === "type" ? "asc" : "desc" }
+    );
+  };
+
+  const sortIcon = (key: SortKey) => {
+    if (sessionSort.key !== key) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    return sessionSort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />;
+  };
+
+  // Export session history to CSV
+  function exportSessionsCsv() {
+    if (!player || !sortedSessions.length) {
+      toast.error("No sessions to export");
+      return;
+    }
+    const header = ["Date", "Session Type", "Bat Speed (mph)", "On-Plane Efficiency (%)", "Attack Angle (deg)", "Exit Velocity (mph)"];
+    const escapeCsv = (v: string) => {
+      if (/[,"\n\r]/.test(v)) return `"${v.replace(/"/g, '""')}"`;
+      return v;
+    };
+    const rows = sortedSessions.map((s: any) => [
+      s.sessionDate ? new Date(s.sessionDate).toISOString().slice(0, 10) : "",
+      s.sessionType ?? "",
+      s.batSpeedMph != null ? String(parseFloat(s.batSpeedMph).toFixed(2)) : "",
+      s.onPlaneEfficiencyPercent != null ? String(parseFloat(s.onPlaneEfficiencyPercent).toFixed(2)) : "",
+      s.attackAngleDeg != null ? String(parseFloat(s.attackAngleDeg).toFixed(2)) : "",
+      s.exitVelocityMph != null ? String(parseFloat(s.exitVelocityMph).toFixed(2)) : "",
+    ].map(escapeCsv).join(","));
+    const csv = [header.map(escapeCsv).join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const safeName = player.fullName.replace(/\s+/g, "-");
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `${safeName}_BlastSessions_${dateStr}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${sortedSessions.length} session${sortedSessions.length !== 1 ? "s" : ""}`);
+  }
+
   // ========== PLAYER ROSTER VIEW ==========
   if (!selectedPlayerId) {
     return (
@@ -254,6 +367,51 @@ export function BlastMetricsTab({
           </div>
         </div>
 
+        {/* Roster filters */}
+        {players.length > 0 && (
+          <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or email…"
+                className="pl-9 bg-muted/40 border-border"
+                value={rosterSearch}
+                onChange={(e) => setRosterSearch(e.target.value)}
+              />
+            </div>
+            <Select value={rosterLinkFilter} onValueChange={(v) => setRosterLinkFilter(v as any)}>
+              <SelectTrigger className="w-full md:w-44 bg-muted/40 border-border">
+                <SelectValue placeholder="Link status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Players</SelectItem>
+                <SelectItem value="linked">Linked to Portal</SelectItem>
+                <SelectItem value="unlinked">Not Linked</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={rosterSort} onValueChange={(v) => setRosterSort(v as any)}>
+              <SelectTrigger className="w-full md:w-48 bg-muted/40 border-border">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">Most Recent Session</SelectItem>
+                <SelectItem value="name">Name (A–Z)</SelectItem>
+                <SelectItem value="sessions">Most Sessions</SelectItem>
+              </SelectContent>
+            </Select>
+            {rosterHasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { setRosterSearch(""); setRosterLinkFilter("all"); }}
+                className="text-xs"
+              >
+                Clear filters
+              </Button>
+            )}
+          </div>
+        )}
+
         {playersLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -277,9 +435,23 @@ export function BlastMetricsTab({
               </Button>
             </CardContent>
           </Card>
+        ) : filteredPlayers.length === 0 ? (
+          <Card className="bg-muted/40 border-border">
+            <CardContent className="py-12 text-center">
+              <Search className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-muted-foreground mb-4">No players match your filters.</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setRosterSearch(""); setRosterLinkFilter("all"); }}
+              >
+                Clear filters
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {players.map((p: any) => (
+            {filteredPlayers.map((p: any) => (
               <button
                 key={p.id}
                 onClick={() => setSelectedPlayerId(p.id)}
@@ -456,24 +628,38 @@ export function BlastMetricsTab({
         </div>
 
         <div className="flex gap-2 items-center">
-          <Select value={chartMetric1} onValueChange={(v) => setChartMetric1(v as MetricKey)}>
+          <Select
+            value={chartMetric1}
+            onValueChange={(v) => {
+              const next = v as MetricKey;
+              if (next === chartMetric2) setChartMetric2(chartMetric1);
+              setChartMetric1(next);
+            }}
+          >
             <SelectTrigger className="w-[160px] bg-muted/60 border-border text-foreground text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {Object.entries(METRIC_CONFIGS).map(([key, cfg]) => (
-                <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+                <SelectItem key={key} value={key} disabled={key === chartMetric2}>{cfg.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           <span className="text-muted-foreground/60 text-xs">vs</span>
-          <Select value={chartMetric2} onValueChange={(v) => setChartMetric2(v as MetricKey)}>
+          <Select
+            value={chartMetric2}
+            onValueChange={(v) => {
+              const next = v as MetricKey;
+              if (next === chartMetric1) setChartMetric1(chartMetric2);
+              setChartMetric2(next);
+            }}
+          >
             <SelectTrigger className="w-[160px] bg-muted/60 border-border text-foreground text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {Object.entries(METRIC_CONFIGS).map(([key, cfg]) => (
-                <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+                <SelectItem key={key} value={key} disabled={key === chartMetric1}>{cfg.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -651,15 +837,28 @@ export function BlastMetricsTab({
                 {sessions.length} sessions
               </Badge>
             </CardTitle>
-            <Button
-              onClick={() => setAddSessionOpen(true)}
-              size="sm"
-              variant="outline"
-              className="text-violet-400 border-violet-500/30 hover:bg-violet-500/10 h-8"
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Add
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={exportSessionsCsv}
+                disabled={!sortedSessions.length}
+                size="sm"
+                variant="outline"
+                className="text-green-400 border-green-500/30 hover:bg-green-500/10 h-8 disabled:opacity-40"
+                title="Export sessions as CSV"
+              >
+                <Download className="h-3.5 w-3.5 mr-1" />
+                CSV
+              </Button>
+              <Button
+                onClick={() => setAddSessionOpen(true)}
+                size="sm"
+                variant="outline"
+                className="text-violet-400 border-violet-500/30 hover:bg-violet-500/10 h-8"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Add
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -687,18 +886,42 @@ export function BlastMetricsTab({
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">Date</th>
-                    <th className="text-left py-3 px-2 text-muted-foreground font-medium">Type</th>
-                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Bat Speed</th>
-                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">On-Plane Eff.</th>
-                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Attack Angle</th>
-                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">Exit Velo</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium">
+                      <button onClick={() => toggleSort("date")} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+                        Date {sortIcon("date")}
+                      </button>
+                    </th>
+                    <th className="text-left py-3 px-2 text-muted-foreground font-medium">
+                      <button onClick={() => toggleSort("type")} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+                        Type {sortIcon("type")}
+                      </button>
+                    </th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">
+                      <button onClick={() => toggleSort("batSpeed")} className="inline-flex items-center gap-1 hover:text-foreground transition-colors mx-auto">
+                        Bat Speed {sortIcon("batSpeed")}
+                      </button>
+                    </th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">
+                      <button onClick={() => toggleSort("onPlane")} className="inline-flex items-center gap-1 hover:text-foreground transition-colors mx-auto">
+                        On-Plane Eff. {sortIcon("onPlane")}
+                      </button>
+                    </th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">
+                      <button onClick={() => toggleSort("attackAngle")} className="inline-flex items-center gap-1 hover:text-foreground transition-colors mx-auto">
+                        Attack Angle {sortIcon("attackAngle")}
+                      </button>
+                    </th>
+                    <th className="text-center py-3 px-2 text-muted-foreground font-medium">
+                      <button onClick={() => toggleSort("exitVelo")} className="inline-flex items-center gap-1 hover:text-foreground transition-colors mx-auto">
+                        Exit Velo {sortIcon("exitVelo")}
+                      </button>
+                    </th>
                     <th className="text-center py-3 px-2 text-muted-foreground font-medium">Note</th>
                     <th className="w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sessions.map((s: any, idx: number) => (
+                  {sortedSessions.map((s: any, idx: number) => (
                     <tr key={s.id || idx} className="border-b border-border/40 hover:bg-muted/20 transition-colors group">
                       <td className="py-3 px-3 text-foreground whitespace-nowrap">{formatDate(s.sessionDate)}</td>
                       <td className="py-3 px-2">
