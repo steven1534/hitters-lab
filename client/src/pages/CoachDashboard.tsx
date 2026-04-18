@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { 
   ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, Search, 
-  Sparkles, Video, Upload, MessageSquare, BarChart3, Activity, Users, 
-  LayoutTemplate, Edit3, ArrowLeftRight, FileText, ChevronRight,
-  Zap, Target, TrendingUp, Shield, Table2, LayoutDashboard, ClipboardList,
-  BookOpen, StickyNote, Menu, X as XIcon, UserPlus, Mail, Bell,
+  Video, Upload, BarChart3, Activity, Users, 
+  Edit3, ChevronRight,
+  Target, Shield, Table2, LayoutDashboard,
+  BookOpen, Menu, X as XIcon, UserPlus, Mail,
   UserCog, Inbox,
   Eye, EyeOff, Database,
 } from "lucide-react";
