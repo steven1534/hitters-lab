@@ -33,7 +33,12 @@ import {
 } from "@shared/drillCatalogMerge";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { EditDrillDetailsModal } from "@/components/EditDrillDetailsModal";
-import { TiptapEditor, TiptapRenderer } from "@/components/TiptapEditor";
+import { lazy, Suspense } from "react";
+import { TiptapRenderer } from "@/components/TiptapRenderer";
+// Lazy-load the heavy editor so only coaches pay the ~350 KB cost
+const TiptapEditor = lazy(() =>
+  import("@/components/TiptapEditor").then((m) => ({ default: m.TiptapEditor }))
+);
 import { trpc } from "@/lib/trpc";
 import { usePreviewLimit } from "@/hooks/usePreviewLimit";
 import { InlineEdit } from "@/components/InlineEdit";
@@ -470,13 +475,21 @@ export default function DrillDetail() {
           </h2>
           <div className="glass-card rounded-xl p-4 md:p-6">
             {isCoach ? (
-              <TiptapEditor
-                value={customInstructions}
-                onChange={setCustomInstructions}
-                onSave={saveCustomInstructions}
-                isSaving={saveInstructionsMutation.isPending}
-                placeholder="Write drill instructions here..."
-              />
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                    Loading editor…
+                  </div>
+                }
+              >
+                <TiptapEditor
+                  value={customInstructions}
+                  onChange={setCustomInstructions}
+                  onSave={saveCustomInstructions}
+                  isSaving={saveInstructionsMutation.isPending}
+                  placeholder="Write drill instructions here..."
+                />
+              </Suspense>
             ) : customInstructions ? (
               <TiptapRenderer content={customInstructions} />
             ) : (
