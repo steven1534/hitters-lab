@@ -340,7 +340,6 @@ export const blastMetricsRouter = router({
             homeworkDrills: [],
             overallRating: null,
             privateNotes: null,
-            practicePlanId: null,
             blastSessionId: sessionId,
           });
           linkedSessionNoteId = note?.id ?? null;
@@ -506,7 +505,6 @@ export const blastMetricsRouter = router({
                 homeworkDrills: [],
                 overallRating: null,
                 privateNotes: null,
-                practicePlanId: null,
                 blastSessionId: sessionId,
               });
               notesCreated++;
@@ -639,7 +637,6 @@ export const blastMetricsRouter = router({
             homeworkDrills: [],
             overallRating: null,
             privateNotes: null,
-            practicePlanId: null,
             blastSessionId: s.sessionId,
           });
           notesCreated++;

@@ -43,7 +43,6 @@ export const sessionNotesRouter = router({
         homeworkDrills: z.array(homeworkDrillSchema).optional(),
         overallRating: z.number().min(1).max(5).optional(),
         privateNotes: z.string().optional(),
-        practicePlanId: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -66,7 +65,6 @@ export const sessionNotesRouter = router({
         homeworkDrills: input.homeworkDrills ?? [],
         overallRating: input.overallRating ?? null,
         privateNotes: input.privateNotes ?? null,
-        practicePlanId: input.practicePlanId ?? null,
       });
     }),
 

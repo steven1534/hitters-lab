@@ -26,7 +26,6 @@ import { BulkGoalUpload } from "@/components/BulkGoalUpload";
 import { AthleteProgressReport } from "@/components/AthleteProgressReport";
 import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOverview";
 import { AthleteTable } from "@/components/AthleteTable";
-import PracticePlanner from "@/components/PracticePlanner";
 import { SessionNotesTab } from "@/components/SessionNotesTab";
 import { PlayerReportsTab } from "@/components/PlayerReportsTab";
 import { VideoAnalysisTab } from "@/components/VideoAnalysisTab";
@@ -51,7 +50,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "planner" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -70,7 +69,6 @@ const NAV_GROUPS = [
       { key: "drill-library" as ActiveTab, label: "Drill Library", icon: BookOpen },
       { key: "drill-videos" as ActiveTab, label: "Manage Videos", icon: Video },
       { key: "challenges" as ActiveTab, label: "Weekly Challenges", icon: Trophy },
-      { key: "planner" as ActiveTab, label: "Practice Planner", icon: Target },
     ],
   },
   {
@@ -116,7 +114,6 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   "bulk-goals": "Bulk Goals",
   "catalog-overrides": "Catalog Overrides",
   athletes: "Athletes Table",
-  planner: "Practice Planner",
   "session-notes": "Session Notes",
   "player-reports": "Player Reports",
   "video-analysis": "Video Analysis",
@@ -636,7 +633,6 @@ export default function CoachDashboard() {
 
             {activeTab === "athletes" && <AthleteTable />}
 
-            {activeTab === "planner" && <PracticePlanner />}
 
             {activeTab === "session-notes" && (
               <SessionNotesTab

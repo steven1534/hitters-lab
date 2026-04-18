@@ -14,7 +14,6 @@ import { videoUploadRouter } from "./routers-video-upload";
 import { notificationsRouter } from "./routers-notifications";
 import { activityRouter } from "./routers-activity";
 import { favoritesRouter } from "./routers-favorites";
-import { practicePlansRouter } from "./routers-practice-plans";
 import { sessionNotesRouter } from "./routers-session-notes";
 import { progressReportsRouter } from "./routers-progress-reports";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
@@ -35,7 +34,6 @@ export const appRouter = router({
   notifications: notificationsRouter,
   activity: activityRouter,
   favorites: favoritesRouter,
-  practicePlans: practicePlansRouter,
   sessionNotes: sessionNotesRouter,
   progressReports: progressReportsRouter,
   athleteProfiles: athleteProfilesRouter,
