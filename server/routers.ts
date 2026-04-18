@@ -17,7 +17,6 @@ import { favoritesRouter } from "./routers-favorites";
 import { sessionNotesRouter } from "./routers-session-notes";
 import { progressReportsRouter } from "./routers-progress-reports";
 import { athleteProfilesRouter } from "./routers-athlete-profiles";
-import { videoAnalysisRouter } from "./routers-video-analysis";
 import { blastMetricsRouter } from "./routers-blast-metrics";
 import { playerReportsRouter } from "./routers-player-reports";
 import { badgesRouter } from "./routers-badges";
@@ -580,7 +579,6 @@ export const appRouter = router({
   videoUpload: videoUploadRouter,
 
   // AI Video Analysis router
-  videoAnalysis: videoAnalysisRouter,
   blastMetrics: blastMetricsRouter,
   playerReports: playerReportsRouter,
 

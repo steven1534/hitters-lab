@@ -3,7 +3,6 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { sendSubmissionNotificationToCoach, sendFeedbackNotificationToAthlete } from "./email";
-import { videoAnalysis } from "../drizzle/schema";
 
 export const submissionsRouter = router({
   // Drill submissions router for athlete feedback
@@ -26,33 +25,6 @@ export const submissionsRouter = router({
           notes: input.notes || null,
           videoUrl: input.videoUrl || null,
         });
-
-        // Auto-create videoAnalysis record if a video was uploaded
-        if (input.videoUrl) {
-          try {
-            const database = await db.getDb();
-            if (database) {
-              // Get the submission ID from the insert result
-              const submissions = await db.getSubmissionsByUser(ctx.user.id);
-              const latestSubmission = submissions
-                .filter((s: any) => s.drillId === input.drillId && s.assignmentId === input.assignmentId)
-                .sort((a: any, b: any) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())[0];
-
-              if (latestSubmission) {
-                await database.insert(videoAnalysis).values({
-                  athleteId: ctx.user.id,
-                  drillId: input.drillId,
-                  videoUrl: input.videoUrl,
-                  status: "pending",
-                } as any);
-                console.log(`[VideoAnalysis] Auto-created pending analysis for submission ${latestSubmission.id}`);
-              }
-            }
-          } catch (vaError) {
-            console.error('[VideoAnalysis] Failed to auto-create analysis record:', vaError);
-            // Don't fail the submission if analysis record creation fails
-          }
-        }
 
         // Send email notification to coach
         try {

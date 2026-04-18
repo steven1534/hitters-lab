@@ -17,8 +17,6 @@ import { CompletionModal } from "@/components/CompletionModal";
 import { DrillCoachFocus, DrillQuickNotes } from "@/components/DrillActionComponents";
 import { AthletePortalSkeleton } from "@/components/Skeleton";
 import { useAllDrills } from "@/hooks/useAllDrills";
-import { AthleteVideoFeedback } from "@/components/AthleteVideoFeedback";
-import { SwingAnalyzer } from "@/components/SwingAnalyzer";
 import { DrillSubmissionForm } from "@/components/DrillSubmissionForm";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
@@ -674,10 +672,8 @@ function ProgressTab({ stats, completedCount }: { stats: any; completedCount: nu
 function SwingLabTab() {
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <SwingAnalyzer />
       <VideoComparisonTool />
       <AthleteBlastMetrics />
-      <AthleteVideoFeedback />
     </div>
   );
 }

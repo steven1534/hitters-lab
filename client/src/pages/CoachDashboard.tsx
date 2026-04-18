@@ -28,7 +28,6 @@ import { AthleteAssignmentOverview } from "@/components/AthleteAssignmentOvervie
 import { AthleteTable } from "@/components/AthleteTable";
 import { SessionNotesTab } from "@/components/SessionNotesTab";
 import { PlayerReportsTab } from "@/components/PlayerReportsTab";
-import { VideoAnalysisTab } from "@/components/VideoAnalysisTab";
 import { BlastMetricsTab } from "@/components/BlastMetricsTab";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { InlineEdit } from "@/components/InlineEdit";
@@ -50,7 +49,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "session-notes" | "player-reports" | "video-analysis" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "bulk-goals" | "catalog-overrides" | "athletes" | "session-notes" | "player-reports" | "blast-metrics" | "notifications" | "account" | "challenges" | "user-management" | "submissions" | "activity-feed" | "drill-library" | "drill-videos";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -83,7 +82,6 @@ const NAV_GROUPS = [
     label: "Analytics",
     items: [
       { key: "blast-metrics" as ActiveTab, label: "Blast Metrics", icon: Activity },
-      { key: "video-analysis" as ActiveTab, label: "Video Analysis", icon: Sparkles },
       { key: "activity-feed" as ActiveTab, label: "Activity Feed", icon: TrendingUp },
     ],
   },
@@ -116,7 +114,6 @@ const TAB_LABELS: Record<ActiveTab, string> = {
   athletes: "Athletes Table",
   "session-notes": "Session Notes",
   "player-reports": "Player Reports",
-  "video-analysis": "Video Analysis",
   "blast-metrics": "Blast Metrics",
   "drill-library": "Drill Library",
   "drill-videos": "Manage Videos",
@@ -650,7 +647,6 @@ export default function CoachDashboard() {
               />
             )}
 
-            {activeTab === "video-analysis" && <VideoAnalysisTab />}
 
             {activeTab === "blast-metrics" && (
               <BlastMetricsTab
@@ -974,7 +970,6 @@ function BusinessMetrics({ onNavigate }: { onNavigate: (tab: ActiveTab) => void 
             {[
               { label: "Assign Drills", icon: Target, tab: "assign" as ActiveTab },
               { label: "Write Notes", icon: StickyNote, tab: "session-notes" as ActiveTab },
-              { label: "Review Videos", icon: Sparkles, tab: "video-analysis" as ActiveTab },
               { label: "Player Reports", icon: BookOpen, tab: "player-reports" as ActiveTab },
               { label: "Blast Metrics", icon: BarChart3, tab: "blast-metrics" as ActiveTab },
               { label: "Submissions", icon: Inbox, tab: "submissions" as ActiveTab },
