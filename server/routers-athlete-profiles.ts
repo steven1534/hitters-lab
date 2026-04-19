@@ -42,6 +42,9 @@ export const athleteProfilesRouter = router({
         parentEmail: z.string().nullable().optional(),
         parentPhone: z.string().nullable().optional(),
         coachProfileNotes: z.string().nullable().optional(),
+        // Coach-only plan context
+        weeklyFocus: z.string().max(500).nullable().optional(),
+        activePathwayId: z.string().max(255).nullable().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -67,6 +70,11 @@ export const athleteProfilesRouter = router({
         });
         if (birthDate !== undefined) {
           data.birthDate = birthDate ? new Date(birthDate) : null;
+        }
+        // Stamp the focus timestamp whenever the focus text is being written
+        // (including clear-to-null) so the athlete UI can show "set 3 days ago".
+        if (rest.weeklyFocus !== undefined) {
+          data.weeklyFocusUpdatedAt = rest.weeklyFocus ? new Date() : null;
         }
       } else {
         // Athlete can update: parentName, parentEmail, parentPhone, position, bats, throws, teamName

@@ -348,6 +348,13 @@ export const athleteProfiles = pgTable("athleteProfiles", {
   parentPhone: varchar("parentPhone", { length: 30 }),
   emergencyContact: varchar("emergencyContact", { length: 255 }),
   emergencyPhone: varchar("emergencyPhone", { length: 30 }),
+  // Coach-authored "this week's focus" — short directive shown at the top of
+  // the athlete's My Plan landing surface. Updated by coach only.
+  weeklyFocus: text("weeklyFocus"),
+  weeklyFocusUpdatedAt: timestamp("weeklyFocusUpdatedAt"),
+  // Slug pointing into the static PATHWAYS list in Pathways.tsx (e.g.
+  // "barrel-path"). Surfaces "You're on the X pathway" on My Plan.
+  activePathwayId: varchar("activePathwayId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });

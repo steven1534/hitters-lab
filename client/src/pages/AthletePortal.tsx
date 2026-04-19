@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { CompletionModal } from "@/components/CompletionModal";
 import { DrillCoachFocus, DrillQuickNotes } from "@/components/DrillActionComponents";
 import { AthletePortalSkeleton } from "@/components/Skeleton";
+import { MyPlanContextCard } from "@/components/MyPlanContextCard";
 import { useAllDrills } from "@/hooks/useAllDrills";
 import { DrillSubmissionForm } from "@/components/DrillSubmissionForm";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -377,7 +378,11 @@ function TrainingTab({
 
   return (
     <>
-      {/* This Week's Focus / Today's Reps Hero */}
+      {/* Coach-set plan context: weekly focus directive + active pathway link.
+          Renders nothing if neither has been set yet. */}
+      <MyPlanContextCard />
+
+      {/* Today's Reps Hero — the next drill to actually work on right now */}
       {upNextDrill ? (
         <div className="glass-card rounded-2xl overflow-hidden border-glow animate-fade-in-up">
           <div className="relative p-6">
@@ -385,10 +390,10 @@ function TrainingTab({
             <div className="relative">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 bg-electric rounded-full animate-pulse shadow-[0_0_10px_rgba(0,191,255,0.8)]" />
-                <span className="text-sm font-medium text-electric uppercase tracking-wide">This Week&apos;s Focus</span>
+                <span className="text-sm font-medium text-electric uppercase tracking-wide">Today&apos;s Reps</span>
               </div>
               <h2 className="text-2xl font-bold mb-1 text-foreground">{upNextDrill.drillName}</h2>
-              <p className="text-sm text-muted-foreground mb-3">Today&apos;s reps — assigned by Coach Steve</p>
+              <p className="text-sm text-muted-foreground mb-3">Up next from your assigned plan</p>
               {(() => {
                 const drill = getDrill(upNextDrill.drillId);
                 return drill && (
