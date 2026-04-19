@@ -129,6 +129,14 @@ function Router() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  return null;
+}
+
 function App() {
   // Register service worker on mount
   useEffect(() => {
@@ -145,6 +153,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <ScrollToTop />
           <Router />
           <PWAInstallBanner />
         </TooltipProvider>

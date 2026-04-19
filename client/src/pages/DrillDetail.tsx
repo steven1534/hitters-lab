@@ -447,59 +447,6 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Stat strip */}
-        {details && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 px-4 md:px-0">
-            <StatCard icon={Clock} label="Time" value={details.time} />
-            <StatCard
-              icon={Users}
-              label="Athletes"
-              value={details.athletes?.split(",")[0] || "—"}
-            />
-            <StatCard
-              icon={Dumbbell}
-              label="Equipment"
-              value={details.equipment?.split(",")[0] || "—"}
-            />
-            <StatCard icon={Target} label="Skill" value={details.skillSet} />
-          </div>
-        )}
-
-        {/* Instructions */}
-        <section className="px-4 md:px-0 mb-8">
-          <h2 className="text-2xl md:text-3xl font-heading font-black mb-3 md:mb-4 flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
-              <Target className="h-4 w-4 text-green-400" />
-            </div>
-            Instructions
-          </h2>
-          <div className="glass-card rounded-xl p-4 md:p-6">
-            {isCoach ? (
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                    Loading editor…
-                  </div>
-                }
-              >
-                <TiptapEditor
-                  value={customInstructions}
-                  onChange={setCustomInstructions}
-                  onSave={saveCustomInstructions}
-                  isSaving={saveInstructionsMutation.isPending}
-                  placeholder="Write drill instructions here..."
-                />
-              </Suspense>
-            ) : customInstructions ? (
-              <TiptapRenderer content={customInstructions} />
-            ) : (
-              <p className="text-muted-foreground italic">
-                No instructions provided for this drill yet.
-              </p>
-            )}
-          </div>
-        </section>
-
         {/* Coaching content */}
         {hasCoachingContent && (
           <div className="grid gap-5 mb-8 px-4 md:px-0">
@@ -633,18 +580,6 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Log drill CTA */}
-        {user && drill && (
-          <div className="mt-6 flex justify-center px-4 md:px-0">
-            <button
-              onClick={() => setShowLogDrill(true)}
-              className="flex items-center gap-2 rounded-[2px] bg-gold px-5 py-2.5 font-heading text-[0.7rem] font-bold uppercase tracking-[0.1em] text-canvas transition-colors hover:bg-gold-dim"
-            >
-              <Check className="h-4 w-4" />
-              Log This Drill
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Log-drill modal */}

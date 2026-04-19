@@ -115,11 +115,11 @@ export default function DrillCard({
 
           {/* Best For */}
           {drill.bestFor && (
-            <div className="mb-4 rounded-md px-3 py-2.5 bg-[oklch(0.11_0.005_260)] border border-[oklch(0.20_0.006_260)]">
-              <span className="block font-heading text-[0.55rem] font-bold uppercase tracking-[0.12em] text-gold/70 mb-1">
+            <div className="mb-4 rounded-sm px-3 py-2.5 bg-[#c9a44a]/[0.04] border border-[#c9a44a]/15 shadow-[inset_0_1px_0_rgba(201,164,74,0.06)]">
+              <span className="block font-heading text-[0.55rem] font-extrabold uppercase tracking-[0.12em] text-[#c9a44a] mb-1">
                 Best For
               </span>
-              <p className="text-[0.75rem] leading-snug text-[oklch(0.72_0.01_260)]">
+              <p className="text-[0.75rem] leading-snug text-white font-bold">
                 {drill.bestFor}
               </p>
             </div>
