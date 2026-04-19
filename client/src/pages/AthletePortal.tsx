@@ -18,6 +18,7 @@ import { CompletionModal } from "@/components/CompletionModal";
 import { DrillCoachFocus, DrillQuickNotes } from "@/components/DrillActionComponents";
 import { AthletePortalSkeleton } from "@/components/Skeleton";
 import { MyPlanContextCard } from "@/components/MyPlanContextCard";
+import { MyRoutines } from "@/components/MyRoutines";
 import { useAllDrills } from "@/hooks/useAllDrills";
 import { DrillSubmissionForm } from "@/components/DrillSubmissionForm";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -381,6 +382,10 @@ function TrainingTab({
       {/* Coach-set plan context: weekly focus directive + active pathway link.
           Renders nothing if neither has been set yet. */}
       <MyPlanContextCard />
+
+      {/* Assigned routines — structured sessions to follow step by step.
+          Renders nothing if no routines are assigned. */}
+      <MyRoutines />
 
       {/* Today's Reps Hero — the next drill to actually work on right now */}
       {upNextDrill ? (

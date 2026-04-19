@@ -461,3 +461,53 @@ export const drillProgress = pgTable("drillProgress", {
 
 export type DrillProgress = typeof drillProgress.$inferSelect;
 export type InsertDrillProgress = typeof drillProgress.$inferInsert;
+
+// ============================================================
+// Routines (ordered drill sequences authored by coach)
+// ============================================================
+export const routineStatusEnum = pgEnum("routine_status", ["active", "paused", "completed"]);
+
+export const routines = pgTable("routines", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  durationMinutes: integer("durationMinutes"),
+  equipment: text("equipment"),
+  location: varchar("location", { length: 100 }),
+  routineType: varchar("routineType", { length: 100 }),
+  createdBy: integer("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type Routine = typeof routines.$inferSelect;
+export type InsertRoutine = typeof routines.$inferInsert;
+
+export const routineDrills = pgTable("routineDrills", {
+  id: serial("id").primaryKey(),
+  routineId: integer("routineId").notNull(),
+  drillId: varchar("drillId", { length: 255 }).notNull(),
+  drillName: varchar("drillName", { length: 255 }).notNull(),
+  orderIndex: integer("orderIndex").notNull(),
+  durationSeconds: integer("durationSeconds"),
+  reps: integer("reps"),
+  sets: integer("sets"),
+  coachNotes: text("coachNotes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RoutineDrill = typeof routineDrills.$inferSelect;
+export type InsertRoutineDrill = typeof routineDrills.$inferInsert;
+
+export const routineAssignments = pgTable("routineAssignments", {
+  id: serial("id").primaryKey(),
+  routineId: integer("routineId").notNull(),
+  userId: integer("userId").notNull(),
+  frequency: varchar("frequency", { length: 100 }),
+  status: routineStatusEnum("status").default("active").notNull(),
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type RoutineAssignment = typeof routineAssignments.$inferSelect;
+export type InsertRoutineAssignment = typeof routineAssignments.$inferInsert;

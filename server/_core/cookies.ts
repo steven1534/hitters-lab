@@ -8,7 +8,9 @@ function isIpAddress(host: string) {
   return host.includes(":");
 }
 
-function isSecureRequest(req: Request) {
+/** True when this request is served over HTTPS (direct or behind a TLS-terminating proxy). */
+export function isSecureRequest(req: Request): boolean {
+  if (req.secure) return true;
   if (req.protocol === "https") return true;
 
   const forwardedProto = req.headers["x-forwarded-proto"];
@@ -39,10 +41,11 @@ export function getSessionCookieOptions(
   //       ? hostname
   //       : undefined;
 
+  const secure = isSecureRequest(req);
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
-    secure: isSecureRequest(req),
+    sameSite: secure ? "none" : "lax",
+    secure,
   };
 }

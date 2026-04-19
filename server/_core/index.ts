@@ -37,6 +37,11 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 
 async function startServer() {
   const app = express();
+  // Behind Render / Railway / nginx, TLS terminates at the proxy — trust first hop so
+  // req.secure and cookie Secure flag match the browser connection.
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
   const server = createServer(app);
 
   // Clickjacking protection.
