@@ -53,8 +53,10 @@ interface Assignment {
 }
 
 // ── Tab configuration ────────────────────────────────────────
+// "This Week" = the assigned-work landing surface (drills coach assigned + today's reps).
+// Other tabs are secondary reference / history surfaces.
 const TABS = [
-  { id: "training", label: "Training", icon: Target },
+  { id: "training", label: "This Week", icon: Target },
   { id: "progress", label: "Progress", icon: BarChart3 },
   { id: "swinglab", label: "Swing Lab", icon: Beaker },
   { id: "coach", label: "Coach Notes", icon: ClipboardList },
@@ -218,8 +220,8 @@ export default function AthletePortal() {
             <AlertCircle className="w-8 h-8 text-electric" />
           </div>
           <h2 className="text-xl font-bold text-center mb-2">Please Log In</h2>
-          <p className="text-muted-foreground text-center mb-6">You need to be logged in to view your training.</p>
-          <Link href="/"><Button variant="outline" className="w-full glass hover:bg-white/5">Back to Directory</Button></Link>
+          <p className="text-muted-foreground text-center mb-6">You need to be logged in to view your plan.</p>
+          <Link href="/drills"><Button variant="outline" className="w-full glass hover:bg-white/5">Back to Library</Button></Link>
         </div>
       </div>
     );
@@ -248,12 +250,15 @@ export default function AthletePortal() {
       {/* Header */}
       <header className="glass sticky top-0 z-40 border-b border-white/10">
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
-          <Link href="/">
+          <Link href="/drills">
             <button className="flex items-center gap-1 text-muted-foreground hover:text-electric text-sm transition-colors hover-lift">
-              <Home className="w-4 h-4" /><span className="hidden sm:inline">Directory</span>
+              <Home className="w-4 h-4" /><span className="hidden sm:inline">Library</span>
             </button>
           </Link>
-          <h1 className="font-bold text-lg text-gradient">My Training</h1>
+          <div className="flex flex-col items-center leading-tight">
+            <h1 className="font-bold text-lg text-gradient">My Plan</h1>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Coach Steve&apos;s assignments</p>
+          </div>
           <div className="flex items-center gap-3">
             <NotificationBell />
             <Link href="/my-profile">
@@ -372,7 +377,7 @@ function TrainingTab({
 
   return (
     <>
-      {/* Up Next Hero */}
+      {/* This Week's Focus / Today's Reps Hero */}
       {upNextDrill ? (
         <div className="glass-card rounded-2xl overflow-hidden border-glow animate-fade-in-up">
           <div className="relative p-6">
@@ -380,9 +385,10 @@ function TrainingTab({
             <div className="relative">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 bg-electric rounded-full animate-pulse shadow-[0_0_10px_rgba(0,191,255,0.8)]" />
-                <span className="text-sm font-medium text-electric uppercase tracking-wide">Up Next</span>
+                <span className="text-sm font-medium text-electric uppercase tracking-wide">This Week&apos;s Focus</span>
               </div>
-              <h2 className="text-2xl font-bold mb-3 text-foreground">{upNextDrill.drillName}</h2>
+              <h2 className="text-2xl font-bold mb-1 text-foreground">{upNextDrill.drillName}</h2>
+              <p className="text-sm text-muted-foreground mb-3">Today&apos;s reps — assigned by Coach Steve</p>
               {(() => {
                 const drill = getDrill(upNextDrill.drillId);
                 return drill && (
@@ -408,8 +414,8 @@ function TrainingTab({
           <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
             <Trophy className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-2xl font-bold mb-2 text-foreground">All Caught Up!</h2>
-          <p className="text-muted-foreground">No pending drills. Check back soon for new assignments!</p>
+          <h2 className="text-2xl font-bold mb-2 text-foreground">Plan Complete!</h2>
+          <p className="text-muted-foreground">You&apos;ve finished this week&apos;s assigned work. Coach Steve will set your next focus soon.</p>
         </div>
       )}
 
@@ -425,11 +431,11 @@ function TrainingTab({
         </div>
       </div>
 
-      {/* Pending Drills Playlist */}
+      {/* Assigned Drills */}
       {pendingAssignments.length > 0 && (
         <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-foreground">Your Playlist</h3>
+            <h3 className="font-bold text-foreground">Assigned Drills</h3>
             <Badge className="bg-electric/20 text-electric border border-electric/30">{pendingAssignments.length} remaining</Badge>
           </div>
           <div className="space-y-2">

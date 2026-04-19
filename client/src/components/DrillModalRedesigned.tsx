@@ -20,6 +20,9 @@ interface DrillModalRedesignedProps {
     drillName: string;
     status: "assigned" | "in-progress" | "completed";
     completedAt: Date | null;
+    // Coach-authored "why you were assigned this" note. Wired from
+    // drillAssignments.notes on the server.
+    notes?: string | null;
   } | null;
   drill?: {
     id: string;
@@ -51,6 +54,9 @@ export function DrillModalRedesigned({
   const [showCustomNote, setShowCustomNote] = useState(false);
   const [showVideoUpload, setShowVideoUpload] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  // Deep-reference content (steps, mistakes, progressions) is collapsed by
+  // default so the top of the modal stays "do this now" instead of a manual.
+  const [showDetails, setShowDetails] = useState(false);
 
   const utils = trpc.useUtils();
 
@@ -92,6 +98,7 @@ export function DrillModalRedesigned({
     setShowCustomNote(false);
     setShowVideoUpload(false);
     setIsCompleting(false);
+    setShowDetails(false);
   };
 
   const handleClose = () => {
@@ -141,53 +148,46 @@ export function DrillModalRedesigned({
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-background">
 
-          {/* 1. Coach's Motivational Message */}
-          <div className="bg-electric/10 border border-electric/20 rounded-xl p-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-electric/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-4 h-4 text-electric" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-electric uppercase tracking-wider mb-1">
-                  Coach Steve says
-                </p>
-                <p className="text-sm text-foreground/90 leading-relaxed">
-                  {drillDetail?.goal
-                    ? `Focus on: ${drillDetail.goal}. You've got this — let's see some great reps today!`
-                    : "You're doing great! Stay focused and give it your best effort today. Every rep counts!"}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* TOP: action-oriented "do this now" stack — assignment reason, focus, cue, video */}
 
-          {/* 2. Drill Instructions */}
-          {drillDetail?.description && drillDetail.description.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <ListChecks className="w-4 h-4 text-[#E8425A]" />
-                <h3 className="font-semibold text-foreground text-sm">How to Do This Drill</h3>
-              </div>
-              <div className="space-y-2">
-                {drillDetail.description.map((step: string, idx: number) => (
-                  <div key={idx} className="flex gap-3 items-start">
-                    <div className="w-6 h-6 bg-[#DC143C]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-[#E8425A]">{idx + 1}</span>
-                    </div>
-                    <p className="text-sm text-foreground/80 leading-relaxed">{step}</p>
-                  </div>
-                ))}
+          {/* Why you were assigned this — coach-authored note (hidden if empty) */}
+          {assignment.notes && assignment.notes.trim().length > 0 && (
+            <div className="bg-electric/10 border border-electric/20 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-electric/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-4 h-4 text-electric" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-electric uppercase tracking-wider mb-1">
+                    Why you were assigned this
+                  </p>
+                  <p className="text-sm text-foreground/90 leading-relaxed">
+                    {assignment.notes}
+                  </p>
+                </div>
               </div>
             </div>
           )}
 
-          {/* 3. Custom Instructions from Coach */}
+          {/* Your Focus — drill goal (one-line "what good looks like") */}
+          {drillDetail?.goal && (
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-electric" />
+                <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">Your Focus</h3>
+              </div>
+              <p className="text-sm text-foreground/90 leading-relaxed pl-6">{drillDetail.goal}</p>
+            </div>
+          )}
+
+          {/* Main Cue — the one thing to remember while doing the drill */}
           {drillDetail?.instructions && (
             <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <Target className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                <MessageCircle className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-1">
-                    Special Instructions
+                    Main Cue
                   </p>
                   <p className="text-sm text-foreground/80 leading-relaxed">
                     {drillDetail.instructions}
@@ -197,49 +197,89 @@ export function DrillModalRedesigned({
             </div>
           )}
 
-          {/* 4. Common Mistakes to Avoid */}
-          {drillDetail?.commonMistakes && drillDetail.commonMistakes.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <h3 className="font-semibold text-foreground text-sm">Watch Out For</h3>
-              </div>
-              <div className="space-y-1.5">
-                {drillDetail.commonMistakes.map((mistake: string, idx: number) => (
-                  <div key={idx} className="flex gap-2 items-start bg-amber-500/5 border border-amber-500/10 rounded-lg px-3 py-2">
-                    <span className="text-amber-400 text-xs mt-0.5">•</span>
-                    <p className="text-xs text-foreground/70">{mistake}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 5. Progressions */}
-          {drillDetail?.progressions && drillDetail.progressions.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <ArrowUp className="w-4 h-4 text-emerald-400" />
-                <h3 className="font-semibold text-foreground text-sm">Level Up</h3>
-              </div>
-              <div className="space-y-1.5">
-                {drillDetail.progressions.map((prog: string, idx: number) => (
-                  <div key={idx} className="flex gap-2 items-start bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
-                    <span className="text-emerald-400 text-xs mt-0.5">→</span>
-                    <p className="text-xs text-foreground/70">{prog}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 6. Watch Video Button */}
+          {/* Watch Video — promoted up so the player can start fast */}
           <Link href={`/drill/${assignment.drillId}`}>
-            <Button variant="outline" className="w-full gap-2 border-border hover:bg-muted text-foreground">
+            <Button className="w-full gap-2 bg-electric hover:bg-electric/90 text-white font-semibold">
               <Play className="w-4 h-4" />
-              Watch Video Instructions
+              Watch Video
             </Button>
           </Link>
+
+          {/* DEEP REFERENCE: how-to steps, mistakes, progressions — collapsed by default */}
+          {(drillDetail?.description?.length || drillDetail?.commonMistakes?.length || drillDetail?.progressions?.length) ? (
+            <div>
+              <button
+                onClick={() => setShowDetails((v) => !v)}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg bg-muted/40 border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground"
+              >
+                <span className="flex items-center gap-2">
+                  <ListChecks className="w-4 h-4 text-muted-foreground" />
+                  Drill details &amp; coaching reference
+                </span>
+                {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+
+              {showDetails && (
+                <div className="mt-3 space-y-5 animate-in slide-in-from-top-2 duration-200">
+                  {/* How to Run This Drill */}
+                  {drillDetail?.description && drillDetail.description.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <ListChecks className="w-4 h-4 text-[#E8425A]" />
+                        <h3 className="font-semibold text-foreground text-sm">How to Run This Drill</h3>
+                      </div>
+                      <div className="space-y-2">
+                        {drillDetail.description.map((step: string, idx: number) => (
+                          <div key={idx} className="flex gap-3 items-start">
+                            <div className="w-6 h-6 bg-[#DC143C]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-xs font-bold text-[#E8425A]">{idx + 1}</span>
+                            </div>
+                            <p className="text-sm text-foreground/80 leading-relaxed">{step}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Watch Out For — common mistakes */}
+                  {drillDetail?.commonMistakes && drillDetail.commonMistakes.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                        <h3 className="font-semibold text-foreground text-sm">Watch Out For</h3>
+                      </div>
+                      <div className="space-y-1.5">
+                        {drillDetail.commonMistakes.map((mistake: string, idx: number) => (
+                          <div key={idx} className="flex gap-2 items-start bg-amber-500/5 border border-amber-500/10 rounded-lg px-3 py-2">
+                            <span className="text-amber-400 text-xs mt-0.5">•</span>
+                            <p className="text-xs text-foreground/70">{mistake}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Level Up — progressions */}
+                  {drillDetail?.progressions && drillDetail.progressions.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <ArrowUp className="w-4 h-4 text-emerald-400" />
+                        <h3 className="font-semibold text-foreground text-sm">Level Up</h3>
+                      </div>
+                      <div className="space-y-1.5">
+                        {drillDetail.progressions.map((prog: string, idx: number) => (
+                          <div key={idx} className="flex gap-2 items-start bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-3 py-2">
+                            <span className="text-emerald-400 text-xs mt-0.5">→</span>
+                            <p className="text-xs text-foreground/70">{prog}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : null}
 
           {/* DIVIDER — Submission Section */}
           {!isCompleted && (
