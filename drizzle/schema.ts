@@ -73,6 +73,10 @@ export const drillAssignments = pgTable("drillAssignments", {
   drillName: varchar("drillName", { length: 255 }).notNull(),
   status: assignmentStatusEnum("status").default("assigned").notNull(),
   notes: text("notes"),
+  // When set, this assignment belongs to a routine (ordered drill sequence).
+  // routineOrder is the 0-indexed position within the routine.
+  routineId: integer("routineId"),
+  routineOrder: integer("routineOrder"),
   assignedAt: timestamp("assignedAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt"),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
@@ -461,3 +465,39 @@ export const drillProgress = pgTable("drillProgress", {
 
 export type DrillProgress = typeof drillProgress.$inferSelect;
 export type InsertDrillProgress = typeof drillProgress.$inferInsert;
+
+// ============================================================
+// Routines (ordered drill sequences coaches can assign)
+// ============================================================
+export const routines = pgTable("routines", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  durationMinutes: integer("durationMinutes"),
+  // Free-form equipment list (e.g. ["tee", "net", "heavy bat"])
+  equipment: json("equipment").$type<string[]>(),
+  // Where the routine fits: "garage" | "cage" | "no-net" | "full" — free text
+  // so coaches can add new spaces without a migration.
+  space: varchar("space", { length: 64 }),
+  skillFocus: varchar("skillFocus", { length: 255 }),
+  createdBy: integer("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type Routine = typeof routines.$inferSelect;
+export type InsertRoutine = typeof routines.$inferInsert;
+
+export const routineDrills = pgTable("routineDrills", {
+  id: serial("id").primaryKey(),
+  routineId: integer("routineId").notNull(),
+  drillId: varchar("drillId", { length: 255 }).notNull(),
+  order: integer("order").notNull(),
+  // Reps or duration as free text so coaches can write "10 reps" or "2 min".
+  repsOrDuration: varchar("repsOrDuration", { length: 64 }),
+  note: text("note"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RoutineDrill = typeof routineDrills.$inferSelect;
+export type InsertRoutineDrill = typeof routineDrills.$inferInsert;
