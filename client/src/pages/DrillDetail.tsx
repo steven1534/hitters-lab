@@ -33,7 +33,12 @@ import {
 } from "@shared/drillCatalogMerge";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { EditDrillDetailsModal } from "@/components/EditDrillDetailsModal";
-import { TiptapEditor, TiptapRenderer } from "@/components/TiptapEditor";
+import { lazy, Suspense } from "react";
+import { TiptapRenderer } from "@/components/TiptapRenderer";
+// Lazy-load the heavy editor so only coaches pay the ~350 KB cost
+const TiptapEditor = lazy(() =>
+  import("@/components/TiptapEditor").then((m) => ({ default: m.TiptapEditor }))
+);
 import { trpc } from "@/lib/trpc";
 import { usePreviewLimit } from "@/hooks/usePreviewLimit";
 import { InlineEdit } from "@/components/InlineEdit";
@@ -97,21 +102,58 @@ export default function DrillDetail() {
         foundationOrAdvanced: staticDrill.foundationOrAdvanced,
       };
     } else if (customDrill) {
-      const cd = customDrill as typeof customDrill & { drillType?: string };
+      const cd = customDrill as typeof customDrill & {
+        drillType?: string;
+        purpose?: string | null;
+        bestFor?: string | null;
+        equipment?: string | null;
+        athletes?: string | null;
+        description?: string[] | null;
+        videoUrl?: string | null;
+        ageLevel?: string[] | null;
+        tags?: string[] | null;
+        problem?: string[] | null;
+        goalTags?: string[] | null;
+        whatThisFixes?: string[] | null;
+        whatToFeel?: string[] | null;
+        commonMistakes?: string[] | null;
+        coachCue?: string | null;
+        watchFor?: string | null;
+        nextSteps?: string[] | null;
+      };
       base = {
-        id: customDrill.drillId,
-        name: customDrill.name,
-        difficulty: customDrill.difficulty,
-        categories: [customDrill.category],
-        duration: customDrill.duration,
-        url: `/drill/${customDrill.drillId}`,
+        id: cd.drillId,
+        name: cd.name,
+        difficulty: cd.difficulty,
+        categories: [cd.category],
+        duration: cd.duration,
+        url: cd.videoUrl?.trim() ? cd.videoUrl : `/drill/${cd.drillId}`,
         is_direct_link: true,
         isCustom: true,
-        ageLevel: [],
-        tags: [],
-        problem: [],
-        goal: [],
-        drillType: cd.drillType || "Game Simulation",
+        ageLevel: cd.ageLevel?.length ? cd.ageLevel : [],
+        tags: cd.tags?.length ? cd.tags : [],
+        problem: cd.problem?.length ? cd.problem : [],
+        goal: cd.goalTags?.length ? cd.goalTags : [],
+        drillType: cd.drillType || "Tee Work",
+        purpose: cd.purpose ?? undefined,
+        bestFor: cd.bestFor ?? undefined,
+        equipment: cd.equipment ?? undefined,
+        athletes: cd.athletes ?? undefined,
+        description: cd.description?.length ? cd.description : undefined,
+        videoUrl: cd.videoUrl ?? undefined,
+        whatThisFixes: cd.whatThisFixes?.length ? cd.whatThisFixes : undefined,
+        whatToFeel: cd.whatToFeel?.length ? cd.whatToFeel : undefined,
+        commonMistakes: cd.commonMistakes?.length ? cd.commonMistakes : undefined,
+        coachCue: cd.coachCue ?? undefined,
+        watchFor: cd.watchFor ?? undefined,
+        nextSteps: cd.nextSteps?.length ? cd.nextSteps : undefined,
+        howToDoIt: cd.description?.length ? cd.description : undefined,
+        foundationOrAdvanced:
+          cd.difficulty === "Easy"
+            ? "foundation"
+            : cd.difficulty === "Hard"
+              ? "advanced"
+              : "build",
       };
     }
     if (!base) return null;
@@ -442,51 +484,6 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Stat strip */}
-        {details && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 px-4 md:px-0">
-            <StatCard icon={Clock} label="Time" value={details.time} />
-            <StatCard
-              icon={Users}
-              label="Athletes"
-              value={details.athletes?.split(",")[0] || "—"}
-            />
-            <StatCard
-              icon={Dumbbell}
-              label="Equipment"
-              value={details.equipment?.split(",")[0] || "—"}
-            />
-            <StatCard icon={Target} label="Skill" value={details.skillSet} />
-          </div>
-        )}
-
-        {/* Instructions */}
-        <section className="px-4 md:px-0 mb-8">
-          <h2 className="text-2xl md:text-3xl font-heading font-black mb-3 md:mb-4 flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
-              <Target className="h-4 w-4 text-green-400" />
-            </div>
-            Instructions
-          </h2>
-          <div className="glass-card rounded-xl p-4 md:p-6">
-            {isCoach ? (
-              <TiptapEditor
-                value={customInstructions}
-                onChange={setCustomInstructions}
-                onSave={saveCustomInstructions}
-                isSaving={saveInstructionsMutation.isPending}
-                placeholder="Write drill instructions here..."
-              />
-            ) : customInstructions ? (
-              <TiptapRenderer content={customInstructions} />
-            ) : (
-              <p className="text-muted-foreground italic">
-                No instructions provided for this drill yet.
-              </p>
-            )}
-          </div>
-        </section>
-
         {/* Coaching content */}
         {hasCoachingContent && (
           <div className="grid gap-5 mb-8 px-4 md:px-0">
@@ -620,18 +617,6 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Log drill CTA */}
-        {user && drill && (
-          <div className="mt-6 flex justify-center px-4 md:px-0">
-            <button
-              onClick={() => setShowLogDrill(true)}
-              className="flex items-center gap-2 rounded-[2px] bg-gold px-5 py-2.5 font-heading text-[0.7rem] font-bold uppercase tracking-[0.1em] text-canvas transition-colors hover:bg-gold-dim"
-            >
-              <Check className="h-4 w-4" />
-              Log This Drill
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Log-drill modal */}

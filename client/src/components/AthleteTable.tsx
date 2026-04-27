@@ -30,6 +30,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { InlineEdit } from "./InlineEdit";
+import { AthletePlanEditor } from "./AthletePlanEditor";
 
 type SortField = "id" | "name" | "email" | "status" | "role" | "totalDrills" | "completedDrills" | "lastActivity" | "createdAt" | "lastSignedIn";
 type SortDirection = "asc" | "desc";
@@ -583,6 +584,16 @@ export function AthleteTable() {
                               </p>
                             </div>
                           </div>
+                          {/* Coach plan editor — weekly focus + active pathway */}
+                          {athlete.type === "user" && (
+                            <div className="mt-3">
+                              <AthletePlanEditor
+                                userId={athlete.numericId}
+                                athleteName={athlete.name}
+                              />
+                            </div>
+                          )}
+
                           {/* Action buttons */}
                           <div className="mt-3 flex items-center gap-2 flex-wrap">
                             <Button

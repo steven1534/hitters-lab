@@ -23,8 +23,9 @@ import {
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { exportProgressReportToPDF } from "@/utils/pdfExport";
-import { FileDown } from "lucide-react";
+// Note: pdfExport is dynamically imported inside handleExportPDF
+// to keep jspdf + jspdf-autotable (~570 KB) out of the coach dashboard entry bundle.
+import { FileDown, Loader2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,13 +62,25 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
     { enabled: !!userId }
   );
 
-  const handleExportPDF = () => {
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  const handleExportPDF = async () => {
     if (!progressData) {
       toast.error("No progress data to export");
       return;
     }
-    exportProgressReportToPDF(athleteName, progressData as any, coachNotes || []);
-    toast.success("Progress report exported successfully");
+    setIsExportingPdf(true);
+    try {
+      const { exportProgressReportToPDF } = await import("@/utils/pdfExport");
+      exportProgressReportToPDF(athleteName, progressData as any, coachNotes || []);
+      toast.success("Progress report exported successfully");
+    } catch (err) {
+      toast.error("Could not export PDF", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
+    } finally {
+      setIsExportingPdf(false);
+    }
   };
 
   const addNoteMutation = trpc.drillAssignments.addCoachNote.useMutation({
@@ -185,9 +198,13 @@ export function AthleteProgressReport({ userId, athleteName }: AthleteProgressRe
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={handleExportPDF} variant="outline" size="sm">
-            <FileDown className="h-4 w-4 mr-2" />
-            Export PDF
+          <Button onClick={handleExportPDF} variant="outline" size="sm" disabled={isExportingPdf}>
+            {isExportingPdf ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <FileDown className="h-4 w-4 mr-2" />
+            )}
+            {isExportingPdf ? "Generating…" : "Export PDF"}
           </Button>
           <Badge variant={coreMetrics.completionRate >= 75 ? "default" : coreMetrics.completionRate >= 50 ? "secondary" : "outline"} className="text-lg px-4 py-2">
             {coreMetrics.completionRate}% Complete

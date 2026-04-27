@@ -2,12 +2,31 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
-import { Menu, X, Dumbbell, GitBranch, ClipboardList, LogOut, User, Settings, Home } from "lucide-react";
+import { Menu, X, Dumbbell, GitBranch, ClipboardList, LogOut, Settings, Target } from "lucide-react";
 
-const NAV_ITEMS = [
-  { label: "HITTING DRILLS", href: "/", icon: Dumbbell },
+type NavItem = {
+  label: string;
+  href: string;
+  icon: typeof Dumbbell;
+  primary?: boolean;
+};
+
+const PUBLIC_NAV: readonly NavItem[] = [
+  { label: "HITTING DRILLS", href: "/drills", icon: Dumbbell },
   { label: "PATHWAYS", href: "/pathways", icon: GitBranch },
+] as const;
+
+const ATHLETE_NAV: readonly NavItem[] = [
+  { label: "MY PLAN", href: "/my-plan", icon: Target, primary: true },
+  { label: "PATHWAYS", href: "/pathways", icon: GitBranch },
+  { label: "LIBRARY", href: "/drills", icon: Dumbbell },
   { label: "MY PROGRESS", href: "/progress", icon: ClipboardList },
+] as const;
+
+const COACH_NAV: readonly NavItem[] = [
+  { label: "DASHBOARD", href: "/coach-dashboard", icon: Settings, primary: true },
+  { label: "PATHWAYS", href: "/pathways", icon: GitBranch },
+  { label: "LIBRARY", href: "/drills", icon: Dumbbell },
 ] as const;
 
 export default function SiteNav() {
@@ -16,8 +35,16 @@ export default function SiteNav() {
   const { user, isAuthenticated, logout } = useAuth();
   const isCoachOrAdmin = user?.role === "admin" || user?.role === "coach";
 
+  const navItems: readonly NavItem[] = user?.role === "athlete"
+    ? ATHLETE_NAV
+    : isCoachOrAdmin
+      ? COACH_NAV
+      : PUBLIC_NAV;
+
   const isActive = (path: string) => {
-    if (path === "/") return location === "/" || location === "/drills";
+    // The library link should also light up when the user lands at "/" as a
+    // public visitor (Landing renders DrillsDirectory in that case).
+    if (path === "/drills") return location === "/drills" || location === "/";
     return location.startsWith(path);
   };
 
@@ -52,40 +79,40 @@ export default function SiteNav() {
 
           {/* Desktop nav */}
           <div className="hidden items-center gap-1 md:flex">
-            {NAV_ITEMS.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <span
-                  className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
-                  style={{
-                    letterSpacing: "0.08em",
-                    color: isActive(item.href) ? "#C8A96B" : "#B8BCC4",
-                    background: isActive(item.href) ? "rgba(200,169,107,0.08)" : "transparent",
-                  }}
-                >
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-            {user?.role === "athlete" && (
-              <Link href="/athlete-portal">
-                <span
-                  className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
-                  style={{ letterSpacing: "0.08em", color: isActive("/athlete-portal") ? "#C8A96B" : "#1F8A8A" }}
-                >
-                  MY PORTAL
-                </span>
-              </Link>
-            )}
-            {isCoachOrAdmin && (
-              <Link href="/coach-dashboard">
-                <span
-                  className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
-                  style={{ letterSpacing: "0.08em", color: isActive("/coach-dashboard") ? "#C8A96B" : "#1F8A8A" }}
-                >
-                  DASHBOARD
-                </span>
-              </Link>
-            )}
+            {navItems.map((item) => {
+              const active = isActive(item.href);
+              if (item.primary) {
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <span
+                      className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-bold transition-all cursor-pointer hover:opacity-90"
+                      style={{
+                        letterSpacing: "0.08em",
+                        background: "linear-gradient(135deg, #C8A96B 0%, #9E7F4A 100%)",
+                        color: "#0B0B0C",
+                        boxShadow: active ? "0 0 0 2px rgba(200,169,107,0.4)" : "none",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              }
+              return (
+                <Link key={item.href} href={item.href}>
+                  <span
+                    className="px-3 py-1.5 rounded font-heading text-[0.8rem] font-medium transition-colors cursor-pointer hover:bg-white/5"
+                    style={{
+                      letterSpacing: "0.08em",
+                      color: active ? "#C8A96B" : "#B8BCC4",
+                      background: active ? "rgba(200,169,107,0.08)" : "transparent",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right side: auth + mobile toggle */}
@@ -132,15 +159,34 @@ export default function SiteNav() {
       {mobileOpen && (
         <div className="border-t md:hidden" style={{ background: "#0B0B0C", borderColor: "rgba(255,255,255,0.06)" }}>
           <div className="flex flex-col gap-1 px-4 py-3">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
+              const active = isActive(item.href);
+              if (item.primary) {
+                return (
+                  <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
+                    <span
+                      className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer"
+                      style={{
+                        background: "linear-gradient(135deg, #C8A96B 0%, #9E7F4A 100%)",
+                        color: "#0B0B0C",
+                      }}
+                    >
+                      <Icon size={14} />
+                      <span className="font-heading text-[0.85rem] font-bold" style={{ letterSpacing: "0.08em" }}>
+                        {item.label}
+                      </span>
+                    </span>
+                  </Link>
+                );
+              }
               return (
                 <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
                   <span
                     className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer"
                     style={{
-                      color: isActive(item.href) ? "#C8A96B" : "#B8BCC4",
-                      background: isActive(item.href) ? "rgba(200,169,107,0.08)" : "transparent",
+                      color: active ? "#C8A96B" : "#B8BCC4",
+                      background: active ? "rgba(200,169,107,0.08)" : "transparent",
                     }}
                   >
                     <Icon size={14} />
@@ -151,23 +197,6 @@ export default function SiteNav() {
                 </Link>
               );
             })}
-
-            {user?.role === "athlete" && (
-              <Link href="/athlete-portal" onClick={() => setMobileOpen(false)}>
-                <span className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer hover:bg-white/5" style={{ color: isActive("/athlete-portal") ? "#C8A96B" : "#1F8A8A" }}>
-                  <Home size={14} />
-                  <span className="font-heading text-[0.85rem]" style={{ letterSpacing: "0.08em" }}>MY PORTAL</span>
-                </span>
-              </Link>
-            )}
-            {isCoachOrAdmin && (
-              <Link href="/coach-dashboard" onClick={() => setMobileOpen(false)}>
-                <span className="flex items-center gap-2 rounded px-3 py-2.5 cursor-pointer hover:bg-white/5" style={{ color: isActive("/coach-dashboard") ? "#C8A96B" : "#1F8A8A" }}>
-                  <Settings size={14} />
-                  <span className="font-heading text-[0.85rem]" style={{ letterSpacing: "0.08em" }}>DASHBOARD</span>
-                </span>
-              </Link>
-            )}
 
             {isAuthenticated ? (
               <button

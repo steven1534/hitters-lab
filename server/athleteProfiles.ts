@@ -63,6 +63,9 @@ export async function getProfileWithUser(userId: number) {
     parentEmail: row.profile?.parentEmail ?? null,
     parentPhone: row.profile?.parentPhone ?? null,
     coachProfileNotes: (row.profile as any)?.coachProfileNotes ?? null,
+    weeklyFocus: row.profile?.weeklyFocus ?? null,
+    weeklyFocusUpdatedAt: row.profile?.weeklyFocusUpdatedAt ?? null,
+    activePathwayId: row.profile?.activePathwayId ?? null,
   };
 }
 

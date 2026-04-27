@@ -5,13 +5,13 @@ import SiteNav from "@/components/SiteNav";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 
-interface PathwayDrill {
+export interface PathwayDrill {
   drillId: string;
   phase: "Foundation" | "Build" | "Advanced";
   note?: string;
 }
 
-interface Pathway {
+export interface Pathway {
   id: string;
   title: string;
   subtitle: string;
@@ -23,7 +23,9 @@ interface Pathway {
   drills: PathwayDrill[];
 }
 
-const PATHWAYS: Pathway[] = [
+// Exported so the coach plan editor and athlete My Plan card can both
+// reference the static pathway list (slug -> title lookup).
+export const PATHWAYS: Pathway[] = [
   {
     id: "barrel-path", title: "Fix Your Barrel Path", subtitle: "Casting / cutting across the ball",
     problem: "Hitter swings around the ball, rolls over, or can't stay on plane",

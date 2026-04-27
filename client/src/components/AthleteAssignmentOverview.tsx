@@ -16,9 +16,7 @@ import {
   TrendingUp,
   AlertTriangle,
   User,
-  ArrowLeft,
 } from "lucide-react";
-import { Link } from "wouter";
 import { AthleteProfilePanel } from "./AthleteProfilePanel";
 import { InlineEdit } from "./InlineEdit";
 
@@ -192,7 +190,7 @@ export function AthleteAssignmentOverview({ onSelectAthlete }: AthleteAssignment
           </div>
           
           {/* Filter Tabs */}
-          <div className="flex gap-2 mt-3">
+          <div className="flex flex-wrap gap-2 mt-3">
             <Button
               variant={filter === "all" ? "default" : "outline"}
               size="sm"

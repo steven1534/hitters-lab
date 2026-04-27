@@ -1,4 +1,3 @@
-import { sanitizeReportHtml } from "@/lib/sanitizeHtml";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -242,29 +241,6 @@ export function TiptapEditor({ value, onChange, onSave, isSaving, placeholder = 
   );
 }
 
-/**
- * Read-only renderer for HTML content stored by TiptapEditor.
- * Falls back to rendering plain text if content looks like markdown.
- */
-export function TiptapRenderer({ content }: { content: string }) {
-  if (!content) return null;
-
-  // Detect if it's HTML or plain text/markdown
-  const isHtml = /<[a-z][\s\S]*>/i.test(content);
-
-  if (isHtml) {
-    return (
-      <div
-        className="prose prose-invert prose-sm max-w-none"
-        dangerouslySetInnerHTML={{ __html: sanitizeReportHtml(content) }}
-      />
-    );
-  }
-
-  // Plain text / legacy markdown — render as preformatted
-  return (
-    <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-foreground leading-relaxed">
-      {content}
-    </div>
-  );
-}
+// TiptapRenderer has been moved to ./TiptapRenderer.tsx so read-only consumers
+// don't pull in the heavy editor bundle. Re-export for backwards compatibility.
+export { TiptapRenderer } from "./TiptapRenderer";

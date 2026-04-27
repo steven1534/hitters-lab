@@ -34,7 +34,7 @@ Live at [hitters-lab.onrender.com](https://hitters-lab.onrender.com).
 ```bash
 pnpm install
 cp .env.example .env  # fill in DATABASE_URL, APP_URL, JWT_SECRET, etc.
-pnpm dev              # starts API on :3000 + Vite on :5173
+pnpm dev              # Express serves API + Vite middleware (one process; default http://localhost:3000)
 ```
 
 ## Scripts

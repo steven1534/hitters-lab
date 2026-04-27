@@ -90,17 +90,25 @@ export default function MyProfile() {
 
   const handleSave = () => {
     if (!user?.id) return;
+    // Basic client-side validation
+    const trimmedParentEmail = parentEmail.trim();
+    if (trimmedParentEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedParentEmail)) {
+      toast.error("Please enter a valid parent email address");
+      return;
+    }
+    // Treat sentinel "none" and empty strings as null
+    const normalize = (v: string) => (v && v !== "none" ? v : null);
     updateMutation.mutate({
       userId: user.id,
       birthDate: birthDate || null,
-      position: position || null,
-      secondaryPosition: secondaryPosition || null,
-      bats: (bats as "L" | "R" | "S") || null,
-      throws: (throws_ as "L" | "R") || null,
-      teamName: teamName || null,
-      parentName: parentName || null,
-      parentEmail: parentEmail || null,
-      parentPhone: parentPhone || null,
+      position: normalize(position),
+      secondaryPosition: normalize(secondaryPosition),
+      bats: (normalize(bats) as "L" | "R" | "S" | null),
+      throws: (normalize(throws_) as "L" | "R" | null),
+      teamName: teamName.trim() || null,
+      parentName: parentName.trim() || null,
+      parentEmail: trimmedParentEmail || null,
+      parentPhone: parentPhone.trim() || null,
     });
   };
 

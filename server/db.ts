@@ -11,7 +11,7 @@ import {
   passwordResetRequests, drills,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { eq, and, desc, sql, or, isNull } from "drizzle-orm";
+import { eq, and, desc, sql, or, isNull, inArray } from "drizzle-orm";
 
 // ── YouTube URL normalizer (server-side) ──────────────────────────────────────
 const YT_ID_RE = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/|e\/|watch\/|attribution_link\?(?:.*&)?u=(?:.*%3Fv%3D|.*\/watch%3Fv%3D)))([a-zA-Z0-9_-]{11})/i;
@@ -817,6 +817,44 @@ export async function upsertNotificationPreferences(userId: number, prefs: Parti
   }
 }
 
+/** JSON in drills.progressions for coach-authored fields (v1). Legacy text progressions are left as-is. */
+function encodeCoachDrillExtended(input: {
+  bestFor?: string; equipment?: string; athletes?: string; watchFor?: string;
+  drillType?: string; duration?: string; whatToFeel?: string[]; nextSteps?: string[];
+  ageLevel?: string[]; tags?: string[]; goalTags?: string[];
+}): string | null {
+  const cleaned: Record<string, unknown> = { _v: 1 };
+  for (const [k, v] of Object.entries(input)) {
+    if (v === undefined || v === null) continue;
+    if (Array.isArray(v) && v.length === 0) continue;
+    if (typeof v === "string" && !v.trim()) continue;
+    cleaned[k] = v;
+  }
+  return Object.keys(cleaned).length > 1 ? JSON.stringify(cleaned) : null;
+}
+
+function decodeCoachDrillExtended(progressions: string | null): {
+  bestFor?: string; equipment?: string; athletes?: string; watchFor?: string;
+  drillType?: string; duration?: string; whatToFeel?: string[]; nextSteps?: string[];
+  ageLevel?: string[]; tags?: string[]; goalTags?: string[];
+} {
+  if (!progressions?.trim()) return {};
+  try {
+    const o = JSON.parse(progressions) as Record<string, unknown>;
+    if (o && typeof o === "object" && o._v === 1) {
+      const { _v: _ignored, ...rest } = o;
+      return rest as {
+        bestFor?: string; equipment?: string; athletes?: string; watchFor?: string;
+        drillType?: string; duration?: string; whatToFeel?: string[]; nextSteps?: string[];
+        ageLevel?: string[]; tags?: string[]; goalTags?: string[];
+      };
+    }
+  } catch {
+    /* legacy free-text progressions */
+  }
+  return {};
+}
+
 export async function createNewDrill(
   input: {
     name: string; difficulty: string; category: string; duration: string;
@@ -844,6 +882,20 @@ export async function createNewDrill(
   const maxIdResult = await db.select({ maxId: sql<number>`coalesce(max(id), 0)` }).from(drills);
   const nextId = (maxIdResult[0]?.maxId ?? 0) + 1;
 
+  const progressions = encodeCoachDrillExtended({
+    bestFor: input.bestFor,
+    equipment: input.equipment,
+    athletes: input.athletes,
+    watchFor: input.watchFor,
+    drillType: input.drillType,
+    duration: input.duration,
+    whatToFeel: input.whatToFeel,
+    nextSteps: input.nextSteps,
+    ageLevel: input.ageLevel,
+    tags: input.tags,
+    goalTags: input.goalTags,
+  });
+
   const [created] = await db.insert(drills).values({
     id: nextId,
     drillId,
@@ -851,12 +903,14 @@ export async function createNewDrill(
     difficulty: input.difficulty,
     category: input.category,
     skillSet: input.skillSet || "Hitting",
-    goal: input.goal || null,
+    // Form "purpose" is the main coaching goal — store in goal (createNewDrill previously only set input.goal).
+    goal: input.purpose?.trim() || input.goal?.trim() || null,
     instructions: input.instructions || (input.description?.length ? input.description.join("\n") : null),
     commonMistakes: input.commonMistakes?.length ? input.commonMistakes.join("\n") : null,
-    progressions: null,
+    progressions,
     problemsFix: input.whatThisFixes?.length ? input.whatThisFixes.join("\n") : (input.problem?.length ? input.problem.join("\n") : null),
     coaching_cues: input.coachCue || null,
+    videoUrl: input.videoUrl?.trim() || null,
     isHidden: 0,
     createdBy,
   }).returning();
@@ -883,36 +937,55 @@ export async function getCustomDrills() {
     // Read from unified drills table, map to the shape components expect
     const rows = await db.select().from(drills)
       .where(or(eq(drills.isHidden, 0), isNull(drills.isHidden)));
-    return rows.map((d) => ({
-      id: Number(d.id),
-      drillId: d.drillId ?? "",
-      name: d.name ?? "",
-      difficulty: d.difficulty ?? "Medium",
-      category: d.category ?? "Hitting",
-      duration: "Varies",
-      purpose: null as string | null,
-      bestFor: null as string | null,
-      equipment: null as string | null,
-      athletes: null as string | null,
-      description: d.instructions ? [d.instructions] : null,
-      videoUrl: null as string | null,
-      drillType: "Tee Work",
-      drillTypeRaw: null as string | null,
-      skillSet: d.skillSet ?? "Hitting",
-      ageLevel: null as string[] | null,
-      tags: null as string[] | null,
-      problem: d.problemsFix ? [d.problemsFix] : null,
-      goalTags: null as string[] | null,
-      whatThisFixes: d.problemsFix ? [d.problemsFix] : null,
-      whatToFeel: null as string[] | null,
-      commonMistakes: d.commonMistakes ? d.commonMistakes.split("\n").filter(Boolean) : null,
-      coachCue: d.coaching_cues ?? null,
-      watchFor: null as string | null,
-      nextSteps: null as string[] | null,
-      createdBy: d.createdBy ?? 0,
-      createdAt: d.createdAt ?? new Date(),
-      updatedAt: d.updatedAt ?? new Date(),
-    }));
+
+    const ids = rows.map((r) => r.drillId).filter((id): id is string => !!id);
+    let videoByDrillId = new Map<string, string>();
+    if (ids.length > 0) {
+      const vidRows = await db.select().from(drillVideos).where(inArray(drillVideos.drillId, ids));
+      videoByDrillId = new Map(vidRows.map((v) => [v.drillId, v.videoUrl]));
+    }
+
+    return rows.map((d) => {
+      const ext = decodeCoachDrillExtended(d.progressions ?? null);
+      const descLines = d.instructions
+        ? d.instructions.split(/\n/).map((s) => s.trim()).filter(Boolean)
+        : null;
+      const problemsLines = d.problemsFix
+        ? d.problemsFix.split(/\n/).map((s) => s.trim()).filter(Boolean)
+        : null;
+      const videoUrl = d.videoUrl?.trim() || videoByDrillId.get(d.drillId ?? "") || null;
+
+      return {
+        id: Number(d.id),
+        drillId: d.drillId ?? "",
+        name: d.name ?? "",
+        difficulty: d.difficulty ?? "Medium",
+        category: d.category ?? "Hitting",
+        duration: ext.duration?.trim() || "Varies",
+        purpose: d.goal ?? null,
+        bestFor: ext.bestFor ?? null,
+        equipment: ext.equipment ?? null,
+        athletes: ext.athletes ?? null,
+        description: descLines?.length ? descLines : null,
+        videoUrl,
+        drillType: ext.drillType?.trim() || "Tee Work",
+        drillTypeRaw: null as string | null,
+        skillSet: d.skillSet ?? "Hitting",
+        ageLevel: ext.ageLevel?.length ? ext.ageLevel : null,
+        tags: ext.tags?.length ? ext.tags : null,
+        problem: problemsLines?.length ? problemsLines : null,
+        goalTags: ext.goalTags?.length ? ext.goalTags : null,
+        whatThisFixes: problemsLines?.length ? problemsLines : null,
+        whatToFeel: ext.whatToFeel?.length ? ext.whatToFeel : null,
+        commonMistakes: d.commonMistakes ? d.commonMistakes.split("\n").filter(Boolean) : null,
+        coachCue: d.coaching_cues ?? null,
+        watchFor: ext.watchFor ?? null,
+        nextSteps: ext.nextSteps?.length ? ext.nextSteps : null,
+        createdBy: d.createdBy ?? 0,
+        createdAt: d.createdAt ?? new Date(),
+        updatedAt: d.updatedAt ?? new Date(),
+      };
+    });
   } catch (error) {
     console.error("[Database] Failed to get drills:", error);
     return [];

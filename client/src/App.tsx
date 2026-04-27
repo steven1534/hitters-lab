@@ -5,9 +5,8 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { NotificationProvider } from "./contexts/NotificationContext";
-import { ToastContainer } from "./components/ToastContainer";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
+import { useAuth } from "./_core/hooks/useAuth";
 import { Suspense, lazy, useEffect } from "react";
 
 // Eager (public / SEO-critical / small) routes
@@ -55,11 +54,34 @@ function RouteFallback() {
   );
 }
 
+// Auth-aware landing: signed-in clients land on their plan, coaches land on
+// their dashboard, public visitors get the drill library (acquisition surface).
+function Landing() {
+  const { user, loading } = useAuth();
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) return;
+    if (user.role === "athlete") {
+      navigate("/my-plan", { replace: true });
+    } else if (user.role === "coach" || user.role === "admin") {
+      navigate("/coach-dashboard", { replace: true });
+    }
+  }, [loading, user, navigate]);
+
+  if (loading) return <RouteFallback />;
+  if (user?.role === "athlete" || user?.role === "coach" || user?.role === "admin") {
+    return <RouteFallback />;
+  }
+  return <DrillsDirectory />;
+}
+
 function Router() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Switch>
-        <Route path={"/"} component={DrillsDirectory} />
+        <Route path={"/"} component={Landing} />
         <Route path={"/login"} component={Login} />
         <Route path={"/register"} component={Login} />
         <Route path={"/drills"} component={DrillsDirectory} />
@@ -106,6 +128,12 @@ function Router() {
         </Route>
 
         {/* Protected Routes - Athlete Only */}
+        <Route path={"/my-plan"}>
+          <ProtectedRoute requiredRole="athlete">
+            <AthletePortal />
+          </ProtectedRoute>
+        </Route>
+        {/* Backward-compat alias for /my-plan */}
         <Route path={"/athlete-portal"}>
           <ProtectedRoute requiredRole="athlete">
             <AthletePortal />
@@ -131,6 +159,14 @@ function Router() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  return null;
+}
+
 function App() {
   // Register service worker on mount
   useEffect(() => {
@@ -141,19 +177,17 @@ function App() {
 
   return (
     <ErrorBoundary resetKey={location}>
-      <NotificationProvider>
-        <ThemeProvider
-          defaultTheme="light"
-          // switchable
-        >
-          <TooltipProvider>
-            <Toaster />
-            <ToastContainer />
-            <Router />
-            <PWAInstallBanner />
-          </TooltipProvider>
-        </ThemeProvider>
-      </NotificationProvider>
+      <ThemeProvider
+        defaultTheme="light"
+        // switchable
+      >
+        <TooltipProvider>
+          <Toaster />
+          <ScrollToTop />
+          <Router />
+          <PWAInstallBanner />
+        </TooltipProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

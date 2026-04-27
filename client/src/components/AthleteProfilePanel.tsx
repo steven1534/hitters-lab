@@ -11,13 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   User,
@@ -25,15 +18,11 @@ import {
   Phone,
   Calendar,
   MapPin,
-  Target,
   Save,
-  X,
   Pencil,
   Loader2,
-  Shield,
   Users,
   Dumbbell,
-  ChevronRight,
   ArrowLeft,
 } from "lucide-react";
 
@@ -59,11 +48,9 @@ const FOCUS_AREAS = [
 interface AthleteProfilePanelProps {
   userId: number;
   onClose?: () => void;
-  /** Compact mode for inline display */
-  compact?: boolean;
 }
 
-export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfilePanelProps) {
+export function AthleteProfilePanel({ userId, onClose }: AthleteProfilePanelProps) {
   const utils = trpc.useUtils();
   const { data: profile, isLoading } = trpc.athleteProfiles.get.useQuery({ userId });
   const updateMutation = trpc.athleteProfiles.update.useMutation({
@@ -110,19 +97,27 @@ export function AthleteProfilePanel({ userId, onClose, compact }: AthleteProfile
   }, [profile]);
 
   const handleSave = () => {
+    // Basic client-side validation
+    const trimmedParentEmail = parentEmail.trim();
+    if (trimmedParentEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedParentEmail)) {
+      toast.error("Please enter a valid parent email address");
+      return;
+    }
+    // Treat Select's "none" sentinel and empty strings as null
+    const normalize = (v: string) => (v && v !== "none" ? v : null);
     updateMutation.mutate({
       userId,
       birthDate: birthDate || null,
-      position: position || null,
-      secondaryPosition: secondaryPosition || null,
-      bats: (bats as "L" | "R" | "S") || null,
-      throws: (throws_ as "L" | "R") || null,
-      teamName: teamName || null,
+      position: normalize(position),
+      secondaryPosition: normalize(secondaryPosition),
+      bats: (normalize(bats) as "L" | "R" | "S" | null),
+      throws: (normalize(throws_) as "L" | "R" | null),
+      teamName: teamName.trim() || null,
       focusAreas,
-      parentName: parentName || null,
-      parentEmail: parentEmail || null,
-      parentPhone: parentPhone || null,
-      coachProfileNotes: coachNotes || null,
+      parentName: parentName.trim() || null,
+      parentEmail: trimmedParentEmail || null,
+      parentPhone: parentPhone.trim() || null,
+      coachProfileNotes: coachNotes.trim() || null,
     });
   };
 

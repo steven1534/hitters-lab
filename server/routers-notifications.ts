@@ -28,6 +28,12 @@ export const notificationsRouter = router({
       return { success };
     }),
 
+  markAllAsRead: protectedProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user) return { success: false };
+    const success = await db.markAllNotificationsRead(ctx.user.id);
+    return { success };
+  }),
+
   getPreferences: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user) return null;
     return await db.getNotificationPreferences(ctx.user.id);
