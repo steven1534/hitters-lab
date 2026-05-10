@@ -1,81 +1,141 @@
+import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import * as routinesDb from "./routines";
 
-const routineDrillInput = z.object({
-  drillId: z.string().min(1).max(255),
-  drillName: z.string().min(1).max(255),
-  order: z.number().int().min(0),
-  repsOrDuration: z.string().max(64).nullable().optional(),
-  note: z.string().nullable().optional(),
-});
-
-const routineInput = z.object({
-  name: z.string().min(1).max(255),
-  description: z.string().nullable().optional(),
-  durationMinutes: z.number().int().min(0).max(600).nullable().optional(),
-  equipment: z.array(z.string()).nullable().optional(),
-  space: z.string().max(64).nullable().optional(),
-  skillFocus: z.string().max(255).nullable().optional(),
-  drills: z.array(routineDrillInput),
-});
-
+// Accept both admin and coach roles (matches the convention used by other
+// coach-facing routers like athleteProfiles).
 function requireCoach(role: string) {
   if (role !== "admin" && role !== "coach") {
     throw new TRPCError({ code: "FORBIDDEN", message: "Coach access required" });
   }
 }
 
+const routineDrillInput = z.object({
+  drillId: z.string(),
+  drillName: z.string(),
+  orderIndex: z.number(),
+  durationSeconds: z.number().nullable().optional(),
+  reps: z.number().nullable().optional(),
+  sets: z.number().nullable().optional(),
+  coachNotes: z.string().nullable().optional(),
+});
+
 export const routinesRouter = router({
-  list: protectedProcedure.query(async ({ ctx }) => {
+  // ── Coach: list all routines ──────────────────────────────
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     requireCoach(ctx.user.role);
-    return routinesDb.listRoutines();
+    const all = await routinesDb.getAllRoutines();
+    const withDrills = await Promise.all(
+      all.map(async (r) => ({
+        ...r,
+        drills: await routinesDb.getRoutineDrills(r.id),
+        assignments: await routinesDb.getAssignmentsForRoutine(r.id),
+      }))
+    );
+    return withDrills;
   }),
 
-  get: protectedProcedure
+  // ── Coach: get single routine with drills ─────────────────
+  getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
-      // Coaches can view any routine. Athletes can view a routine they've been
-      // assigned (checked at the query layer via their drillAssignments) — for
-      // now, allow any signed-in user to read routine definitions since they
-      // contain no sensitive info.
-      void ctx;
-      const routine = await routinesDb.getRoutine(input.id);
-      if (!routine) throw new TRPCError({ code: "NOT_FOUND", message: "Routine not found" });
-      return routine;
+      requireCoach(ctx.user.role);
+      const routine = await routinesDb.getRoutineById(input.id);
+      if (!routine) throw new TRPCError({ code: "NOT_FOUND" });
+      const drills = await routinesDb.getRoutineDrills(input.id);
+      const assignments = await routinesDb.getAssignmentsForRoutine(input.id);
+      return { ...routine, drills, assignments };
     }),
 
+  // ── Coach: create routine ─────────────────────────────────
   create: protectedProcedure
-    .input(routineInput)
+    .input(
+      z.object({
+        name: z.string().min(1),
+        description: z.string().optional(),
+        durationMinutes: z.number().optional(),
+        equipment: z.string().optional(),
+        location: z.string().optional(),
+        routineType: z.string().optional(),
+        drills: z.array(routineDrillInput).optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       requireCoach(ctx.user.role);
-      return routinesDb.createRoutine(input, ctx.user.id);
+      const { drills, ...routineData } = input;
+      const id = await routinesDb.createRoutine({
+        ...routineData,
+        createdBy: ctx.user.id,
+      });
+      if (drills && drills.length > 0) {
+        await routinesDb.setRoutineDrills(id, drills);
+      }
+      return { id };
     }),
 
+  // ── Coach: update routine ─────────────────────────────────
   update: protectedProcedure
-    .input(z.object({ id: z.number() }).and(routineInput))
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        description: z.string().nullable().optional(),
+        durationMinutes: z.number().nullable().optional(),
+        equipment: z.string().nullable().optional(),
+        location: z.string().nullable().optional(),
+        routineType: z.string().nullable().optional(),
+        drills: z.array(routineDrillInput).optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       requireCoach(ctx.user.role);
-      const { id, ...rest } = input;
-      return routinesDb.updateRoutine(id, rest);
+      const { id, drills, ...data } = input;
+      await routinesDb.updateRoutine(id, data as any);
+      if (drills !== undefined) {
+        await routinesDb.setRoutineDrills(id, drills);
+      }
+      return { success: true };
     }),
 
+  // ── Coach: delete routine ─────────────────────────────────
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       requireCoach(ctx.user.role);
-      return routinesDb.deleteRoutine(input.id);
+      await routinesDb.deleteRoutine(input.id);
+      return { success: true };
     }),
 
-  assignToAthlete: protectedProcedure
-    .input(z.object({
-      routineId: z.number(),
-      userId: z.number(),
-      note: z.string().nullable().optional(),
-    }))
+  // ── Coach: assign routine to athlete ──────────────────────
+  assign: protectedProcedure
+    .input(z.object({ routineId: z.number(), userId: z.number(), frequency: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       requireCoach(ctx.user.role);
-      return routinesDb.assignRoutineToAthlete(input.routineId, input.userId, input.note ?? null);
+      const id = await routinesDb.assignRoutine(input.routineId, input.userId, input.frequency);
+      return { id };
     }),
+
+  // ── Coach: unassign routine from athlete ──────────────────
+  unassign: protectedProcedure
+    .input(z.object({ routineId: z.number(), userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      requireCoach(ctx.user.role);
+      await routinesDb.unassignRoutine(input.routineId, input.userId);
+      return { success: true };
+    }),
+
+  // ── Athlete: get my assigned routines with drills ─────────
+  getMyRoutines: protectedProcedure.query(async ({ ctx }) => {
+    const assignments = await routinesDb.getAssignmentsForUser(ctx.user.id);
+    const result = await Promise.all(
+      assignments.map(async (a) => {
+        const routine = await routinesDb.getRoutineById(a.routineId);
+        if (!routine) return null;
+        const drills = await routinesDb.getRoutineDrills(a.routineId);
+        return { ...a, routine, drills };
+      })
+    );
+    return result.filter(Boolean);
+  }),
 });

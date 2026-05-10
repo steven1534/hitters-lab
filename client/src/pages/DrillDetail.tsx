@@ -102,21 +102,58 @@ export default function DrillDetail() {
         foundationOrAdvanced: staticDrill.foundationOrAdvanced,
       };
     } else if (customDrill) {
-      const cd = customDrill as typeof customDrill & { drillType?: string };
+      const cd = customDrill as typeof customDrill & {
+        drillType?: string;
+        purpose?: string | null;
+        bestFor?: string | null;
+        equipment?: string | null;
+        athletes?: string | null;
+        description?: string[] | null;
+        videoUrl?: string | null;
+        ageLevel?: string[] | null;
+        tags?: string[] | null;
+        problem?: string[] | null;
+        goalTags?: string[] | null;
+        whatThisFixes?: string[] | null;
+        whatToFeel?: string[] | null;
+        commonMistakes?: string[] | null;
+        coachCue?: string | null;
+        watchFor?: string | null;
+        nextSteps?: string[] | null;
+      };
       base = {
-        id: customDrill.drillId,
-        name: customDrill.name,
-        difficulty: customDrill.difficulty,
-        categories: [customDrill.category],
-        duration: customDrill.duration,
-        url: `/drill/${customDrill.drillId}`,
+        id: cd.drillId,
+        name: cd.name,
+        difficulty: cd.difficulty,
+        categories: [cd.category],
+        duration: cd.duration,
+        url: cd.videoUrl?.trim() ? cd.videoUrl : `/drill/${cd.drillId}`,
         is_direct_link: true,
         isCustom: true,
-        ageLevel: [],
-        tags: [],
-        problem: [],
-        goal: [],
-        drillType: cd.drillType || "Game Simulation",
+        ageLevel: cd.ageLevel?.length ? cd.ageLevel : [],
+        tags: cd.tags?.length ? cd.tags : [],
+        problem: cd.problem?.length ? cd.problem : [],
+        goal: cd.goalTags?.length ? cd.goalTags : [],
+        drillType: cd.drillType || "Tee Work",
+        purpose: cd.purpose ?? undefined,
+        bestFor: cd.bestFor ?? undefined,
+        equipment: cd.equipment ?? undefined,
+        athletes: cd.athletes ?? undefined,
+        description: cd.description?.length ? cd.description : undefined,
+        videoUrl: cd.videoUrl ?? undefined,
+        whatThisFixes: cd.whatThisFixes?.length ? cd.whatThisFixes : undefined,
+        whatToFeel: cd.whatToFeel?.length ? cd.whatToFeel : undefined,
+        commonMistakes: cd.commonMistakes?.length ? cd.commonMistakes : undefined,
+        coachCue: cd.coachCue ?? undefined,
+        watchFor: cd.watchFor ?? undefined,
+        nextSteps: cd.nextSteps?.length ? cd.nextSteps : undefined,
+        howToDoIt: cd.description?.length ? cd.description : undefined,
+        foundationOrAdvanced:
+          cd.difficulty === "Easy"
+            ? "foundation"
+            : cd.difficulty === "Hard"
+              ? "advanced"
+              : "build",
       };
     }
     if (!base) return null;

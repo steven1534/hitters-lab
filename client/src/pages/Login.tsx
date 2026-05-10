@@ -31,6 +31,7 @@ export default function Login() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
+          credentials: "include",
         });
         if (!res.ok) { setError("Something went wrong. Please try again."); return; }
         setResetSent(true);
@@ -47,6 +48,7 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Something went wrong."); return; }

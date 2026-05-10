@@ -6,6 +6,7 @@ import type { Express, Request, Response } from "express";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import * as db from "../db";
 import { ENV } from "./env";
+import { isSecureRequest } from "./cookies";
 import {
   hashPassword,
   verifyPassword,
@@ -13,9 +14,12 @@ import {
 } from "./auth";
 
 function getCookieOptions(req: Request) {
-  // SameSite=None + Secure is required for cookies to work inside cross-site iframes
-  // (e.g. when the app is embedded on another domain). Lax blocks third-party cookies.
-  const isSecure = ENV.isProduction || req.secure || req.headers["x-forwarded-proto"] === "https";
+  // SameSite=None requires Secure. Browsers drop Secure cookies on plain HTTP — so we must
+  // NOT set secure=true unless the request is actually HTTPS (including behind a proxy).
+  // Using NODE_ENV===production alone breaks local/prod smoke tests over http://localhost.
+  const isSecure = isSecureRequest(req);
+  // SameSite=None + Secure is for cross-site contexts (e.g. iframes). Same-origin browser
+  // login uses Lax + non-Secure on HTTP dev servers.
   return {
     httpOnly: true,
     secure: isSecure,

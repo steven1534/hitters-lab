@@ -73,10 +73,6 @@ export const drillAssignments = pgTable("drillAssignments", {
   drillName: varchar("drillName", { length: 255 }).notNull(),
   status: assignmentStatusEnum("status").default("assigned").notNull(),
   notes: text("notes"),
-  // When set, this assignment belongs to a routine (ordered drill sequence).
-  // routineOrder is the 0-indexed position within the routine.
-  routineId: integer("routineId"),
-  routineOrder: integer("routineOrder"),
   assignedAt: timestamp("assignedAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt"),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
@@ -467,19 +463,18 @@ export type DrillProgress = typeof drillProgress.$inferSelect;
 export type InsertDrillProgress = typeof drillProgress.$inferInsert;
 
 // ============================================================
-// Routines (ordered drill sequences coaches can assign)
+// Routines (ordered drill sequences authored by coach)
 // ============================================================
+export const routineStatusEnum = pgEnum("routine_status", ["active", "paused", "completed"]);
+
 export const routines = pgTable("routines", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   durationMinutes: integer("durationMinutes"),
-  // Free-form equipment list (e.g. ["tee", "net", "heavy bat"])
-  equipment: json("equipment").$type<string[]>(),
-  // Where the routine fits: "garage" | "cage" | "no-net" | "full" — free text
-  // so coaches can add new spaces without a migration.
-  space: varchar("space", { length: 64 }),
-  skillFocus: varchar("skillFocus", { length: 255 }),
+  equipment: text("equipment"),
+  location: varchar("location", { length: 100 }),
+  routineType: varchar("routineType", { length: 100 }),
   createdBy: integer("createdBy").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
@@ -492,12 +487,27 @@ export const routineDrills = pgTable("routineDrills", {
   id: serial("id").primaryKey(),
   routineId: integer("routineId").notNull(),
   drillId: varchar("drillId", { length: 255 }).notNull(),
-  order: integer("order").notNull(),
-  // Reps or duration as free text so coaches can write "10 reps" or "2 min".
-  repsOrDuration: varchar("repsOrDuration", { length: 64 }),
-  note: text("note"),
+  drillName: varchar("drillName", { length: 255 }).notNull(),
+  orderIndex: integer("orderIndex").notNull(),
+  durationSeconds: integer("durationSeconds"),
+  reps: integer("reps"),
+  sets: integer("sets"),
+  coachNotes: text("coachNotes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type RoutineDrill = typeof routineDrills.$inferSelect;
 export type InsertRoutineDrill = typeof routineDrills.$inferInsert;
+
+export const routineAssignments = pgTable("routineAssignments", {
+  id: serial("id").primaryKey(),
+  routineId: integer("routineId").notNull(),
+  userId: integer("userId").notNull(),
+  frequency: varchar("frequency", { length: 100 }),
+  status: routineStatusEnum("status").default("active").notNull(),
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type RoutineAssignment = typeof routineAssignments.$inferSelect;
+export type InsertRoutineAssignment = typeof routineAssignments.$inferInsert;

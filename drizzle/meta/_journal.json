@@ -50,6 +50,20 @@
       "when": 1776430015795,
       "tag": "0006_silky_the_initiative",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1776600000000,
+      "tag": "0007_athlete_plan_context",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1776700000000,
+      "tag": "0008_routines",
+      "breakpoints": true
     }
   ]
 }

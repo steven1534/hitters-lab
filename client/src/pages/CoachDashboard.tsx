@@ -44,6 +44,7 @@ import { InlineEdit } from "@/components/InlineEdit";
 import { AddNewDrill } from "@/components/AddNewDrill";
 import { AccountSettings } from "@/components/AccountSettings";
 import { DrillCatalogOverridesEditor } from "@/components/DrillCatalogOverridesEditor";
+import { RoutinesManager } from "@/components/RoutinesManager";
 import UserManagement from "@/pages/UserManagement";
 import SubmissionsDashboard from "@/pages/SubmissionsDashboard";
 import { ManageDrillVideos } from "@/pages/ManageDrillVideos";
@@ -56,7 +57,7 @@ interface Drill {
   duration: string;
 }
 
-type ActiveTab = "overview" | "assign" | "bulk-import" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "account" | "user-management" | "submissions" | "drill-library" | "drill-videos";
+type ActiveTab = "overview" | "assign" | "bulk-import" | "catalog-overrides" | "athletes" | "player-reports" | "blast-metrics" | "account" | "user-management" | "submissions" | "drill-library" | "drill-videos" | "routines";
 
 // ── Sidebar nav config ────────────────────────────────────────
 const NAV_GROUPS = [
@@ -72,6 +73,7 @@ const NAV_GROUPS = [
     label: "Training",
     items: [
       { key: "assign" as ActiveTab, label: "Assign Drills", icon: Plus },
+      { key: "routines" as ActiveTab, label: "Routines", icon: Target },
       { key: "drill-library" as ActiveTab, label: "Drill Library", icon: BookOpen },
       { key: "drill-videos" as ActiveTab, label: "Manage Videos", icon: Video },
     ],
@@ -100,6 +102,7 @@ const NAV_GROUPS = [
 const TAB_LABELS: Record<ActiveTab, string> = {
   overview: "Athlete Overview",
   assign: "Assign Drills",
+  routines: "Routines",
   "bulk-import": "Bulk Import",
   "catalog-overrides": "Catalog Overrides",
   athletes: "Athletes Table",
@@ -646,6 +649,8 @@ export default function CoachDashboard() {
             )}
 
             {activeTab === "account" && <AccountSettings />}
+
+            {activeTab === "routines" && <RoutinesManager />}
 
             {activeTab === "drill-library" && <DrillLibraryTab />}
 
