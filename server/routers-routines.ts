@@ -3,6 +3,14 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as routinesDb from "./routines";
 
+// Accept both admin and coach roles (matches the convention used by other
+// coach-facing routers like athleteProfiles).
+function requireCoach(role: string) {
+  if (role !== "admin" && role !== "coach") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Coach access required" });
+  }
+}
+
 const routineDrillInput = z.object({
   drillId: z.string(),
   drillName: z.string(),
@@ -16,9 +24,7 @@ const routineDrillInput = z.object({
 export const routinesRouter = router({
   // ── Coach: list all routines ──────────────────────────────
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.user.role !== "admin") {
-      throw new TRPCError({ code: "FORBIDDEN" });
-    }
+    requireCoach(ctx.user.role);
     const all = await routinesDb.getAllRoutines();
     const withDrills = await Promise.all(
       all.map(async (r) => ({
@@ -34,9 +40,7 @@ export const routinesRouter = router({
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      requireCoach(ctx.user.role);
       const routine = await routinesDb.getRoutineById(input.id);
       if (!routine) throw new TRPCError({ code: "NOT_FOUND" });
       const drills = await routinesDb.getRoutineDrills(input.id);
@@ -58,9 +62,7 @@ export const routinesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      requireCoach(ctx.user.role);
       const { drills, ...routineData } = input;
       const id = await routinesDb.createRoutine({
         ...routineData,
@@ -87,9 +89,7 @@ export const routinesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      requireCoach(ctx.user.role);
       const { id, drills, ...data } = input;
       await routinesDb.updateRoutine(id, data as any);
       if (drills !== undefined) {
@@ -102,9 +102,7 @@ export const routinesRouter = router({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      requireCoach(ctx.user.role);
       await routinesDb.deleteRoutine(input.id);
       return { success: true };
     }),
@@ -113,9 +111,7 @@ export const routinesRouter = router({
   assign: protectedProcedure
     .input(z.object({ routineId: z.number(), userId: z.number(), frequency: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      requireCoach(ctx.user.role);
       const id = await routinesDb.assignRoutine(input.routineId, input.userId, input.frequency);
       return { id };
     }),
@@ -124,9 +120,7 @@ export const routinesRouter = router({
   unassign: protectedProcedure
     .input(z.object({ routineId: z.number(), userId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      requireCoach(ctx.user.role);
       await routinesDb.unassignRoutine(input.routineId, input.userId);
       return { success: true };
     }),
